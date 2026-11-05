@@ -245,20 +245,25 @@
       margin-right: 4px;
     }
 
-    /* Center Toast Banner */
+    /* Auto-Fading Top Toast Banner */
     #toast-banner {
       align-self: center;
       background: var(--bg-glass-heavy);
       border: 1px solid var(--border-glass);
       border-radius: 999px;
-      padding: 7px 15px;
+      padding: 6px 14px;
       font-size: 11.5px;
       color: var(--text-main);
       text-align: center;
       max-width: 94vw;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
       pointer-events: none;
-      transition: opacity 0.3s ease;
+      opacity: 1;
+      transition: opacity 0.4s ease;
+    }
+
+    #toast-banner.fade-out {
+      opacity: 0;
     }
 
     /* Bottom Section: Walk Pad + Preset Camera Scroller */
@@ -504,11 +509,11 @@
         <button id="btn-ar-scale-up" class="btn btn-sm" style="display:none;">➕ Larger</button>
         <button id="btn-ar-rotate" class="btn btn-sm">🔄 Rotate 45°</button>
       </div>
-    </div>
 
-    <!-- Center Instruction Toast -->
-    <div id="toast-banner">
-      Drag to look 360° · <b>WASD / Arrows</b> to walk · <b>E/Q</b> up/down · Click any room below to teleport
+      <!-- Auto-Fading Instruction Toast (Docked cleanly under top bar) -->
+      <div id="toast-banner">
+        Drag to look 360° · <b>WASD / Arrows</b> to walk · <b>E/Q</b> up/down · Click any room below to teleport
+      </div>
     </div>
 
     <!-- Bottom Navigation & On-Screen Walk Pad -->
@@ -697,9 +702,19 @@
     const btnExitXR = document.getElementById('btn-exit-xr');
     const walkPad = document.getElementById('walk-pad');
 
-    function setToast(htmlText) {
+    let toastTimeout = null;
+    function setToast(htmlText, durationMs = 3200) {
       toastBanner.innerHTML = htmlText;
+      toastBanner.classList.remove('fade-out');
+      if (toastTimeout) clearTimeout(toastTimeout);
+      if (durationMs > 0) {
+        toastTimeout = setTimeout(() => {
+          toastBanner.classList.add('fade-out');
+        }, durationMs);
+      }
     }
+    // Start initial toast fade timer on load
+    setToast('Drag to look 360° · <b>WASD / Arrows</b> to walk · <b>E/Q</b> up/down · Click any room below', 3500);
 
     // Build clickable room camera pills
     ROOMS.forEach((room, idx) => {
@@ -920,6 +935,7 @@
       prevPointerX = e.clientX;
       prevPointerY = e.clientY;
       camTransition.active = false;
+      toastBanner.classList.add('fade-out');
     });
 
     window.addEventListener('pointermove', (e) => {
