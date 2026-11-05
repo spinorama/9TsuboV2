@@ -4,18 +4,63 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>9-Tsubo House (Koizumi Studio, 1999) — 4-Mode WebXR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-glass: rgba(14, 18, 26, 0.84);
-      --bg-glass-heavy: rgba(10, 14, 20, 0.94);
-      --border-glass: rgba(255, 255, 255, 0.16);
-      --accent: #e8b878;
-      --accent-glow: rgba(232, 184, 120, 0.32);
-      --ar-cyan: #5ce1e6;
-      --ar-green: #4ade80;
-      --text-main: #f5f5f7;
-      --text-muted: #9ca3af;
-      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    /* =========================================================================
+       DUAL-ENGINE GRAPHIC DESIGN SYSTEM (DEFAULT: GERMAN DIN 1451 E-INK PAPER)
+       Toggleable with STAR TREK LCARS (24th Century Okuda Telemetry)
+       ========================================================================= */
+    :root,
+    body[data-style="din"] {
+      --bg-panel: rgba(255, 255, 255, 0.94);
+      --bg-panel-heavy: #ffffff;
+      --border-main: #050505;
+      --border-width: 1.5px;
+      --radius-panel: 0px;
+      --radius-btn: 0px;
+      --radius-pill: 0px;
+      --text-main: #050505;
+      --text-muted: #555555;
+      --accent: #050505;
+      --accent-text: #ffffff;
+      --btn-bg: #f4f4f5;
+      --btn-hover: #e4e4e7;
+      --btn-border: #050505;
+      --ar-accent: #050505;
+      --toggle-on-bg: #050505;
+      --toggle-on-text: #ffffff;
+      --danger-bg: #dc2626;
+      --danger-text: #ffffff;
+      --shadow-panel: 4px 4px 0px rgba(5, 5, 5, 0.9);
+      --font-ui: 'Bahnschrift', 'DIN Alternate', 'Franklin Gothic Medium', 'JetBrains Mono', -apple-system, sans-serif;
+      --letter-spacing: 0.04em;
+    }
+
+    body[data-style="lcars"] {
+      --bg-panel: rgba(0, 0, 0, 0.90);
+      --bg-panel-heavy: rgba(0, 0, 0, 0.96);
+      --border-main: #ff9900;
+      --border-width: 2px;
+      --radius-panel: 22px;
+      --radius-btn: 999px;
+      --radius-pill: 999px;
+      --text-main: #ffcc99;
+      --text-muted: #cc99cc;
+      --accent: #ff9900;
+      --accent-text: #000000;
+      --btn-bg: rgba(255, 153, 0, 0.16);
+      --btn-hover: rgba(255, 153, 0, 0.32);
+      --btn-border: #ff9900;
+      --ar-accent: #5588ee;
+      --toggle-on-bg: #cc99cc;
+      --toggle-on-text: #000000;
+      --danger-bg: #ff5500;
+      --danger-text: #000000;
+      --shadow-panel: 0 0 18px rgba(255, 153, 0, 0.25);
+      --font-ui: 'Antonio', 'Bahnschrift', 'Arial Narrow', sans-serif;
+      --letter-spacing: 0.06em;
     }
 
     * {
@@ -32,7 +77,7 @@
       height: 100%;
       overflow: hidden;
       background: #0d1017;
-      font-family: var(--font-sans);
+      font-family: var(--font-ui);
       color: var(--text-main);
       touch-action: none;
     }
@@ -43,6 +88,7 @@
       width: 100%;
       height: 100%;
       z-index: 1;
+      touch-action: none;
     }
 
     /* DOM Overlay Root - Explicitly kept visible in Browser 3D & WebXR AR */
@@ -69,7 +115,7 @@
       flex-direction: column;
       gap: 6px;
       width: 100%;
-      max-width: 980px;
+      max-width: 1020px;
       margin: 0 auto;
       pointer-events: none;
     }
@@ -79,14 +125,34 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      background: var(--bg-glass);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--border-glass);
-      border-radius: 12px;
+      background: var(--bg-panel);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: var(--border-width) solid var(--border-main);
+      border-radius: var(--radius-panel);
       padding: 7px 12px;
       pointer-events: auto;
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+      box-shadow: var(--shadow-panel);
+      position: relative;
+    }
+
+    /* LCARS Left Elbow Accent Bar */
+    body[data-style="lcars"] .header-row {
+      border-left: 18px solid #ff9900;
+      border-top-left-radius: 26px;
+      border-bottom-left-radius: 8px;
+    }
+
+    body[data-style="lcars"] .mode-grid {
+      border-left: 18px solid #cc99cc;
+      border-top-left-radius: 8px;
+      border-bottom-left-radius: 26px;
+    }
+
+    body[data-style="lcars"] .camera-bar-wrap {
+      border-left: 18px solid #5588ee;
+      border-top-left-radius: 24px;
+      border-bottom-left-radius: 24px;
     }
 
     .brand-info {
@@ -99,14 +165,17 @@
     .status-dot {
       width: 9px;
       height: 9px;
-      border-radius: 50%;
+      border-radius: var(--radius-pill);
       background: #f59e0b;
       flex-shrink: 0;
-      box-shadow: 0 0 8px #f59e0b;
+      border: 1px solid var(--border-main);
     }
     .status-dot.ready {
-      background: #4ade80;
-      box-shadow: 0 0 8px #4ade80;
+      background: #16a34a;
+    }
+    body[data-style="lcars"] .status-dot.ready {
+      background: #ff9900;
+      box-shadow: 0 0 8px #ff9900;
     }
 
     .brand-text {
@@ -116,16 +185,23 @@
     .brand-title {
       font-size: 13px;
       font-weight: 700;
-      letter-spacing: 0.02em;
-      color: var(--accent);
+      letter-spacing: var(--letter-spacing);
+      text-transform: uppercase;
+      color: var(--text-main);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
+    body[data-style="lcars"] .brand-title {
+      color: #ff9900;
+      font-size: 14.5px;
+    }
+
     .brand-sub {
       font-size: 10.5px;
       color: var(--text-muted);
+      letter-spacing: 0.02em;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -136,6 +212,8 @@
       align-items: center;
       gap: 5px;
       flex-shrink: 0;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     /* 4-Mode Bar: Desktop 4 columns, Mobile 2x2 Grid so ALL 4 modes are always visible */
@@ -143,28 +221,30 @@
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 6px;
-      background: var(--bg-glass);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--border-glass);
-      border-radius: 12px;
+      background: var(--bg-panel);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: var(--border-width) solid var(--border-main);
+      border-radius: var(--radius-panel);
       padding: 6px;
       pointer-events: auto;
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+      box-shadow: var(--shadow-panel);
     }
 
     .btn {
       appearance: none;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: rgba(255, 255, 255, 0.07);
+      border: var(--border-width) solid var(--btn-border);
+      background: var(--btn-bg);
       color: var(--text-main);
-      font-family: var(--font-sans);
+      font-family: var(--font-ui);
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 700;
+      letter-spacing: var(--letter-spacing);
+      text-transform: uppercase;
       padding: 8px 10px;
-      border-radius: 9px;
+      border-radius: var(--radius-btn);
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: background 0.12s ease, color 0.12s ease, transform 0.08s ease;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -175,8 +255,7 @@
     }
 
     .btn:hover {
-      background: rgba(255, 255, 255, 0.15);
-      border-color: rgba(255, 255, 255, 0.28);
+      background: var(--btn-hover);
     }
 
     .btn:active {
@@ -184,39 +263,58 @@
     }
 
     .btn.active {
-      background: var(--accent-glow);
+      background: var(--accent);
       border-color: var(--accent);
-      color: #fff;
-      box-shadow: 0 0 12px rgba(232, 184, 120, 0.3);
+      color: var(--accent-text);
     }
 
-    .btn.ar-btn {
-      border-color: rgba(92, 225, 230, 0.35);
+    /* LCARS Color-Coded Mode Buttons */
+    body[data-style="lcars"] #btn-mode-2 {
+      border-color: #cc99cc;
+      color: #cc99cc;
+      background: rgba(204, 153, 204, 0.15);
     }
-
-    .btn.ar-btn.active {
-      background: rgba(92, 225, 230, 0.24);
-      border-color: var(--ar-cyan);
-      color: #fff;
-      box-shadow: 0 0 12px rgba(92, 225, 230, 0.35);
+    body[data-style="lcars"] #btn-mode-2.active {
+      background: #cc99cc;
+      color: #000000;
+    }
+    body[data-style="lcars"] .btn.ar-btn {
+      border-color: #5588ee;
+      color: #5588ee;
+      background: rgba(85, 136, 238, 0.16);
+    }
+    body[data-style="lcars"] .btn.ar-btn.active {
+      background: #5588ee;
+      border-color: #5588ee;
+      color: #000000;
     }
 
     .btn.toggle-on {
-      background: rgba(74, 222, 128, 0.2);
-      border-color: var(--ar-green);
-      color: #d1fae5;
+      background: var(--toggle-on-bg);
+      border-color: var(--border-main);
+      color: var(--toggle-on-text);
+    }
+
+    .btn.style-btn {
+      background: #ff9900;
+      color: #000000;
+      border-color: #050505;
+    }
+    body[data-style="lcars"] .btn.style-btn {
+      background: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
     }
 
     .btn.danger {
-      background: rgba(239, 68, 68, 0.28);
-      border-color: #f87171;
-      color: #fee2e2;
+      background: var(--danger-bg);
+      border-color: var(--danger-bg);
+      color: var(--danger-text);
     }
 
     .btn-sm {
       font-size: 11px;
       padding: 6px 9px;
-      border-radius: 8px;
     }
 
     /* AR Contextual Action Bar (Shown in Mode 3 & Mode 4) */
@@ -226,12 +324,12 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      background: var(--bg-glass-heavy);
-      border: 1px solid var(--ar-cyan);
-      border-radius: 12px;
+      background: var(--bg-panel-heavy);
+      border: var(--border-width) solid var(--border-main);
+      border-radius: var(--radius-panel);
       padding: 7px 10px;
       pointer-events: auto;
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+      box-shadow: var(--shadow-panel);
     }
 
     #ar-action-bar.visible {
@@ -240,94 +338,34 @@
 
     .ar-status-text {
       font-size: 11.5px;
-      font-weight: 600;
-      color: var(--ar-cyan);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: var(--letter-spacing);
+      color: var(--text-main);
       margin-right: 4px;
     }
 
-    /* Auto-Fading Top Toast Banner */
-    #toast-banner {
-      align-self: center;
-      background: var(--bg-glass-heavy);
-      border: 1px solid var(--border-glass);
-      border-radius: 999px;
-      padding: 6px 14px;
-      font-size: 11.5px;
-      color: var(--text-main);
-      text-align: center;
-      max-width: 94vw;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
-      pointer-events: none;
-      opacity: 1;
-      transition: opacity 0.4s ease;
-    }
-
-    #toast-banner.fade-out {
-      opacity: 0;
-    }
-
-    /* Bottom Section: Walk Pad + Preset Camera Scroller */
+    /* Bottom Section: Preset Camera Scroller */
     .bottom-section {
       display: flex;
       flex-direction: column;
       gap: 8px;
       width: 100%;
-      max-width: 980px;
+      max-width: 1020px;
       margin: 0 auto;
       pointer-events: none;
     }
 
-    /* On-Screen Walk + Elevation Pad (for Mobile Touch & Desktop Click) */
-    #walk-pad {
-      align-self: flex-end;
-      display: none;
-      grid-template-columns: repeat(3, 40px);
-      gap: 4px;
-      background: var(--bg-glass);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid var(--border-glass);
-      border-radius: 12px;
-      padding: 6px;
-      pointer-events: auto;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-    }
-
-    #walk-pad.visible {
-      display: grid;
-    }
-
-    .pad-btn {
-      width: 40px;
-      height: 36px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      background: rgba(255, 255, 255, 0.09);
-      color: #fff;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      touch-action: none;
-    }
-
-    .pad-btn:active {
-      background: var(--accent-glow);
-      border-color: var(--accent);
-    }
-
     /* Preset Room Camera Bar */
     .camera-bar-wrap {
-      background: var(--bg-glass);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid var(--border-glass);
-      border-radius: 14px;
+      background: var(--bg-panel);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: var(--border-width) solid var(--border-main);
+      border-radius: var(--radius-panel);
       padding: 8px 10px;
       pointer-events: auto;
-      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+      box-shadow: var(--shadow-panel);
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -338,13 +376,16 @@
       align-items: center;
       justify-content: space-between;
       font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: var(--letter-spacing);
       color: var(--text-muted);
       padding: 0 2px;
     }
 
     .kbd-hint {
-      color: #d1d5db;
-      font-weight: 500;
+      color: var(--text-muted);
+      font-weight: 700;
     }
 
     #room-strip {
@@ -363,30 +404,30 @@
 
     .room-pill {
       appearance: none;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: rgba(255, 255, 255, 0.07);
+      border: var(--border-width) solid var(--btn-border);
+      background: var(--btn-bg);
       color: var(--text-main);
-      font-family: var(--font-sans);
+      font-family: var(--font-ui);
       font-size: 11.5px;
-      font-weight: 600;
+      font-weight: 700;
+      letter-spacing: var(--letter-spacing);
+      text-transform: uppercase;
       padding: 7px 12px;
-      border-radius: 999px;
+      border-radius: var(--radius-pill);
       cursor: pointer;
       white-space: nowrap;
       flex-shrink: 0;
-      transition: all 0.15s ease;
+      transition: background 0.12s ease, color 0.12s ease;
     }
 
     .room-pill:hover {
-      background: rgba(255, 255, 255, 0.16);
+      background: var(--btn-hover);
     }
 
     .room-pill.active {
       background: var(--accent);
       border-color: var(--accent);
-      color: #111827;
-      font-weight: 700;
-      box-shadow: 0 0 12px rgba(232, 184, 120, 0.45);
+      color: var(--accent-text);
     }
 
     /* Loading Overlay */
@@ -394,13 +435,14 @@
       position: fixed;
       inset: 0;
       z-index: 100;
-      background: radial-gradient(circle at center, #182030 0%, #0b0e14 100%);
+      background: #ffffff;
+      color: #050505;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 14px;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.35s ease;
     }
 
     #loading-screen.hidden {
@@ -409,11 +451,11 @@
     }
 
     .spinner {
-      width: 42px;
-      height: 42px;
-      border: 3px solid rgba(232, 184, 120, 0.2);
-      border-top-color: var(--accent);
-      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      border: 3px solid #d4d4d8;
+      border-top-color: #050505;
+      border-radius: 0px;
       animation: spin 0.8s linear infinite;
     }
 
@@ -423,14 +465,17 @@
 
     #loading-text {
       font-size: 14px;
-      font-weight: 600;
-      color: var(--accent);
-      letter-spacing: 0.03em;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #050505;
     }
 
     #loading-sub {
-      font-size: 12px;
-      color: var(--text-muted);
+      font-size: 11.5px;
+      color: #555555;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
     /* Responsive Mobile Layout (Pixel 10 Pro & phones) */
@@ -441,8 +486,8 @@
         padding: 5px;
       }
       .btn {
-        font-size: 11.5px;
-        padding: 8px 6px;
+        font-size: 11px;
+        padding: 7px 6px;
       }
       .brand-sub {
         display: none;
@@ -462,12 +507,13 @@
     }
   </script>
 </head>
-<body>
+<!-- Default Graphic Style: German DIN 1451 Minimal E-Ink Paper (data-style="din") -->
+<body data-style="din">
   <!-- Loading Screen -->
   <div id="loading-screen">
     <div class="spinner"></div>
-    <div id="loading-text">Loading 9-Tsubo House (GLB)...</div>
-    <div id="loading-sub">Preparing 13 cameras, Sakura deck &amp; WebXR modes</div>
+    <div id="loading-text">DIN 1451 CAD · LOADING 9-TSUBO HOUSE (GLB)...</div>
+    <div id="loading-sub">13 CAMERAS · WEBXR VR + 1:1 AR + TABLETOP DOLLHOUSE</div>
   </div>
 
   <!-- 3D WebGL / WebXR Canvas Container -->
@@ -481,21 +527,21 @@
         <div class="brand-info">
           <span id="status-dot" class="status-dot"></span>
           <div class="brand-text">
-            <div class="brand-title">9-TSUBO HOUSE · KOIZUMI STUDIO</div>
-            <div id="status-sub" class="brand-sub">Initializing 3D Scene...</div>
+            <div class="brand-title">9-TSUBO HOUSE · KOIZUMI STUDIO (1999)</div>
+            <div id="status-sub" class="brand-sub">DIN 1451 TECHNICAL SPEC · 13 CAMERAS READY</div>
           </div>
         </div>
         <div class="quick-toggles">
-          <button id="btn-toggle-roof" class="btn btn-sm toggle-on" title="Toggle Roof_Group">🏠 Roof</button>
-          <button id="btn-toggle-context" class="btn btn-sm toggle-on" title="Toggle Context_Group">🌳 Context</button>
-          <button id="btn-toggle-pad" class="btn btn-sm" title="Toggle On-Screen Walk Pad">🕹️ Move</button>
+          <button id="btn-toggle-roof" class="btn btn-sm toggle-on" title="Toggle Roof_Group">🏠 Roof: ON</button>
+          <button id="btn-toggle-context" class="btn btn-sm toggle-on" title="Toggle Context_Group">🌳 Context: ON</button>
+          <button id="btn-toggle-style" class="btn btn-sm style-btn" title="Switch UI Style: German DIN 1451 vs Star Trek LCARS (Hotkey: T)">📐 Style: DIN</button>
           <button id="btn-exit-xr" class="btn btn-sm danger" style="display:none;">✕ Exit XR</button>
         </div>
       </div>
 
       <!-- 4-Mode Selector Grid (2x2 on Mobile so AR options are always front & center) -->
       <div class="mode-grid">
-        <button id="btn-mode-1" class="btn active">🖥️ 1 · 3D Walk</button>
+        <button id="btn-mode-1" class="btn active">🖥️ 1 · 3D View</button>
         <button id="btn-mode-2" class="btn">🥽 2 · Quest VR</button>
         <button id="btn-mode-3" class="btn ar-btn">📱 3 · 1:1 AR Walk</button>
         <button id="btn-mode-4" class="btn ar-btn">🏡 4 · Tabletop AR</button>
@@ -503,36 +549,20 @@
 
       <!-- Contextual AR Bar (Automatically shown in Mode 3 & Mode 4) -->
       <div id="ar-action-bar">
-        <span id="ar-status-label" class="ar-status-text">AR Ready</span>
-        <button id="btn-ar-recenter" class="btn btn-sm active">📍 Anchor / Place Here</button>
+        <span id="ar-status-label" class="ar-status-text">AR Ready · Pinch to Scale</span>
+        <button id="btn-ar-recenter" class="btn btn-sm active">📍 Anchor / Place</button>
         <button id="btn-ar-scale-down" class="btn btn-sm" style="display:none;">➖ Smaller</button>
         <button id="btn-ar-scale-up" class="btn btn-sm" style="display:none;">➕ Larger</button>
         <button id="btn-ar-rotate" class="btn btn-sm">🔄 Rotate 45°</button>
       </div>
-
-      <!-- Auto-Fading Instruction Toast (Docked cleanly under top bar) -->
-      <div id="toast-banner">
-        Drag to look 360° · <b>WASD / Arrows</b> to walk · <b>E/Q</b> up/down · Click any room below to teleport
-      </div>
     </div>
 
-    <!-- Bottom Navigation & On-Screen Walk Pad -->
+    <!-- Bottom Navigation: Preset Room Camera Strip -->
     <div class="bottom-section">
-      <!-- Touch / Click Walk Pad -->
-      <div id="walk-pad">
-        <button class="pad-btn" data-move="down" title="Move Down (Q)">▼Dn</button>
-        <button class="pad-btn" data-move="fwd" title="Walk Forward (W)">▲</button>
-        <button class="pad-btn" data-move="up" title="Move Up (E)">▲Up</button>
-        <button class="pad-btn" data-move="left" title="Strafe Left (A)">◄</button>
-        <button class="pad-btn" data-move="back" title="Walk Backward (S)">▼</button>
-        <button class="pad-btn" data-move="right" title="Strafe Right (D)">►</button>
-      </div>
-
-      <!-- Preset Room Camera Strip -->
       <div class="camera-bar-wrap">
         <div class="camera-bar-header">
-          <span id="active-room-label">📷 Viewpoint: 01 · Ext Three-Quarter</span>
-          <span class="kbd-hint">WASD / Arrows: Walk · Shift: Sprint · E/Q: Up/Down · Drag: Look</span>
+          <span id="active-room-label">📷 VIEWPOINT: 01 · EXT THREE-QUARTER</span>
+          <span id="control-hint-label" class="kbd-hint">DRAG: LOOK · RIGHT-DRAG: PAN · SCROLL / WASD: MOVE · [T]: STYLE</span>
         </div>
         <div id="room-strip"></div>
       </div>
@@ -543,6 +573,48 @@
     import * as THREE from 'three';
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
     import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
+
+    // =========================================================================
+    // 0. PROCEDURAL WEB AUDIO SYNTHESIZER (DIN Typewriter Click vs LCARS Chirp)
+    // =========================================================================
+    let audioCtx = null;
+    function playUISound() {
+      try {
+        if (!audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContextClass) return;
+          audioCtx = new AudioContextClass();
+        }
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const isLcars = document.body.getAttribute('data-style') === 'lcars';
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (isLcars) {
+          // Starfleet LCARS dual-frequency sine chirp (1200Hz -> 1920Hz)
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(1200, now);
+          osc.frequency.setValueAtTime(1920, now + 0.035);
+          gain.gain.setValueAtTime(0.06, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+          osc.start(now);
+          osc.stop(now + 0.09);
+        } else {
+          // German DIN 1451 mechanical triangle-wave typewriter click (160Hz -> 40Hz)
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(160, now);
+          osc.frequency.exponentialRampToValueAtTime(40, now + 0.025);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.028);
+          osc.start(now);
+          osc.stop(now + 0.028);
+        }
+      } catch (_) {}
+    }
 
     // =========================================================================
     // 1. VERIFIED PRESET CAMERAS & WAYPOINTS (Exact Three.js World Coordinates)
@@ -564,7 +636,7 @@
     ];
 
     const IS_MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-    const DOLLHOUSE_DEFAULT_SCALE = 0.06; // ~1:16.6 architectural model scale (5.4m house = 32cm tabletop model)
+    const DOLLHOUSE_DEFAULT_SCALE = 0.06; // ~1:16.6 architectural model scale
 
     // =========================================================================
     // 2. CORE THREE.JS SCENE, RENDERER & CAMERA RIG
@@ -578,7 +650,7 @@
     const camera = new THREE.PerspectiveCamera(62, window.innerWidth / window.innerHeight, 0.05, 250);
     camera.rotation.order = 'YXZ';
 
-    // Camera Rig: Moves the user in Browser 3D (WASD + Presets) and in Quest VR (Teleport + Stick)
+    // Camera Rig: Moves the user in Browser 3D and in Quest VR
     const rig = new THREE.Group();
     rig.name = 'User_Camera_Rig';
     rig.add(camera);
@@ -594,12 +666,10 @@
       alpha: true,
       powerPreference: 'high-performance'
     });
-    // Guardrail: Cap pixel ratio at 2 on mobile devices
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.08;
-    // Fast mobile startup: Avoid compiling shadow maps for 857 meshes on mobile GPUs
     renderer.shadowMap.enabled = !IS_MOBILE;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.xr.enabled = true;
@@ -632,19 +702,16 @@
     fillLight.position.set(16, 12, -14);
     scene.add(fillLight);
 
-    // Interior warm glow lights attached to worldRoot so they scale/move with the house in AR
-    const interiorLights = [];
     function addInteriorPointLight(x, y, z, intensity = 1.6, distance = 7.5) {
       const pt = new THREE.PointLight(0xffdca8, intensity, distance, 1.4);
       pt.position.set(x, y, z);
       worldRoot.add(pt);
-      interiorLights.push(pt);
     }
-    addInteriorPointLight(-0.8, 2.25, 1.2, 1.8, 8.0);  // 1F Living / Dining
-    addInteriorPointLight(-1.6, 2.25, -1.2, 1.5, 6.5); // 1F Kitchen
-    addInteriorPointLight(1.4, 2.20, -1.0, 1.3, 5.5);  // 1F Bathroom
-    addInteriorPointLight(0.0, 4.35, 0.2, 2.0, 9.0);   // 2F Loft & Bed Atrium
-    addInteriorPointLight(-0.9, 3.80, -3.9, 1.6, 5.0); // Neighbor Kitty Window Light
+    addInteriorPointLight(-0.8, 2.25, 1.2, 1.8, 8.0);
+    addInteriorPointLight(-1.6, 2.25, -1.2, 1.5, 6.5);
+    addInteriorPointLight(1.4, 2.20, -1.0, 1.3, 5.5);
+    addInteriorPointLight(0.0, 4.35, 0.2, 2.0, 9.0);
+    addInteriorPointLight(-0.9, 3.80, -3.9, 1.6, 5.0);
 
     // =========================================================================
     // 4. STATE & SCENE GROUPS (Roof_Group, Context_Group, Walkable Surfaces)
@@ -653,25 +720,20 @@
     let currentRoomIndex = 0;
     let roofGroup = null;
     let contextGroup = null;
-    let houseGroup = null;
     let roofVisible = true;
     let contextVisible = true;
     let dollhouseScale = DOLLHOUSE_DEFAULT_SCALE;
-    let dollhousePlaced = false;
     const walkableMeshes = [];
 
-    // First-person look state (Browser 3D)
+    // Camera look state (Browser 3D)
     let yaw = ROOMS[0].yaw;
     let pitch = ROOMS[0].pitch;
-    let isPointerDown = false;
-    let prevPointerX = 0;
-    let prevPointerY = 0;
 
     // Smooth camera transition state
     const camTransition = {
       active: false,
       startTime: 0,
-      duration: 650,
+      duration: 600,
       startPos: new THREE.Vector3(),
       endPos: new THREE.Vector3(),
       startYaw: 0,
@@ -680,41 +742,51 @@
       endPitch: 0
     };
 
-    // Immediately place camera at ROOMS[0] BEFORE the GLB finishes loading
+    // Place camera at ROOMS[0] immediately before GLB finishes loading
     rig.position.set(...ROOMS[0].eyePos);
     camera.position.set(0, 0, 0);
     camera.rotation.set(pitch, yaw, 0);
 
     // =========================================================================
-    // 5. UI ELEMENTS & ROOM CAMERA STRIP INITIALIZATION
+    // 5. UI ELEMENTS, STYLE TOGGLER (DIN 1451 vs LCARS) & ROOM STRIP
     // =========================================================================
     const roomStrip = document.getElementById('room-strip');
     const activeRoomLabel = document.getElementById('active-room-label');
     const statusDot = document.getElementById('status-dot');
     const statusSub = document.getElementById('status-sub');
-    const toastBanner = document.getElementById('toast-banner');
     const loadingScreen = document.getElementById('loading-screen');
     const arActionBar = document.getElementById('ar-action-bar');
     const arStatusLabel = document.getElementById('ar-status-label');
     const btnToggleRoof = document.getElementById('btn-toggle-roof');
     const btnToggleContext = document.getElementById('btn-toggle-context');
-    const btnTogglePad = document.getElementById('btn-toggle-pad');
+    const btnToggleStyle = document.getElementById('btn-toggle-style');
     const btnExitXR = document.getElementById('btn-exit-xr');
-    const walkPad = document.getElementById('walk-pad');
 
-    let toastTimeout = null;
-    function setToast(htmlText, durationMs = 3200) {
-      toastBanner.innerHTML = htmlText;
-      toastBanner.classList.remove('fade-out');
-      if (toastTimeout) clearTimeout(toastTimeout);
-      if (durationMs > 0) {
-        toastTimeout = setTimeout(() => {
-          toastBanner.classList.add('fade-out');
-        }, durationMs);
-      }
+    function setStatus(text) {
+      statusSub.textContent = text;
     }
-    // Start initial toast fade timer on load
-    setToast('Drag to look 360° · <b>WASD / Arrows</b> to walk · <b>E/Q</b> up/down · Click any room below', 3500);
+
+    // Dual-Engine Graphic Style Toggle (German DIN 1451 Default <-> Star Trek LCARS)
+    function toggleGraphicStyle() {
+      const current = document.body.getAttribute('data-style') || 'din';
+      const next = current === 'din' ? 'lcars' : 'din';
+      document.body.setAttribute('data-style', next);
+      playUISound();
+
+      if (next === 'lcars') {
+        btnToggleStyle.textContent = '🖖 Style: LCARS';
+        setStatus('LCARS TELEMETRY ONLINE · STARFLEET CORPS OF ENGINEERS');
+      } else {
+        btnToggleStyle.textContent = '📐 Style: DIN';
+        setStatus('DIN 1451 TECHNICAL SPEC · KOIZUMI STUDIO CAD');
+      }
+      updateVRHudCanvas();
+    }
+
+    btnToggleStyle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleGraphicStyle();
+    });
 
     // Build clickable room camera pills
     ROOMS.forEach((room, idx) => {
@@ -723,6 +795,7 @@
       btn.textContent = room.name;
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
+        playUISound();
         goToRoom(idx, true);
       });
       roomStrip.appendChild(btn);
@@ -731,7 +804,7 @@
     function updateRoomUI(index) {
       currentRoomIndex = index;
       const room = ROOMS[index];
-      activeRoomLabel.textContent = `📷 Viewpoint: ${room.name}`;
+      activeRoomLabel.textContent = `📷 VIEWPOINT: ${room.name}`;
       const pills = roomStrip.querySelectorAll('.room-pill');
       pills.forEach((pill, i) => {
         pill.classList.toggle('active', i === index);
@@ -742,7 +815,6 @@
       updateVRHudCanvas();
     }
 
-    // Toggle Roof_Group visibility
     function setRoofVisibility(vis) {
       roofVisible = vis;
       if (roofGroup) roofGroup.visible = vis;
@@ -751,7 +823,6 @@
       updateVRHudCanvas();
     }
 
-    // Toggle Context_Group visibility
     function setContextVisibility(vis) {
       contextVisible = vis;
       if (contextGroup) contextGroup.visible = vis;
@@ -762,23 +833,14 @@
 
     btnToggleRoof.addEventListener('click', (e) => {
       e.stopPropagation();
+      playUISound();
       setRoofVisibility(!roofVisible);
     });
 
     btnToggleContext.addEventListener('click', (e) => {
       e.stopPropagation();
+      playUISound();
       setContextVisibility(!contextVisible);
-    });
-
-    if (IS_MOBILE) {
-      walkPad.classList.add('visible');
-      btnTogglePad.classList.add('toggle-on');
-    }
-    btnTogglePad.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const vis = !walkPad.classList.contains('visible');
-      walkPad.classList.toggle('visible', vis);
-      btnTogglePad.classList.toggle('toggle-on', vis);
     });
 
     // =========================================================================
@@ -798,23 +860,18 @@
 
       const session = renderer.xr.getSession();
 
-      // Case A: Active WebXR Session
       if (session) {
         if (currentMode === 2) {
-          // Mode 2 (Full VR with local-floor): Move rig to the room's floor position and orient yaw
           rig.position.set(room.floorPos[0], room.floorPos[1], room.floorPos[2]);
           rig.rotation.set(0, room.yaw, 0);
         } else if (currentMode === 3) {
-          // Mode 3 (1:1 AR Walkthrough): Anchor worldRoot so the selected room's eyePos matches the phone's current AR pose
           anchor1to1ARRoom(room);
         } else if (currentMode === 4) {
-          // Mode 4 (Tabletop Dollhouse AR): Keep miniature house placed, just highlight room info
-          setToast(`Dollhouse View · Selected <b>${room.name}</b>`);
+          arStatusLabel.textContent = `Tabletop · ${room.name}`;
         }
         return;
       }
 
-      // Case B: Mode 1 (Browser 3D First-Person Walk & Look)
       worldRoot.position.set(0, 0, 0);
       worldRoot.rotation.set(0, 0, 0);
       worldRoot.scale.set(1, 1, 1);
@@ -842,7 +899,10 @@
     }
 
     // =========================================================================
-    // 7. DESKTOP WASD / ARROW KEYS + MOUSE / TOUCH 360° LOOK + ON-SCREEN PAD
+    // 7. NAVIGATION CONTROLS:
+    //    - Desktop: WASD / Arrows + Mouse Look + Right-Click Pan + Wheel Zoom
+    //    - Mobile 3D: 1-Finger Look + 2-Finger Pinch-to-Zoom AND 2-Finger Pan
+    //    - Mode 4 Tabletop AR: 2-Finger Pinch-to-Scale Dollhouse Size in Real Time
     // =========================================================================
     const moveKeys = {
       fwd: false,
@@ -856,6 +916,11 @@
 
     window.addEventListener('keydown', (e) => {
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+      if (e.code === 'KeyT') {
+        toggleGraphicStyle();
+        return;
+      }
+      if (IS_MOBILE) return;
       switch (e.code) {
         case 'KeyW':
         case 'ArrowUp':
@@ -907,63 +972,178 @@
       }
     });
 
-    // Bind On-Screen Walk Pad buttons for touch & mouse
-    document.querySelectorAll('.pad-btn').forEach((btn) => {
-      const dir = btn.dataset.move;
-      const startMove = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        camTransition.active = false;
-        if (dir in moveKeys) moveKeys[dir] = true;
-      };
-      const endMove = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (dir in moveKeys) moveKeys[dir] = false;
-      };
-      btn.addEventListener('pointerdown', startMove);
-      btn.addEventListener('pointerup', endMove);
-      btn.addEventListener('pointerleave', endMove);
-      btn.addEventListener('pointercancel', endMove);
-    });
+    // Helper: Get camera basis vectors (forward, right, up)
+    function getCameraBasis() {
+      const euler = new THREE.Euler(pitch, yaw, 0, 'YXZ');
+      const forward = new THREE.Vector3(0, 0, -1).applyEuler(euler).normalize();
+      const right = new THREE.Vector3(1, 0, 0).applyEuler(euler).normalize();
+      const up = new THREE.Vector3(0, 1, 0).applyEuler(euler).normalize();
+      return { forward, right, up };
+    }
 
-    // Pointer Look (Mouse Drag & Single-Finger Touch Drag on Canvas)
+    // Desktop Mouse Drag (Left-Click = Look, Right/Middle-Click or Shift+Drag = Pan)
     const canvasEl = renderer.domElement;
-    canvasEl.addEventListener('pointerdown', (e) => {
+    let isMouseDown = false;
+    let mouseButton = 0;
+    let prevMouseX = 0;
+    let prevMouseY = 0;
+
+    canvasEl.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    canvasEl.addEventListener('mousedown', (e) => {
       if (renderer.xr.isPresenting) return;
-      isPointerDown = true;
-      prevPointerX = e.clientX;
-      prevPointerY = e.clientY;
+      isMouseDown = true;
+      mouseButton = e.button;
+      prevMouseX = e.clientX;
+      prevMouseY = e.clientY;
       camTransition.active = false;
-      toastBanner.classList.add('fade-out');
     });
 
-    window.addEventListener('pointermove', (e) => {
-      if (!isPointerDown || renderer.xr.isPresenting) return;
-      const dx = e.clientX - prevPointerX;
-      const dy = e.clientY - prevPointerY;
-      prevPointerX = e.clientX;
-      prevPointerY = e.clientY;
+    window.addEventListener('mousemove', (e) => {
+      if (!isMouseDown || renderer.xr.isPresenting) return;
+      const dx = e.clientX - prevMouseX;
+      const dy = e.clientY - prevMouseY;
+      prevMouseX = e.clientX;
+      prevMouseY = e.clientY;
 
-      const sensitivity = IS_MOBILE ? 0.0042 : 0.0032;
-      yaw -= dx * sensitivity;
-      pitch = Math.max(-Math.PI / 2 + 0.05, Math.min(Math.PI / 2 - 0.05, pitch - dy * sensitivity));
-      camera.rotation.set(pitch, yaw, 0);
+      if (mouseButton === 2 || mouseButton === 1 || e.shiftKey) {
+        // Desktop Pan
+        const { right, up } = getCameraBasis();
+        const panSpeed = 0.0085;
+        rig.position.addScaledVector(right, -dx * panSpeed);
+        rig.position.addScaledVector(up, dy * panSpeed);
+      } else {
+        // Desktop 360° Look
+        const sensitivity = 0.0032;
+        yaw -= dx * sensitivity;
+        pitch = Math.max(-Math.PI / 2 + 0.05, Math.min(Math.PI / 2 - 0.05, pitch - dy * sensitivity));
+        camera.rotation.set(pitch, yaw, 0);
+      }
     });
 
-    window.addEventListener('pointerup', () => {
-      isPointerDown = false;
+    window.addEventListener('mouseup', () => {
+      isMouseDown = false;
     });
 
-    // Mouse Wheel Dolly Forward / Backward along view vector
+    // Mouse Wheel Zoom (or scales Dollhouse when previewing Mode 4 on Desktop)
     canvasEl.addEventListener('wheel', (e) => {
       if (renderer.xr.isPresenting) return;
       e.preventDefault();
       camTransition.active = false;
-      const forward = new THREE.Vector3(0, 0, -1).applyEuler(new THREE.Euler(pitch, yaw, 0, 'YXZ'));
-      const step = -e.deltaY * 0.0035;
+      const { forward } = getCameraBasis();
+      const step = -e.deltaY * 0.004;
       rig.position.addScaledVector(forward, step);
     }, { passive: false });
+
+    // =========================================================================
+    // MULTI-TOUCH ENGINE FOR MOBILE:
+    // - In Browser 3D: 1-Finger Look + 2-Finger Pinch Zoom + 2-Finger Pan
+    // - In Tabletop AR (Mode 4): 2-Finger Pinch-to-Scale Dollhouse Model Size
+    // =========================================================================
+    let touchMode = null; // 'look' | 'pinch-pan'
+    let prevTouchX = 0;
+    let prevTouchY = 0;
+    let prevPinchDist = 0;
+    let prevMidX = 0;
+    let prevMidY = 0;
+    let lastPinchTimestamp = 0;
+
+    function getTouchDistanceAndMidpoint(t0, t1) {
+      const dx = t1.clientX - t0.clientX;
+      const dy = t1.clientY - t0.clientY;
+      return {
+        dist: Math.hypot(dx, dy),
+        midX: (t0.clientX + t1.clientX) * 0.5,
+        midY: (t0.clientY + t1.clientY) * 0.5
+      };
+    }
+
+    window.addEventListener('touchstart', (e) => {
+      // Ignore single-finger taps directly on UI buttons
+      if (e.touches.length === 1 && e.target && e.target.closest('button, #room-strip')) {
+        touchMode = null;
+        return;
+      }
+
+      if (e.touches.length === 1) {
+        touchMode = 'look';
+        prevTouchX = e.touches[0].clientX;
+        prevTouchY = e.touches[0].clientY;
+        camTransition.active = false;
+      } else if (e.touches.length >= 2) {
+        touchMode = 'pinch-pan';
+        const info = getTouchDistanceAndMidpoint(e.touches[0], e.touches[1]);
+        prevPinchDist = info.dist;
+        prevMidX = info.midX;
+        prevMidY = info.midY;
+        lastPinchTimestamp = performance.now();
+        camTransition.active = false;
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchmove', (e) => {
+      if (!touchMode) return;
+
+      // 2-FINGER GESTURE:
+      if (e.touches.length >= 2) {
+        e.preventDefault();
+        lastPinchTimestamp = performance.now();
+        const info = getTouchDistanceAndMidpoint(e.touches[0], e.touches[1]);
+
+        if (prevPinchDist > 10) {
+          // Case A: Tabletop Dollhouse AR (Mode 4) -> Pinch dynamically scales the miniature house!
+          if (currentMode === 4 && renderer.xr.isPresenting) {
+            const scaleRatio = info.dist / prevPinchDist;
+            dollhouseScale = THREE.MathUtils.clamp(dollhouseScale * scaleRatio, 0.015, 0.50);
+            worldRoot.scale.setScalar(dollhouseScale);
+            arStatusLabel.textContent = `Scale: ${Math.round(dollhouseScale * 100)}%`;
+          }
+          // Case B: Browser 3D Mode -> Pinch-to-Zoom AND Two-Finger Pan!
+          else if (!renderer.xr.isPresenting) {
+            const distDelta = info.dist - prevPinchDist;
+            const panDx = info.midX - prevMidX;
+            const panDy = info.midY - prevMidY;
+
+            const { forward, right, up } = getCameraBasis();
+            // Pinch Zoom forward / backward along camera view ray
+            rig.position.addScaledVector(forward, distDelta * 0.018);
+            // Two-finger Pan left/right and up/down along screen plane
+            rig.position.addScaledVector(right, -panDx * 0.011);
+            rig.position.addScaledVector(up, panDy * 0.011);
+          }
+        }
+
+        prevPinchDist = info.dist;
+        prevMidX = info.midX;
+        prevMidY = info.midY;
+        return;
+      }
+
+      // 1-FINGER GESTURE (Browser 3D Look):
+      if (e.touches.length === 1 && touchMode === 'look' && !renderer.xr.isPresenting) {
+        const t = e.touches[0];
+        const dx = t.clientX - prevTouchX;
+        const dy = t.clientY - prevTouchY;
+        prevTouchX = t.clientX;
+        prevTouchY = t.clientY;
+
+        const sensitivity = 0.0042;
+        yaw -= dx * sensitivity;
+        pitch = Math.max(-Math.PI / 2 + 0.05, Math.min(Math.PI / 2 - 0.05, pitch - dy * sensitivity));
+        camera.rotation.set(pitch, yaw, 0);
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchend', (e) => {
+      if (e.touches.length === 0) {
+        touchMode = null;
+      } else if (e.touches.length === 1) {
+        // Avoid sudden jump when lifting one finger after a pinch
+        touchMode = 'look';
+        prevTouchX = e.touches[0].clientX;
+        prevTouchY = e.touches[0].clientY;
+      }
+    });
 
     function updateDesktopMovement(dt) {
       if (renderer.xr.isPresenting) return;
@@ -982,7 +1162,9 @@
         if (t >= 1) camTransition.active = false;
       }
 
-      // WASD / Arrow / Walk Pad continuous movement
+      if (IS_MOBILE) return;
+
+      // Desktop WASD / Arrow continuous movement
       const speed = (moveKeys.sprint ? 6.5 : 3.0) * dt;
       const fwdDir = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw)).normalize();
       const rightDir = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw)).normalize();
@@ -1025,11 +1207,9 @@
 
         roofGroup = model.getObjectByName('Roof_Group');
         contextGroup = model.getObjectByName('Context_Group');
-        houseGroup = model.getObjectByName('House_Group');
 
         model.traverse((child) => {
           if (child.isMesh) {
-            // Only cast shadows on desktop for major structural meshes to keep FPS high
             if (!IS_MOBILE) {
               child.castShadow = true;
               child.receiveShadow = true;
@@ -1037,7 +1217,6 @@
             if (child.material) {
               child.material.side = THREE.DoubleSide;
             }
-            // Collect walkable surfaces for VR Point-and-Teleport
             const n = child.name.toLowerCase();
             if (
               n.includes('floor') ||
@@ -1060,33 +1239,28 @@
           }
         });
 
-        // Fallback: if walkableMeshes is empty, allow raycasting against all house/context meshes
         if (walkableMeshes.length === 0) {
           model.traverse((c) => { if (c.isMesh) walkableMeshes.push(c); });
         }
 
-        // Apply initial visibility states
         setRoofVisibility(true);
         setContextVisibility(true);
-
-        // Ensure initial camera position is locked to ROOMS[0]
         goToRoom(0, false);
 
         statusDot.classList.add('ready');
-        statusSub.textContent = '13 Cameras Ready · WASD + VR Teleport + AR Enabled';
+        setStatus('DIN 1451 TECHNICAL SPEC · 13 CAMERAS READY');
         loadingScreen.classList.add('hidden');
       },
       (xhr) => {
         if (xhr.total > 0) {
           const pct = Math.round((xhr.loaded / xhr.total) * 100);
-          document.getElementById('loading-text').textContent = `Loading 9-Tsubo House... ${pct}%`;
+          document.getElementById('loading-text').textContent = `LOADING 9-TSUBO HOUSE... ${pct}%`;
         }
       },
       (err) => {
         console.error('Failed to load ./9_tsubo_house.glb:', err);
-        statusSub.textContent = 'Error loading 9_tsubo_house.glb — check file path';
-        document.getElementById('loading-text').textContent = 'Error loading ./9_tsubo_house.glb';
-        document.getElementById('loading-sub').textContent = 'Ensure 9_tsubo_house.glb is in the same folder as index.html';
+        setStatus('ERROR LOADING 9_TSUBO_HOUSE.GLB');
+        document.getElementById('loading-text').textContent = 'ERROR LOADING ./9_tsubo_house.glb';
       }
     );
 
@@ -1096,7 +1270,7 @@
     const vrRaycaster = new THREE.Raycaster();
     const tempMatrix = new THREE.Matrix4();
 
-    // Glowing Cyan Floor Teleport Reticle for VR Mode 2
+    // Glowing Floor Teleport Reticle for VR Mode 2
     const vrTeleportReticle = new THREE.Group();
     const tpRingGeo = new THREE.RingGeometry(0.18, 0.26, 32);
     tpRingGeo.rotateX(-Math.PI / 2);
@@ -1111,7 +1285,7 @@
     vrTeleportReticle.visible = false;
     scene.add(vrTeleportReticle);
 
-    // Green Surface Hit-Test Reticle for Tabletop AR Mode 4
+    // Surface Hit-Test Reticle for Tabletop AR Mode 4
     const arHitReticle = new THREE.Group();
     const arRingGeo = new THREE.RingGeometry(0.08, 0.11, 32);
     arRingGeo.rotateX(-Math.PI / 2);
@@ -1121,7 +1295,7 @@
     arHitReticle.visible = false;
     scene.add(arHitReticle);
 
-    // In-VR Floating 3D HUD Menu attached to rig so Quest users can switch rooms or toggle roof
+    // In-VR Floating 3D HUD Menu attached to rig
     const vrHudCanvas = document.createElement('canvas');
     vrHudCanvas.width = 512;
     vrHudCanvas.height = 256;
@@ -1138,47 +1312,45 @@
 
     function updateVRHudCanvas() {
       if (!vrHudCtx) return;
+      const isLcars = document.body.getAttribute('data-style') === 'lcars';
       vrHudCtx.clearRect(0, 0, 512, 256);
-      vrHudCtx.fillStyle = 'rgba(12, 16, 24, 0.88)';
-      vrHudCtx.strokeStyle = '#e8b878';
-      vrHudCtx.lineWidth = 4;
-      vrHudCtx.beginPath();
-      vrHudCtx.roundRect(6, 6, 500, 244, 20);
-      vrHudCtx.fill();
-      vrHudCtx.stroke();
 
-      vrHudCtx.fillStyle = '#e8b878';
-      vrHudCtx.font = 'bold 22px sans-serif';
+      if (isLcars) {
+        vrHudCtx.fillStyle = 'rgba(0, 0, 0, 0.92)';
+        vrHudCtx.strokeStyle = '#ff9900';
+      } else {
+        vrHudCtx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+        vrHudCtx.strokeStyle = '#050505';
+      }
+      vrHudCtx.lineWidth = 4;
+      vrHudCtx.strokeRect(6, 6, 500, 244);
+      vrHudCtx.fillRect(6, 6, 500, 244);
+
+      vrHudCtx.fillStyle = isLcars ? '#ff9900' : '#050505';
+      vrHudCtx.font = 'bold 21px sans-serif';
       vrHudCtx.fillText('9-TSUBO HOUSE · QUEST VR HUD', 24, 42);
 
       const room = ROOMS[currentRoomIndex] || ROOMS[0];
-      vrHudCtx.fillStyle = '#ffffff';
-      vrHudCtx.font = 'bold 20px sans-serif';
-      vrHudCtx.fillText(`Room: ${room.name}`, 24, 82);
+      vrHudCtx.fillStyle = isLcars ? '#ffcc99' : '#050505';
+      vrHudCtx.font = 'bold 19px sans-serif';
+      vrHudCtx.fillText(`ROOM: ${room.name.toUpperCase()}`, 24, 80);
 
-      vrHudCtx.fillStyle = '#5ce1e6';
-      vrHudCtx.font = '17px sans-serif';
-      vrHudCtx.fillText('• Aim at Floor + Trigger/Grip = Teleport Here', 24, 118);
-      vrHudCtx.fillText('• Left Stick = Walk  |  Right Stick = Snap Turn', 24, 146);
-      vrHudCtx.fillText('• A/B or X/Y Buttons = Next / Prev Room', 24, 174);
+      vrHudCtx.fillStyle = isLcars ? '#cc99cc' : '#444444';
+      vrHudCtx.font = '16px sans-serif';
+      vrHudCtx.fillText('• Aim at Floor + Trigger/Grip = Teleport Here', 24, 116);
+      vrHudCtx.fillText('• Left Stick = Walk  |  Right Stick = Snap Turn', 24, 144);
+      vrHudCtx.fillText('• A/B or X/Y Buttons = Next / Prev Room', 24, 172);
 
-      // Interactive HUD buttons along bottom
-      vrHudCtx.fillStyle = '#1f2937';
+      vrHudCtx.fillStyle = isLcars ? '#ff9900' : '#050505';
       vrHudCtx.fillRect(24, 194, 140, 42);
       vrHudCtx.fillRect(184, 194, 140, 42);
       vrHudCtx.fillRect(344, 194, 144, 42);
 
-      vrHudCtx.strokeStyle = '#9ca3af';
-      vrHudCtx.lineWidth = 2;
-      vrHudCtx.strokeRect(24, 194, 140, 42);
-      vrHudCtx.strokeRect(184, 194, 140, 42);
-      vrHudCtx.strokeRect(344, 194, 144, 42);
-
-      vrHudCtx.fillStyle = '#f9fafb';
-      vrHudCtx.font = 'bold 16px sans-serif';
-      vrHudCtx.fillText('◀ Prev Room', 42, 221);
-      vrHudCtx.fillText('Next Room ▶', 202, 221);
-      vrHudCtx.fillText(roofVisible ? 'Roof: ON' : 'Roof: OFF', 372, 221);
+      vrHudCtx.fillStyle = isLcars ? '#000000' : '#ffffff';
+      vrHudCtx.font = 'bold 15px sans-serif';
+      vrHudCtx.fillText('◀ PREV ROOM', 40, 221);
+      vrHudCtx.fillText('NEXT ROOM ▶', 200, 221);
+      vrHudCtx.fillText(roofVisible ? 'ROOF: ON' : 'ROOF: OFF', 374, 221);
 
       vrHudTex.needsUpdate = true;
     }
@@ -1202,7 +1374,7 @@
       controller.add(laserLine);
 
       controller.addEventListener('selectstart', () => onControllerTrigger(controller));
-      controller.addEventListener('squeezestart', () => onControllerSqueeze(controller));
+      controller.addEventListener('squeezestart', () => onControllerSqueeze());
 
       const grip = renderer.xr.getControllerGrip(i);
       grip.add(controllerModelFactory.createControllerModel(grip));
@@ -1214,19 +1386,17 @@
     function onControllerTrigger(controller) {
       if (!renderer.xr.isPresenting) return;
 
-      // Mode 4 (Tabletop Dollhouse AR): Place miniature house at reticle or in front of user
+      // Mode 4 (Tabletop Dollhouse AR): Ignore tap if user was just 2-finger pinching to scale!
       if (currentMode === 4) {
+        if (performance.now() - lastPinchTimestamp < 400) return;
         placeDollhouseAtReticleOrFront();
         return;
       }
 
-      // Mode 3 (1:1 AR Walk): Cycle to next room if using headset passthrough controller
       if (currentMode === 3) {
-        goToRoom(currentRoomIndex + 1, false);
         return;
       }
 
-      // Mode 2 (Full VR): Check if pointing at the 3D HUD panel first
       if (currentMode === 2) {
         tempMatrix.identity().extractRotation(controller.matrixWorld);
         vrRaycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
@@ -1245,7 +1415,6 @@
           }
         }
 
-        // Otherwise, if floor teleport reticle is valid, teleport user to that exact spot!
         if (vrTeleportReticle.visible) {
           rig.position.copy(vrTeleportReticle.position);
         }
@@ -1263,7 +1432,6 @@
       }
     }
 
-    // Poll Quest Gamepad Thumbsticks & A/B/X/Y Buttons in VR
     const prevButtonStates = new Map();
     let snapTurnCooldown = 0;
 
@@ -1274,7 +1442,6 @@
         return;
       }
 
-      // 1. Raycast from controllers against walkableMeshes to position Floor Teleport Reticle
       let foundFloorHit = false;
       for (const ctrl of controllers) {
         tempMatrix.identity().extractRotation(ctrl.matrixWorld);
@@ -1300,7 +1467,6 @@
         vrTeleportReticle.visible = false;
       }
 
-      // 2. Poll Quest Gamepads for Smooth Locomotion, Snap Turn, and A/B Room Cycling
       if (snapTurnCooldown > 0) snapTurnCooldown -= dt;
 
       for (const source of session.inputSources) {
@@ -1308,12 +1474,10 @@
         const gp = source.gamepad;
         const hand = source.handedness || 'unknown';
 
-        // Thumbsticks: axes[2] (X) and axes[3] (Y) on WebXR Quest Touch controllers
         const axX = gp.axes.length > 2 ? gp.axes[2] : (gp.axes[0] || 0);
         const axY = gp.axes.length > 3 ? gp.axes[3] : (gp.axes[1] || 0);
 
         if (hand === 'left') {
-          // Left Stick: Smooth Walk / Strafe along headset forward horizontal direction
           if (Math.abs(axX) > 0.18 || Math.abs(axY) > 0.18) {
             const xrCam = renderer.xr.getCamera();
             const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(xrCam.quaternion);
@@ -1328,14 +1492,12 @@
             rig.position.addScaledVector(right, axX * walkSpeed);
           }
         } else if (hand === 'right') {
-          // Right Stick X: Snap Turn 45 degrees
           if (Math.abs(axX) > 0.65 && snapTurnCooldown <= 0) {
             rig.rotation.y -= Math.sign(axX) * (Math.PI / 4);
             snapTurnCooldown = 0.35;
           }
         }
 
-        // Buttons 4 (A/X) = Next Room, Button 5 (B/Y) = Toggle Roof or Prev Room
         gp.buttons.forEach((btn, bIdx) => {
           const key = `${hand}_${bIdx}`;
           const wasPressed = prevButtonStates.get(key) || false;
@@ -1359,24 +1521,20 @@
     let hitTestSourceRequested = false;
     let needInitialARAnchor = false;
 
-    // Anchor Mode 3 (1:1 AR Walkthrough) so the selected room's eyePos matches the user's current AR camera pose
     function anchor1to1ARRoom(room) {
       const xrCam = renderer.xr.getCamera();
       const camPos = new THREE.Vector3();
       xrCam.getWorldPosition(camPos);
 
       worldRoot.scale.set(1, 1, 1);
-      // Offset worldRoot so the room's eyePos lands right at the phone's current position
       worldRoot.position.set(
         camPos.x - room.eyePos[0],
         camPos.y - room.eyePos[1],
         camPos.z - room.eyePos[2]
       );
       arStatusLabel.textContent = `1:1 AR · ${room.name}`;
-      setToast(`<b>1:1 AR Active</b> · Physically walk around <b>${room.name}</b> or tap another room below`);
     }
 
-    // Place Mode 4 (Tabletop Dollhouse AR) either at the green hit-test reticle or 0.75m in front of the phone
     function placeDollhouseAtReticleOrFront(forceFront = false) {
       worldRoot.scale.setScalar(dollhouseScale);
 
@@ -1384,11 +1542,8 @@
         const hitPos = new THREE.Vector3();
         hitPos.setFromMatrixPosition(arHitReticle.matrix);
         worldRoot.position.copy(hitPos);
-        dollhousePlaced = true;
-        arStatusLabel.textContent = `Tabletop Placed (${Math.round(dollhouseScale * 100)}%)`;
-        setToast(`<b>Dollhouse Locked to Surface!</b> · Peer inside or use ➖/➕/🔄 above`);
+        arStatusLabel.textContent = `Tabletop (${Math.round(dollhouseScale * 100)}%) · Pinch to Scale`;
       } else {
-        // Place comfortably 0.75m in front and 0.25m below the current AR camera
         const xrCam = renderer.xr.getCamera();
         const camPos = new THREE.Vector3();
         const camQuat = new THREE.Quaternion();
@@ -1398,15 +1553,13 @@
         const forward = new THREE.Vector3(0, 0, -0.75).applyQuaternion(camQuat);
         worldRoot.position.copy(camPos).add(forward);
         worldRoot.position.y -= 0.25;
-        dollhousePlaced = true;
-        arStatusLabel.textContent = `Dollhouse Ready (${Math.round(dollhouseScale * 100)}%)`;
-        setToast(`<b>Dollhouse Placed in Front!</b> · Aim at a table &amp; tap screen to snap to surface`);
+        arStatusLabel.textContent = `Dollhouse (${Math.round(dollhouseScale * 100)}%) · Pinch to Scale`;
       }
     }
 
-    // Bind AR Action Bar Buttons (DOM Overlay)
     document.getElementById('btn-ar-recenter').addEventListener('click', (e) => {
       e.stopPropagation();
+      playUISound();
       if (currentMode === 3) {
         anchor1to1ARRoom(ROOMS[currentRoomIndex]);
       } else if (currentMode === 4) {
@@ -1416,7 +1569,8 @@
 
     document.getElementById('btn-ar-scale-down').addEventListener('click', (e) => {
       e.stopPropagation();
-      dollhouseScale = Math.max(0.02, dollhouseScale * 0.8);
+      playUISound();
+      dollhouseScale = Math.max(0.015, dollhouseScale * 0.8);
       if (currentMode === 4) {
         worldRoot.scale.setScalar(dollhouseScale);
         arStatusLabel.textContent = `Scale: ${Math.round(dollhouseScale * 100)}%`;
@@ -1425,7 +1579,8 @@
 
     document.getElementById('btn-ar-scale-up').addEventListener('click', (e) => {
       e.stopPropagation();
-      dollhouseScale = Math.min(0.25, dollhouseScale * 1.25);
+      playUISound();
+      dollhouseScale = Math.min(0.50, dollhouseScale * 1.25);
       if (currentMode === 4) {
         worldRoot.scale.setScalar(dollhouseScale);
         arStatusLabel.textContent = `Scale: ${Math.round(dollhouseScale * 100)}%`;
@@ -1434,6 +1589,7 @@
 
     document.getElementById('btn-ar-rotate').addEventListener('click', (e) => {
       e.stopPropagation();
+      playUISound();
       worldRoot.rotation.y += Math.PI / 4;
     });
 
@@ -1461,7 +1617,6 @@
       }
     }
 
-    // MODE 1: Standard Browser 3D Walkthrough
     async function activateMode1() {
       await endCurrentXRSessionIfAny();
       setActiveModeButton(1);
@@ -1479,23 +1634,21 @@
       setRoofVisibility(true);
       setContextVisibility(true);
       goToRoom(currentRoomIndex, true);
-      setToast('<b>Mode 1 · Browser 3D</b> · Drag to look · <b>WASD / Arrows</b> to walk · Click any room below');
     }
 
-    // MODE 2: Full VR (Quest 3 / Quest Pro)
     async function activateMode2() {
       await endCurrentXRSessionIfAny();
       setActiveModeButton(2);
 
       if (!navigator.xr) {
-        setToast('⚠️ WebXR not available in this browser. Open on Meta Quest Browser for Mode 2 VR.');
+        setStatus('WEBXR NOT AVAILABLE — OPEN ON META QUEST FOR VR');
         return;
       }
 
       try {
         const supported = await navigator.xr.isSessionSupported('immersive-vr');
         if (!supported) {
-          setToast('⚠️ immersive-vr not supported on this device. Use Meta Quest 3 / Pro for Mode 2.');
+          setStatus('IMMERSIVE-VR NOT SUPPORTED ON THIS DEVICE');
           return;
         }
 
@@ -1525,27 +1678,23 @@
         session.addEventListener('end', onXRSessionEnded);
       } catch (err) {
         console.error('VR session error:', err);
-        setToast(`⚠️ Could not start VR: ${err.message}`);
+        setStatus(`VR ERROR: ${err.message}`);
       }
     }
 
-    // MODE 3 (1:1 AR Walkthrough) & MODE 4 (Dollhouse Tabletop AR)
     async function activateARMode(targetMode) {
       await endCurrentXRSessionIfAny();
       setActiveModeButton(targetMode);
 
-      // Show the AR Contextual Action Bar immediately even before WebXR starts so mobile users see all controls!
       arActionBar.classList.add('visible');
       const isDollhouse = targetMode === 4;
       document.getElementById('btn-ar-scale-down').style.display = isDollhouse ? 'inline-flex' : 'none';
       document.getElementById('btn-ar-scale-up').style.display = isDollhouse ? 'inline-flex' : 'none';
 
       if (isDollhouse) {
-        // Dollhouse Tabletop preview & setup: Automatically hide Roof_Group and Context_Group
         setRoofVisibility(false);
         setContextVisibility(false);
-        arStatusLabel.textContent = 'Mode 4 · Tabletop Dollhouse';
-        // Switch to an isometric overview angle if currently in Browser 3D preview
+        arStatusLabel.textContent = 'Tabletop · Pinch to Scale';
         if (!renderer.xr.isPresenting) {
           rig.position.set(-4.2, 4.8, 5.2);
           yaw = -0.68;
@@ -1553,33 +1702,23 @@
           camera.rotation.set(pitch, yaw, 0);
         }
       } else {
-        // 1:1 AR Walk setup: Keep house roof on, hide heavy exterior context if desired
         setRoofVisibility(true);
         setContextVisibility(false);
-        arStatusLabel.textContent = 'Mode 3 · 1:1 AR Walk';
+        arStatusLabel.textContent = '1:1 AR Walk';
       }
 
       if (!navigator.xr) {
-        setToast(
-          isDollhouse
-            ? '<b>Dollhouse Cutaway Preview Active</b> (Roof &amp; Context hidden). Open on Android Chrome / Quest for live camera AR!'
-            : '<b>1:1 Room Walkthrough Preview</b>. Open on Android Chrome (Pixel 10 Pro) for live camera AR!'
-        );
+        setStatus(isDollhouse ? 'DOLLHOUSE CUTAWAY PREVIEW ACTIVE' : '1:1 WALK PREVIEW ACTIVE');
         return;
       }
 
       try {
         const supported = await navigator.xr.isSessionSupported('immersive-ar');
         if (!supported) {
-          setToast(
-            isDollhouse
-              ? '<b>Dollhouse Cutaway Active</b> (immersive-ar not supported on this browser; showing 3D cutaway).'
-              : '<b>1:1 Walk Mode Active</b> (immersive-ar not supported on this browser).'
-          );
+          setStatus(isDollhouse ? 'DOLLHOUSE CUTAWAY ACTIVE (3D PREVIEW)' : '1:1 WALK MODE ACTIVE (3D PREVIEW)');
           return;
         }
 
-        // Use 'local' reference space so Android Chrome immersive-ar starts 100% reliably on frame 1
         renderer.xr.setReferenceSpaceType('local');
 
         const sessionInit = {
@@ -1590,30 +1729,25 @@
         const session = await navigator.xr.requestSession('immersive-ar', sessionInit);
         await renderer.xr.setSession(session);
 
-        // Guardrail: Enable foveation & disable expensive shadow maps in AR
         if (renderer.xr.setFoveation) renderer.xr.setFoveation(1.0);
         renderer.shadowMap.enabled = false;
 
-        // Transparent camera passthrough background
         scene.background = null;
         scene.fog = null;
         vrHudMesh.visible = false;
         btnExitXR.style.display = 'inline-flex';
-        walkPad.classList.remove('visible');
 
-        // Reset rig to origin so XR camera tracking drives movement directly
         rig.position.set(0, 0, 0);
         rig.rotation.set(0, 0, 0);
 
         needInitialARAnchor = true;
-        dollhousePlaced = false;
         hitTestSourceRequested = false;
         hitTestSource = null;
 
         session.addEventListener('end', onXRSessionEnded);
       } catch (err) {
         console.error('AR session error:', err);
-        setToast(`<b>AR Preview Mode</b> (${err.message || 'Check camera permissions on HTTPS'})`);
+        setStatus(`AR PREVIEW (${err.message || 'HTTPS REQUIRED'})`);
       }
     }
 
@@ -1638,28 +1772,31 @@
       setContextVisibility(true);
       setActiveModeButton(1);
       goToRoom(currentRoomIndex, false);
-      setToast('Exited XR Session · Back in <b>Mode 1 · Browser 3D</b>');
     }
 
-    // Bind 4 Mode Buttons
     document.getElementById('btn-mode-1').addEventListener('click', (e) => {
       e.stopPropagation();
+      playUISound();
       activateMode1();
     });
     document.getElementById('btn-mode-2').addEventListener('click', (e) => {
       e.stopPropagation();
+      playUISound();
       activateMode2();
     });
     document.getElementById('btn-mode-3').addEventListener('click', (e) => {
       e.stopPropagation();
+      playUISound();
       activateARMode(3);
     });
     document.getElementById('btn-mode-4').addEventListener('click', (e) => {
       e.stopPropagation();
+      playUISound();
       activateARMode(4);
     });
     btnExitXR.addEventListener('click', (e) => {
       e.stopPropagation();
+      playUISound();
       endCurrentXRSessionIfAny();
     });
 
@@ -1675,27 +1812,22 @@
         const session = renderer.xr.getSession();
         const refSpace = renderer.xr.getReferenceSpace();
 
-        // Initial Frame Anchor for AR Modes 3 & 4
         if (needInitialARAnchor) {
           needInitialARAnchor = false;
           if (currentMode === 3) {
-            // Mode 3: If currently on an exterior far camera, jump to Living Room (index 4) or keep current room
             if (currentRoomIndex === 0 || currentRoomIndex === 12) {
-              updateRoomUI(4); // 05 · Living & Kitchen
+              updateRoomUI(4);
             }
             anchor1to1ARRoom(ROOMS[currentRoomIndex]);
           } else if (currentMode === 4) {
-            // Mode 4: Immediately place miniature dollhouse 0.75m in front so user sees it right away!
             placeDollhouseAtReticleOrFront(true);
           }
         }
 
-        // Mode 2: Update VR Floor Teleport Reticle & Thumbsticks
         if (currentMode === 2) {
           updateVRControllers(dt);
         }
 
-        // Mode 4: WebXR Surface Hit-Test for Tabletop Dollhouse Placement
         if (currentMode === 4 && session) {
           if (!hitTestSourceRequested) {
             session.requestReferenceSpace('viewer').then((viewerSpace) => {
@@ -1725,14 +1857,12 @@
           arHitReticle.visible = false;
         }
       } else {
-        // Browser 3D Mode: Update WASD movement + smooth preset transitions
         updateDesktopMovement(dt);
       }
 
       renderer.render(scene, camera);
     });
 
-    // Responsive Window Resize
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
