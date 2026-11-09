@@ -109,8 +109,23 @@
         max(10px, env(safe-area-inset-left));
     }
 
+    /* AR Touch Surface for reliable multi-touch pinch/drag inside WebXR DOM Overlay */
+    #ar-touch-surface {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      touch-action: none;
+    }
+
+    #ar-touch-surface.active {
+      pointer-events: auto;
+    }
+
     /* Top Section: Header + 4-Mode Switcher + AR Contextual Bar */
     .top-section {
+      position: relative;
+      z-index: 2;
       display: flex;
       flex-direction: column;
       gap: 6px;
@@ -347,6 +362,8 @@
 
     /* Bottom Section: Preset Camera Scroller */
     .bottom-section {
+      position: relative;
+      z-index: 2;
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -354,6 +371,89 @@
       max-width: 1020px;
       margin: 0 auto;
       pointer-events: none;
+    }
+
+    /* Changelog Modal Overlay */
+    #changelog-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      pointer-events: auto;
+    }
+
+    #changelog-modal.visible {
+      display: flex;
+    }
+
+    .changelog-card {
+      width: 100%;
+      max-width: 620px;
+      max-height: 82dvh;
+      overflow-y: auto;
+      background: var(--bg-panel-heavy);
+      border: var(--border-width) solid var(--border-main);
+      border-radius: var(--radius-panel);
+      box-shadow: var(--shadow-panel);
+      padding: 16px 18px;
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      touch-action: pan-y;
+    }
+
+    body[data-style="lcars"] .changelog-card {
+      border-left: 18px solid #ff9900;
+    }
+
+    .changelog-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-main);
+      padding-bottom: 8px;
+    }
+
+    .changelog-title {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: var(--letter-spacing);
+      text-transform: uppercase;
+    }
+
+    .changelog-entry {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+      line-height: 1.45;
+      border-left: 3px solid var(--border-main);
+      padding-left: 10px;
+    }
+
+    .changelog-ver {
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: var(--letter-spacing);
+    }
+
+    .changelog-desc {
+      color: var(--text-muted);
+      font-size: 11.5px;
+    }
+
+    .changelog-link {
+      color: var(--text-main);
+      font-size: 11.5px;
+      font-weight: 700;
+      text-decoration: underline;
     }
 
     /* Preset Room Camera Bar */
@@ -521,6 +621,9 @@
 
   <!-- DOM Overlay UI (Works in Browser 3D and Android Chrome WebXR AR) -->
   <div id="ui-overlay">
+    <!-- Dedicated gesture capture surface for Tabletop AR pinch-to-scale & drag-to-rotate -->
+    <div id="ar-touch-surface"></div>
+
     <div class="top-section">
       <!-- Compact Header Row -->
       <div class="header-row">
@@ -534,7 +637,9 @@
         <div class="quick-toggles">
           <button id="btn-toggle-roof" class="btn btn-sm toggle-on" title="Toggle Roof_Group">🏠 Roof: ON</button>
           <button id="btn-toggle-context" class="btn btn-sm toggle-on" title="Toggle Context_Group">🌳 Context: ON</button>
+          <button id="btn-toggle-lines" class="btn btn-sm" title="Toggle Subtle Hidden-Line CAD Render (Hotkey: L)">✏️ Lines: OFF</button>
           <button id="btn-toggle-style" class="btn btn-sm style-btn" title="Switch UI Style: German DIN 1451 vs Star Trek LCARS (Hotkey: T)">📐 Style: DIN</button>
+          <button id="btn-changelog" class="btn btn-sm" title="View Version Changelog">📋 v0.4</button>
           <button id="btn-exit-xr" class="btn btn-sm danger" style="display:none;">✕ Exit XR</button>
         </div>
       </div>
@@ -562,9 +667,42 @@
       <div class="camera-bar-wrap">
         <div class="camera-bar-header">
           <span id="active-room-label">📷 VIEWPOINT: 01 · EXT THREE-QUARTER</span>
-          <span id="control-hint-label" class="kbd-hint">DRAG: LOOK · RIGHT-DRAG: PAN · SCROLL / WASD: MOVE · [T]: STYLE</span>
+          <span id="control-hint-label" class="kbd-hint">DRAG: LOOK · RIGHT-DRAG: PAN · SCROLL / WASD: MOVE · [L]: LINES · [T]: STYLE</span>
         </div>
         <div id="room-strip"></div>
+      </div>
+    </div>
+
+    <!-- Version Changelog Modal -->
+    <div id="changelog-modal">
+      <div class="changelog-card">
+        <div class="changelog-header">
+          <span class="changelog-title">📋 9TSUBOV2 · VERSION CHANGELOG</span>
+          <button id="btn-close-changelog" class="btn btn-sm">✕ Close</button>
+        </div>
+        <div class="changelog-entry">
+          <div class="changelog-ver">v0.4.0 · 2026-11-08 (Current)</div>
+          <div class="changelog-desc">• Phone 3D Navigation: True 1-finger 360° orbit, 2-finger pinch zoom &amp; 2-finger pan around viewpoint targets (desktop mouse/WASD preserved).<br>• Tabletop AR (Mode 4): Auto-scales view to full extents of the entire model including neighborhood context, fixes WebXR first-frame pose anchor, and enables smooth 2-finger pinch scaling.<br>• Hidden-Line Render (`✏️ Lines` / `[L]`): Subtle CAD edge-line overlay with depth-occluded paper shading.<br>• Added GitHub `CHANGELOG.md` and in-app version history tracker.</div>
+        </div>
+        <div class="changelog-entry">
+          <div class="changelog-ver">v0.3.0 · 2026-11-04 (`6e7d113`)</div>
+          <div class="changelog-desc">• Dual-Engine Graphic Design System: German DIN 1451 E-Ink technical specification UI (default) toggleable with 24th-century Star Trek LCARS telemetry (`[T]` / `📐 Style`), plus procedural Web Audio synthesizer sound effects.</div>
+        </div>
+        <div class="changelog-entry">
+          <div class="changelog-ver">v0.2.1 · 2026-11-04 (`2f81f26`)</div>
+          <div class="changelog-desc">• Docked instruction toast banner under top bar with auto-fade timer (subsequently streamlined out in v0.3.0).</div>
+        </div>
+        <div class="changelog-entry">
+          <div class="changelog-ver">v0.2.0 · 2026-11-04 (`37d86d8`)</div>
+          <div class="changelog-desc">• Updated `9_tsubo_house.glb` with 2F sliding bedroom window (`Bed_SlidingWin_*`), non-symmetrical tuxedo cat (`Ctx_Kitty_*`), and cherry blossom tree (`Ctx_Sakura_*`).<br>• Verified all 13 preset camera viewpoints, fixed mobile WebGL load, WASD locomotion, VR floor teleport reticle, and 1:1 AR room anchoring.</div>
+        </div>
+        <div class="changelog-entry">
+          <div class="changelog-ver">v0.1.0 · 2026-11-02 (`ade8b05`)</div>
+          <div class="changelog-desc">• Initial release of the 9-Tsubo House (Koizumi Studio, 1999) 4-Mode WebXR experience and Blender GLB export.</div>
+        </div>
+        <div>
+          <a class="changelog-link" href="https://github.com/spinorama/9TsuboV2/blob/main/CHANGELOG.md" target="_blank" rel="noopener">↗ View Full CHANGELOG.md on GitHub</a>
+        </div>
       </div>
     </div>
   </div>
@@ -620,23 +758,23 @@
     // 1. VERIFIED PRESET CAMERAS & WAYPOINTS (Exact Three.js World Coordinates)
     // =========================================================================
     const ROOMS = [
-      { id: 'Cam_01_Ext_ThreeQuarter',           name: '01 · Ext Three-Quarter',   floorPos: [-7.80, 0.00,  8.50], eyePos: [-7.80,  1.75,  8.50], yaw: -0.7465, pitch:  0.0550 },
-      { id: 'Cam_02_Ext_FrontLowAngle',          name: '02 · Ext Front & Sakura',  floorPos: [-3.50, 0.00,  7.20], eyePos: [-3.50,  1.35,  7.20], yaw: -0.4456, pitch:  0.1339 },
-      { id: 'Cam_04_Ext_FrontElevation',         name: '03 · Ext Front Elevation', floorPos: [-0.05, 0.00,  9.20], eyePos: [-0.05,  1.85,  9.20], yaw:  0.0000, pitch:  0.0609 },
-      { id: 'WP_02_Sakura_Deck',                 name: '04 · Sakura Engawa Deck',  floorPos: [ 0.85, 0.36,  3.55], eyePos: [ 0.85,  1.96,  3.55], yaw:  0.3890, pitch: -0.0350 },
-      { id: 'Cam_03_Int_KitchenAndLoft',         name: '05 · Living & Kitchen',    floorPos: [-2.15, 0.36,  2.10], eyePos: [-2.15,  2.05,  2.10], yaw: -1.2530, pitch: -0.0250 },
-      { id: 'Cam_06_Int_HighAngleDiningKitchen', name: '06 · Dining & Patio View', floorPos: [-2.25, 2.52,  0.35], eyePos: [-2.25,  3.75,  0.35], yaw: -2.0032, pitch: -0.7177 },
-      { id: 'Cam_08_Int_TatamiRoom',             name: '07 · 1F Tatami Room',      floorPos: [-0.65, 0.36,  2.05], eyePos: [-0.65,  1.38,  2.05], yaw:  0.0000, pitch: -0.0141 },
-      { id: 'Cam_09_Int_Bathroom',               name: '08 · 1F Bathroom Suite',   floorPos: [ 1.52, 0.36, -0.45], eyePos: [ 1.52,  1.45, -0.45], yaw: -0.1237, pitch: -0.2114 },
-      { id: 'Cam_05_Int_LoftLoungeAndBed',       name: '09 · 2F Loft & Columns',   floorPos: [-1.25, 2.52,  0.55], eyePos: [-1.25,  3.35,  0.55], yaw: -1.1456, pitch: -0.0686 },
-      { id: 'Cam_07_Int_LoftToBedAndStairs',     name: '10 · 2F Loft Lounge',      floorPos: [ 1.55, 2.52,  1.35], eyePos: [ 1.55,  3.25,  1.35], yaw:  0.7266, pitch: -0.1914 },
-      { id: 'Cam_13_Int_BedWindow_To_Kitty',     name: '11 · 2F Bed → Kitty Win',  floorPos: [-0.26, 2.52, -0.45], eyePos: [-0.26,  3.40, -0.45], yaw: -0.0198, pitch:  0.0082 },
-      { id: 'Cam_14_Ext_RearWindow_And_Kitty',   name: '12 · Tuxedo Kitty Close',  floorPos: [-1.35, 2.52, -3.65], eyePos: [-1.35,  3.62, -3.65], yaw: -0.4169, pitch: -0.0236 },
-      { id: 'Cam_12_Context_Overview',           name: '13 · Aerial Overview',     floorPos: [-11.50, 0.00, 16.20], eyePos: [-11.50, 11.80, 16.20], yaw: -0.7227, pitch: -0.4802 }
+      { id: 'Cam_01_Ext_ThreeQuarter',           name: '01 · Ext Three-Quarter',   floorPos: [-7.80, 0.00,  8.50], eyePos: [-7.80,  1.75,  8.50], yaw: -0.7465, pitch:  0.0550, orbitDist: 11.5 },
+      { id: 'Cam_02_Ext_FrontLowAngle',          name: '02 · Ext Front & Sakura',  floorPos: [-3.50, 0.00,  7.20], eyePos: [-3.50,  1.35,  7.20], yaw: -0.4456, pitch:  0.1339, orbitDist:  7.7 },
+      { id: 'Cam_04_Ext_FrontElevation',         name: '03 · Ext Front Elevation', floorPos: [-0.05, 0.00,  9.20], eyePos: [-0.05,  1.85,  9.20], yaw:  0.0000, pitch:  0.0609, orbitDist:  9.2 },
+      { id: 'WP_02_Sakura_Deck',                 name: '04 · Sakura Engawa Deck',  floorPos: [ 0.85, 0.36,  3.55], eyePos: [ 0.85,  1.96,  3.55], yaw:  0.3890, pitch: -0.0350, orbitDist:  3.2 },
+      { id: 'Cam_03_Int_KitchenAndLoft',         name: '05 · Living & Kitchen',    floorPos: [-2.15, 0.36,  2.10], eyePos: [-2.15,  2.05,  2.10], yaw: -1.2530, pitch: -0.0250, orbitDist:  2.8 },
+      { id: 'Cam_06_Int_HighAngleDiningKitchen', name: '06 · Dining & Patio View', floorPos: [-2.25, 2.52,  0.35], eyePos: [-2.25,  3.75,  0.35], yaw: -2.0032, pitch: -0.7177, orbitDist:  3.0 },
+      { id: 'Cam_08_Int_TatamiRoom',             name: '07 · 1F Tatami Room',      floorPos: [-0.65, 0.36,  2.05], eyePos: [-0.65,  1.38,  2.05], yaw:  0.0000, pitch: -0.0141, orbitDist:  2.4 },
+      { id: 'Cam_09_Int_Bathroom',               name: '08 · 1F Bathroom Suite',   floorPos: [ 1.52, 0.36, -0.45], eyePos: [ 1.52,  1.45, -0.45], yaw: -0.1237, pitch: -0.2114, orbitDist:  1.8 },
+      { id: 'Cam_05_Int_LoftLoungeAndBed',       name: '09 · 2F Loft & Columns',   floorPos: [-1.25, 2.52,  0.55], eyePos: [-1.25,  3.35,  0.55], yaw: -1.1456, pitch: -0.0686, orbitDist:  2.6 },
+      { id: 'Cam_07_Int_LoftToBedAndStairs',     name: '10 · 2F Loft Lounge',      floorPos: [ 1.55, 2.52,  1.35], eyePos: [ 1.55,  3.25,  1.35], yaw:  0.7266, pitch: -0.1914, orbitDist:  2.8 },
+      { id: 'Cam_13_Int_BedWindow_To_Kitty',     name: '11 · 2F Bed → Kitty Win',  floorPos: [-0.26, 2.52, -0.45], eyePos: [-0.26,  3.40, -0.45], yaw: -0.0198, pitch:  0.0082, orbitDist:  2.5 },
+      { id: 'Cam_14_Ext_RearWindow_And_Kitty',   name: '12 · Tuxedo Kitty Close',  floorPos: [-1.35, 2.52, -3.65], eyePos: [-1.35,  3.62, -3.65], yaw: -0.4169, pitch: -0.0236, orbitDist:  1.1 },
+      { id: 'Cam_12_Context_Overview',           name: '13 · Aerial Overview',     floorPos: [-11.50, 0.00, 16.20], eyePos: [-11.50, 11.80, 16.20], yaw: -0.7227, pitch: -0.4802, orbitDist: 22.0 }
     ];
 
     const IS_MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-    const DOLLHOUSE_DEFAULT_SCALE = 0.06; // ~1:16.6 architectural model scale
+    const DOLLHOUSE_DEFAULT_SCALE = 0.012; // Fits entire 33m x 32.3m model + context on screen
 
     // =========================================================================
     // 2. CORE THREE.JS SCENE, RENDERER & CAMERA RIG
@@ -714,7 +852,7 @@
     addInteriorPointLight(-0.9, 3.80, -3.9, 1.6, 5.0);
 
     // =========================================================================
-    // 4. STATE & SCENE GROUPS (Roof_Group, Context_Group, Walkable Surfaces)
+    // 4. STATE, ORBIT PIVOT, FULL MODEL EXTENTS & HIDDEN-LINE RENDER STATE
     // =========================================================================
     let currentMode = 1; // 1: Browser 3D, 2: Quest VR, 3: 1:1 AR Walk, 4: Tabletop Dollhouse AR
     let currentRoomIndex = 0;
@@ -722,12 +860,50 @@
     let contextGroup = null;
     let roofVisible = true;
     let contextVisible = true;
+    let hiddenLineEnabled = false;
+    let hiddenLineBuilt = false;
     let dollhouseScale = DOLLHOUSE_DEFAULT_SCALE;
     const walkableMeshes = [];
 
-    // Camera look state (Browser 3D)
+    // Full Model Extents (including Context_Group) for Tabletop AR scaling
+    const fullModelSize = new THREE.Vector3(33.0, 8.48, 32.3);
+    const fullModelGroundCenter = new THREE.Vector3(0.0, 0.0, 0.65);
+    let fullModelMaxSpan = 33.0;
+
+    // Tabletop AR Anchor & Rotation state
+    const tabletopAnchorPos = new THREE.Vector3(0, -0.10, -0.85);
+    let tabletopYaw = 0;
+    const lastViewerPos = new THREE.Vector3(0, 1.5, 0);
+    const lastViewerQuat = new THREE.Quaternion();
+    let hasViewerPose = false;
+
+    // Camera look & Mobile Orbit state (Browser 3D)
     let yaw = ROOMS[0].yaw;
     let pitch = ROOMS[0].pitch;
+    let orbitRadius = ROOMS[0].orbitDist || 11.5;
+    const orbitTarget = new THREE.Vector3();
+
+    function getForwardFromAngles(y, p) {
+      return new THREE.Vector3(
+        -Math.sin(y) * Math.cos(p),
+         Math.sin(p),
+        -Math.cos(y) * Math.cos(p)
+      ).normalize();
+    }
+
+    // Recomputes orbitTarget from current rig.position + forward * orbitRadius
+    function syncOrbitFromRig(newRadius) {
+      if (typeof newRadius === 'number') orbitRadius = newRadius;
+      const fwd = getForwardFromAngles(yaw, pitch);
+      orbitTarget.copy(rig.position).addScaledVector(fwd, orbitRadius);
+    }
+
+    // Positions rig on the sphere of radius orbitRadius around orbitTarget (Mobile 1-finger Orbit & Pinch Zoom)
+    function applyOrbitToRig() {
+      const fwd = getForwardFromAngles(yaw, pitch);
+      rig.position.copy(orbitTarget).addScaledVector(fwd, -orbitRadius);
+      camera.rotation.set(pitch, yaw, 0);
+    }
 
     // Smooth camera transition state
     const camTransition = {
@@ -739,32 +915,148 @@
       startYaw: 0,
       endYaw: 0,
       startPitch: 0,
-      endPitch: 0
+      endPitch: 0,
+      endOrbitDist: 11.5
     };
 
     // Place camera at ROOMS[0] immediately before GLB finishes loading
     rig.position.set(...ROOMS[0].eyePos);
     camera.position.set(0, 0, 0);
     camera.rotation.set(pitch, yaw, 0);
+    syncOrbitFromRig(ROOMS[0].orbitDist);
 
     // =========================================================================
-    // 5. UI ELEMENTS, STYLE TOGGLER (DIN 1451 vs LCARS) & ROOM STRIP
+    // 5. UI ELEMENTS, STYLE TOGGLER, HIDDEN-LINE CAD MODE & ROOM STRIP
     // =========================================================================
     const roomStrip = document.getElementById('room-strip');
     const activeRoomLabel = document.getElementById('active-room-label');
+    const controlHintLabel = document.getElementById('control-hint-label');
     const statusDot = document.getElementById('status-dot');
     const statusSub = document.getElementById('status-sub');
     const loadingScreen = document.getElementById('loading-screen');
     const arActionBar = document.getElementById('ar-action-bar');
     const arStatusLabel = document.getElementById('ar-status-label');
+    const arTouchSurface = document.getElementById('ar-touch-surface');
     const btnToggleRoof = document.getElementById('btn-toggle-roof');
     const btnToggleContext = document.getElementById('btn-toggle-context');
+    const btnToggleLines = document.getElementById('btn-toggle-lines');
     const btnToggleStyle = document.getElementById('btn-toggle-style');
+    const btnChangelog = document.getElementById('btn-changelog');
+    const btnCloseChangelog = document.getElementById('btn-close-changelog');
+    const changelogModal = document.getElementById('changelog-modal');
     const btnExitXR = document.getElementById('btn-exit-xr');
+
+    if (IS_MOBILE && controlHintLabel) {
+      controlHintLabel.textContent = '1-FINGER: ORBIT · PINCH: ZOOM · 2-FINGER: PAN';
+    }
+
+    // Prevent WebXR from hijacking touch gestures as select events when using Mode 4 Tabletop AR
+    document.getElementById('ui-overlay').addEventListener('beforexrselect', (e) => {
+      if (currentMode === 4 || (e.target && e.target.closest('.top-section, .bottom-section, #changelog-modal'))) {
+        e.preventDefault();
+      }
+    });
 
     function setStatus(text) {
       statusSub.textContent = text;
     }
+
+    // Subtle Hidden-Line CAD Render Mode (EdgesGeometry + Depth-Occluded Paper Shading)
+    const paperSkyColor = new THREE.Color(0xf4f4f0);
+    const sharedEdgeMaterial = new THREE.LineBasicMaterial({
+      color: 0x27272a,
+      transparent: true,
+      opacity: 0.42,
+      depthTest: true,
+      depthWrite: false
+    });
+
+    function buildHiddenLineMaterialsIfNeeded() {
+      if (hiddenLineBuilt) return;
+      hiddenLineBuilt = true;
+
+      const paperTint = new THREE.Color(0xfafaf7);
+      worldRoot.traverse((child) => {
+        if (!child.isMesh || child.userData.isEdgeHelper) return;
+        child.userData.origMaterial = child.material;
+
+        const makeSubtlePaperMat = (mat) => {
+          if (!mat) return mat;
+          const isGlass = (mat.transparent && mat.opacity < 0.85) || /glass|pane/i.test(child.name);
+          const cloned = mat.clone();
+          if (isGlass) {
+            cloned.transparent = true;
+            cloned.opacity = 0.22;
+            if (cloned.color) cloned.color.setHex(0xe2e8f0);
+          } else {
+            if (cloned.color) {
+              cloned.color.lerp(paperTint, 0.80);
+            }
+            if ('roughness' in cloned) cloned.roughness = 0.92;
+            if ('metalness' in cloned) cloned.metalness = 0.02;
+            cloned.polygonOffset = true;
+            cloned.polygonOffsetFactor = 1;
+            cloned.polygonOffsetUnits = 1;
+          }
+          return cloned;
+        };
+
+        if (Array.isArray(child.material)) {
+          child.userData.hlMaterial = child.material.map(makeSubtlePaperMat);
+        } else {
+          child.userData.hlMaterial = makeSubtlePaperMat(child.material);
+        }
+
+        if (child.geometry) {
+          const edgesGeo = new THREE.EdgesGeometry(child.geometry, 24);
+          const edgeSegments = new THREE.LineSegments(edgesGeo, sharedEdgeMaterial);
+          edgeSegments.userData.isEdgeHelper = true;
+          edgeSegments.raycast = () => {}; // Never interfere with VR floor teleport raycasting
+          edgeSegments.visible = false;
+          child.add(edgeSegments);
+          child.userData.edgeSegments = edgeSegments;
+        }
+      });
+    }
+
+    function applySceneBackgroundForCurrentState() {
+      if (renderer.xr.isPresenting && (currentMode === 3 || currentMode === 4)) {
+        scene.background = null;
+        scene.fog = null;
+        return;
+      }
+      const bg = hiddenLineEnabled ? paperSkyColor : skyBgColor;
+      scene.background = bg;
+      scene.fog = new THREE.FogExp2(bg.getHex(), 0.012);
+    }
+
+    function setHiddenLineMode(enabled) {
+      buildHiddenLineMaterialsIfNeeded();
+      hiddenLineEnabled = enabled;
+
+      const isLcars = document.body.getAttribute('data-style') === 'lcars';
+      sharedEdgeMaterial.color.setHex(isLcars ? 0x18181b : 0x27272a);
+
+      worldRoot.traverse((child) => {
+        if (!child.isMesh || child.userData.isEdgeHelper) return;
+        if (child.userData.origMaterial && child.userData.hlMaterial) {
+          child.material = enabled ? child.userData.hlMaterial : child.userData.origMaterial;
+        }
+        if (child.userData.edgeSegments) {
+          child.userData.edgeSegments.visible = enabled;
+        }
+      });
+
+      btnToggleLines.classList.toggle('toggle-on', enabled);
+      btnToggleLines.textContent = enabled ? '✏️ Lines: ON' : '✏️ Lines: OFF';
+      applySceneBackgroundForCurrentState();
+    }
+
+    btnToggleLines.addEventListener('click', (e) => {
+      e.stopPropagation();
+      playUISound();
+      setHiddenLineMode(!hiddenLineEnabled);
+    });
 
     // Dual-Engine Graphic Style Toggle (German DIN 1451 Default <-> Star Trek LCARS)
     function toggleGraphicStyle() {
@@ -786,6 +1078,26 @@
     btnToggleStyle.addEventListener('click', (e) => {
       e.stopPropagation();
       toggleGraphicStyle();
+    });
+
+    // Changelog Modal Listeners
+    btnChangelog.addEventListener('click', (e) => {
+      e.stopPropagation();
+      playUISound();
+      changelogModal.classList.toggle('visible');
+    });
+
+    btnCloseChangelog.addEventListener('click', (e) => {
+      e.stopPropagation();
+      playUISound();
+      changelogModal.classList.remove('visible');
+    });
+
+    changelogModal.addEventListener('click', (e) => {
+      if (e.target === changelogModal) {
+        playUISound();
+        changelogModal.classList.remove('visible');
+      }
     });
 
     // Build clickable room camera pills
@@ -884,6 +1196,7 @@
         yaw = room.yaw;
         pitch = room.pitch;
         camera.rotation.set(pitch, yaw, 0);
+        syncOrbitFromRig(room.orbitDist || 8.0);
         return;
       }
 
@@ -896,13 +1209,14 @@
       camTransition.endYaw = yaw + shortestAngleDelta(yaw, room.yaw);
       camTransition.startPitch = pitch;
       camTransition.endPitch = room.pitch;
+      camTransition.endOrbitDist = room.orbitDist || 8.0;
     }
 
     // =========================================================================
     // 7. NAVIGATION CONTROLS:
     //    - Desktop: WASD / Arrows + Mouse Look + Right-Click Pan + Wheel Zoom
-    //    - Mobile 3D: 1-Finger Look + 2-Finger Pinch-to-Zoom AND 2-Finger Pan
-    //    - Mode 4 Tabletop AR: 2-Finger Pinch-to-Scale Dollhouse Size in Real Time
+    //    - Mobile Phone 3D: 1-Finger 360° Orbit + 2-Finger Pinch Zoom + 2-Finger Pan
+    //    - Mode 4 Tabletop AR: 2-Finger Pinch-to-Scale + 1-Finger Drag Rotate
     // =========================================================================
     const moveKeys = {
       fwd: false,
@@ -918,6 +1232,11 @@
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
       if (e.code === 'KeyT') {
         toggleGraphicStyle();
+        return;
+      }
+      if (e.code === 'KeyL') {
+        playUISound();
+        setHiddenLineMode(!hiddenLineEnabled);
         return;
       }
       if (IS_MOBILE) return;
@@ -1012,12 +1331,14 @@
         const panSpeed = 0.0085;
         rig.position.addScaledVector(right, -dx * panSpeed);
         rig.position.addScaledVector(up, dy * panSpeed);
+        syncOrbitFromRig();
       } else {
         // Desktop 360° Look
         const sensitivity = 0.0032;
         yaw -= dx * sensitivity;
         pitch = Math.max(-Math.PI / 2 + 0.05, Math.min(Math.PI / 2 - 0.05, pitch - dy * sensitivity));
         camera.rotation.set(pitch, yaw, 0);
+        syncOrbitFromRig();
       }
     });
 
@@ -1025,7 +1346,7 @@
       isMouseDown = false;
     });
 
-    // Mouse Wheel Zoom (or scales Dollhouse when previewing Mode 4 on Desktop)
+    // Mouse Wheel Zoom
     canvasEl.addEventListener('wheel', (e) => {
       if (renderer.xr.isPresenting) return;
       e.preventDefault();
@@ -1033,16 +1354,19 @@
       const { forward } = getCameraBasis();
       const step = -e.deltaY * 0.004;
       rig.position.addScaledVector(forward, step);
+      syncOrbitFromRig();
     }, { passive: false });
 
     // =========================================================================
-    // MULTI-TOUCH ENGINE FOR MOBILE:
-    // - In Browser 3D: 1-Finger Look + 2-Finger Pinch Zoom + 2-Finger Pan
-    // - In Tabletop AR (Mode 4): 2-Finger Pinch-to-Scale Dollhouse Model Size
+    // MULTI-TOUCH ENGINE FOR PHONE:
+    // - In Browser 3D: 1-Finger 360° Orbit + 2-Finger Pinch Zoom + 2-Finger Pan
+    // - In Tabletop AR (Mode 4): 2-Finger Pinch-to-Scale + 1-Finger Drag Rotate
     // =========================================================================
-    let touchMode = null; // 'look' | 'pinch-pan'
+    let touchMode = null; // 'single' | 'pinch-pan'
     let prevTouchX = 0;
     let prevTouchY = 0;
+    let touchStartTime = 0;
+    let touchMovedDist = 0;
     let prevPinchDist = 0;
     let prevMidX = 0;
     let prevMidY = 0;
@@ -1059,16 +1383,18 @@
     }
 
     window.addEventListener('touchstart', (e) => {
-      // Ignore single-finger taps directly on UI buttons
-      if (e.touches.length === 1 && e.target && e.target.closest('button, #room-strip')) {
+      // Ignore single-finger taps directly on UI buttons, room strip, or modal
+      if (e.touches.length === 1 && e.target && e.target.closest('button, a, #room-strip, .changelog-card')) {
         touchMode = null;
         return;
       }
 
       if (e.touches.length === 1) {
-        touchMode = 'look';
+        touchMode = 'single';
         prevTouchX = e.touches[0].clientX;
         prevTouchY = e.touches[0].clientY;
+        touchStartTime = performance.now();
+        touchMovedDist = 0;
         camTransition.active = false;
       } else if (e.touches.length >= 2) {
         touchMode = 'pinch-pan';
@@ -1084,32 +1410,41 @@
     window.addEventListener('touchmove', (e) => {
       if (!touchMode) return;
 
-      // 2-FINGER GESTURE:
+      // 2-FINGER GESTURE (Pinch Zoom + Pan in 3D, or Pinch Scale in Tabletop AR):
       if (e.touches.length >= 2) {
         e.preventDefault();
         lastPinchTimestamp = performance.now();
         const info = getTouchDistanceAndMidpoint(e.touches[0], e.touches[1]);
 
-        if (prevPinchDist > 10) {
-          // Case A: Tabletop Dollhouse AR (Mode 4) -> Pinch dynamically scales the miniature house!
+        if (prevPinchDist > 8 && info.dist > 8) {
+          // Case A: Tabletop Dollhouse AR (Mode 4 in WebXR) -> Simple Pinch Zoom to Change Scale
           if (currentMode === 4 && renderer.xr.isPresenting) {
             const scaleRatio = info.dist / prevPinchDist;
-            dollhouseScale = THREE.MathUtils.clamp(dollhouseScale * scaleRatio, 0.015, 0.50);
-            worldRoot.scale.setScalar(dollhouseScale);
-            arStatusLabel.textContent = `Scale: ${Math.round(dollhouseScale * 100)}%`;
+            dollhouseScale = THREE.MathUtils.clamp(dollhouseScale * scaleRatio, 0.002, 1.0);
+            applyTabletopTransform();
           }
-          // Case B: Browser 3D Mode -> Pinch-to-Zoom AND Two-Finger Pan!
+          // Case B: Phone Browser 3D Mode -> Pinch-to-Zoom Orbit Radius + Two-Finger Pan Target
           else if (!renderer.xr.isPresenting) {
-            const distDelta = info.dist - prevPinchDist;
+            const zoomRatio = prevPinchDist / info.dist;
+            const dampedZoom = 1 + (zoomRatio - 1) * 1.15;
+            const { forward, right, up } = getCameraBasis();
+
+            if (orbitRadius * dampedZoom < 0.35 && zoomRatio < 1) {
+              // When zoomed all the way in, gently advance target forward so user never gets stuck
+              orbitTarget.addScaledVector(forward, (1 - zoomRatio) * 0.6);
+              orbitRadius = 0.35;
+            } else {
+              orbitRadius = THREE.MathUtils.clamp(orbitRadius * dampedZoom, 0.35, 75.0);
+            }
+
+            // Two-finger Pan of orbitTarget along screen plane
             const panDx = info.midX - prevMidX;
             const panDy = info.midY - prevMidY;
+            const panFactor = Math.max(0.0025, orbitRadius * 0.0014);
+            orbitTarget.addScaledVector(right, -panDx * panFactor);
+            orbitTarget.addScaledVector(up, panDy * panFactor);
 
-            const { forward, right, up } = getCameraBasis();
-            // Pinch Zoom forward / backward along camera view ray
-            rig.position.addScaledVector(forward, distDelta * 0.018);
-            // Two-finger Pan left/right and up/down along screen plane
-            rig.position.addScaledVector(right, -panDx * 0.011);
-            rig.position.addScaledVector(up, panDy * 0.011);
+            applyOrbitToRig();
           }
         }
 
@@ -1119,29 +1454,50 @@
         return;
       }
 
-      // 1-FINGER GESTURE (Browser 3D Look):
-      if (e.touches.length === 1 && touchMode === 'look' && !renderer.xr.isPresenting) {
+      // 1-FINGER GESTURE (Single-Finger Orbit in 3D, or Rotate Model in Tabletop AR):
+      if (e.touches.length === 1 && touchMode === 'single') {
         const t = e.touches[0];
         const dx = t.clientX - prevTouchX;
         const dy = t.clientY - prevTouchY;
+        touchMovedDist += Math.hypot(dx, dy);
         prevTouchX = t.clientX;
         prevTouchY = t.clientY;
 
-        const sensitivity = 0.0042;
-        yaw -= dx * sensitivity;
-        pitch = Math.max(-Math.PI / 2 + 0.05, Math.min(Math.PI / 2 - 0.05, pitch - dy * sensitivity));
-        camera.rotation.set(pitch, yaw, 0);
+        if (currentMode === 4 && renderer.xr.isPresenting) {
+          e.preventDefault();
+          tabletopYaw += dx * 0.007;
+          applyTabletopTransform();
+        } else if (!renderer.xr.isPresenting) {
+          e.preventDefault();
+          const orbitSensitivity = 0.0052;
+          yaw -= dx * orbitSensitivity;
+          pitch = THREE.MathUtils.clamp(pitch - dy * orbitSensitivity, -Math.PI / 2 + 0.04, Math.PI / 2 - 0.04);
+          applyOrbitToRig();
+        }
       }
     }, { passive: false });
 
     window.addEventListener('touchend', (e) => {
       if (e.touches.length === 0) {
+        // In Tabletop AR (Mode 4), a quick single tap on a detected surface snaps the model to the reticle
+        if (
+          currentMode === 4 &&
+          renderer.xr.isPresenting &&
+          touchMode === 'single' &&
+          touchMovedDist < 12 &&
+          performance.now() - touchStartTime < 260 &&
+          performance.now() - lastPinchTimestamp > 400 &&
+          arHitReticle.visible
+        ) {
+          placeDollhouseAtReticleOrFront(false);
+        }
         touchMode = null;
       } else if (e.touches.length === 1) {
-        // Avoid sudden jump when lifting one finger after a pinch
-        touchMode = 'look';
+        // Avoid sudden jump when lifting one finger after a 2-finger pinch
+        touchMode = 'single';
         prevTouchX = e.touches[0].clientX;
         prevTouchY = e.touches[0].clientY;
+        touchMovedDist = 999;
       }
     });
 
@@ -1158,6 +1514,7 @@
         yaw = THREE.MathUtils.lerp(camTransition.startYaw, camTransition.endYaw, ease);
         pitch = THREE.MathUtils.lerp(camTransition.startPitch, camTransition.endPitch, ease);
         camera.rotation.set(pitch, yaw, 0);
+        syncOrbitFromRig(camTransition.endOrbitDist);
 
         if (t >= 1) camTransition.active = false;
       }
@@ -1168,35 +1525,43 @@
       const speed = (moveKeys.sprint ? 6.5 : 3.0) * dt;
       const fwdDir = new THREE.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw)).normalize();
       const rightDir = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw)).normalize();
+      let moved = false;
 
       if (moveKeys.fwd) {
         camTransition.active = false;
         rig.position.addScaledVector(fwdDir, speed);
+        moved = true;
       }
       if (moveKeys.back) {
         camTransition.active = false;
         rig.position.addScaledVector(fwdDir, -speed);
+        moved = true;
       }
       if (moveKeys.right) {
         camTransition.active = false;
         rig.position.addScaledVector(rightDir, speed);
+        moved = true;
       }
       if (moveKeys.left) {
         camTransition.active = false;
         rig.position.addScaledVector(rightDir, -speed);
+        moved = true;
       }
       if (moveKeys.up) {
         camTransition.active = false;
         rig.position.y += speed * 0.8;
+        moved = true;
       }
       if (moveKeys.down) {
         camTransition.active = false;
         rig.position.y = Math.max(0.25, rig.position.y - speed * 0.8);
+        moved = true;
       }
+      if (moved) syncOrbitFromRig();
     }
 
     // =========================================================================
-    // 8. LOAD 9_TSUBO_HOUSE.GLB & TAG GROUPS / WALKABLE SURFACES
+    // 8. LOAD 9_TSUBO_HOUSE.GLB & COMPUTE FULL EXTENTS (INCLUDING CONTEXT)
     // =========================================================================
     const loader = new GLTFLoader();
     loader.load(
@@ -1241,6 +1606,16 @@
 
         if (walkableMeshes.length === 0) {
           model.traverse((c) => { if (c.isMesh) walkableMeshes.push(c); });
+        }
+
+        // Compute exact bounding box of the entire model including Context_Group
+        const fullBox = new THREE.Box3().setFromObject(model);
+        if (!fullBox.isEmpty()) {
+          const center = new THREE.Vector3();
+          fullBox.getSize(fullModelSize);
+          fullBox.getCenter(center);
+          fullModelGroundCenter.set(center.x, 0, center.z);
+          fullModelMaxSpan = Math.max(fullModelSize.x, fullModelSize.z, 10.0);
         }
 
         setRoofVisibility(true);
@@ -1521,6 +1896,7 @@
     let hitTestSourceRequested = false;
     let needInitialARAnchor = false;
 
+    // Mode 3 (1:1 AR Walk) — Kept 100% intact!
     function anchor1to1ARRoom(room) {
       const xrCam = renderer.xr.getCamera();
       const camPos = new THREE.Vector3();
@@ -1535,25 +1911,72 @@
       arStatusLabel.textContent = `1:1 AR · ${room.name}`;
     }
 
-    function placeDollhouseAtReticleOrFront(forceFront = false) {
+    // Mode 4 (Tabletop AR): Compute scale so the entire model (including Context_Group) fits the view
+    function computeFitTabletopScale(distanceMeters = 0.85) {
+      const vFovRad = THREE.MathUtils.degToRad(camera.fov || 62);
+      const aspect = window.innerWidth / Math.max(1, window.innerHeight);
+      const visibleHeight = 2 * distanceMeters * Math.tan(vFovRad * 0.5);
+      const visibleWidth = visibleHeight * aspect;
+      const minViewportSpan = Math.min(visibleWidth, visibleHeight);
+      // Fit the full 33m x 32.3m model + context comfortably inside 85% of the screen width
+      const projectedModelSpan = fullModelMaxSpan * 1.12;
+      const fitScale = (minViewportSpan * 0.85) / Math.max(10.0, projectedModelSpan);
+      return THREE.MathUtils.clamp(fitScale, 0.004, 0.25);
+    }
+
+    // Applies dollhouseScale & tabletopYaw around fullModelGroundCenter locked at tabletopAnchorPos
+    function applyTabletopTransform() {
       worldRoot.scale.setScalar(dollhouseScale);
+      worldRoot.rotation.set(0, tabletopYaw, 0);
+
+      const centerOffset = fullModelGroundCenter.clone()
+        .multiplyScalar(dollhouseScale)
+        .applyAxisAngle(new THREE.Vector3(0, 1, 0), tabletopYaw);
+      worldRoot.position.copy(tabletopAnchorPos).sub(centerOffset);
+
+      const pct = dollhouseScale * 100;
+      const pctStr = pct < 10 ? pct.toFixed(1) : Math.round(pct).toString();
+      arStatusLabel.textContent = `Scale: ${pctStr}% · Pinch to Zoom`;
+    }
+
+    // Frames the 3D non-XR camera to the full extents of the entire model including context
+    function frameFullModelExtentsIn3D() {
+      const vFovRad = THREE.MathUtils.degToRad(camera.fov || 62);
+      const aspect = window.innerWidth / Math.max(1, window.innerHeight);
+      const minHalfFov = Math.atan(Math.tan(vFovRad * 0.5) * Math.min(1.0, aspect));
+      const halfSpan = (fullModelMaxSpan * 1.12) * 0.5;
+      const fitRadius = THREE.MathUtils.clamp((halfSpan / Math.tan(minHalfFov)) * 1.05, 18.0, 65.0);
+
+      camTransition.active = false;
+      orbitTarget.set(fullModelGroundCenter.x, 1.2, fullModelGroundCenter.z);
+      orbitRadius = fitRadius;
+      yaw = -0.72;
+      pitch = -0.52;
+      applyOrbitToRig();
+    }
+
+    function placeDollhouseAtReticleOrFront(forceFront = false) {
+      const placeDist = 0.85;
 
       if (!forceFront && arHitReticle.visible) {
-        const hitPos = new THREE.Vector3();
-        hitPos.setFromMatrixPosition(arHitReticle.matrix);
-        worldRoot.position.copy(hitPos);
-        arStatusLabel.textContent = `Tabletop (${Math.round(dollhouseScale * 100)}%) · Pinch to Scale`;
+        tabletopAnchorPos.setFromMatrixPosition(arHitReticle.matrix);
+        applyTabletopTransform();
       } else {
-        const xrCam = renderer.xr.getCamera();
         const camPos = new THREE.Vector3();
         const camQuat = new THREE.Quaternion();
-        xrCam.getWorldPosition(camPos);
-        xrCam.getWorldQuaternion(camQuat);
+        if (hasViewerPose) {
+          camPos.copy(lastViewerPos);
+          camQuat.copy(lastViewerQuat);
+        } else {
+          const xrCam = renderer.xr.getCamera();
+          xrCam.getWorldPosition(camPos);
+          xrCam.getWorldQuaternion(camQuat);
+        }
 
-        const forward = new THREE.Vector3(0, 0, -0.75).applyQuaternion(camQuat);
-        worldRoot.position.copy(camPos).add(forward);
-        worldRoot.position.y -= 0.25;
-        arStatusLabel.textContent = `Dollhouse (${Math.round(dollhouseScale * 100)}%) · Pinch to Scale`;
+        const forward = new THREE.Vector3(0, 0, -placeDist).applyQuaternion(camQuat);
+        tabletopAnchorPos.copy(camPos).add(forward);
+        tabletopAnchorPos.y -= 0.10;
+        applyTabletopTransform();
       }
     }
 
@@ -1563,34 +1986,55 @@
       if (currentMode === 3) {
         anchor1to1ARRoom(ROOMS[currentRoomIndex]);
       } else if (currentMode === 4) {
-        placeDollhouseAtReticleOrFront(!arHitReticle.visible);
+        if (renderer.xr.isPresenting) {
+          dollhouseScale = computeFitTabletopScale(0.85);
+          placeDollhouseAtReticleOrFront(!arHitReticle.visible);
+        } else {
+          frameFullModelExtentsIn3D();
+        }
       }
     });
 
     document.getElementById('btn-ar-scale-down').addEventListener('click', (e) => {
       e.stopPropagation();
       playUISound();
-      dollhouseScale = Math.max(0.015, dollhouseScale * 0.8);
       if (currentMode === 4) {
-        worldRoot.scale.setScalar(dollhouseScale);
-        arStatusLabel.textContent = `Scale: ${Math.round(dollhouseScale * 100)}%`;
+        if (renderer.xr.isPresenting) {
+          dollhouseScale = Math.max(0.002, dollhouseScale * 0.78);
+          applyTabletopTransform();
+        } else {
+          orbitRadius = Math.min(75.0, orbitRadius * 1.22);
+          applyOrbitToRig();
+        }
       }
     });
 
     document.getElementById('btn-ar-scale-up').addEventListener('click', (e) => {
       e.stopPropagation();
       playUISound();
-      dollhouseScale = Math.min(0.50, dollhouseScale * 1.25);
       if (currentMode === 4) {
-        worldRoot.scale.setScalar(dollhouseScale);
-        arStatusLabel.textContent = `Scale: ${Math.round(dollhouseScale * 100)}%`;
+        if (renderer.xr.isPresenting) {
+          dollhouseScale = Math.min(1.0, dollhouseScale * 1.28);
+          applyTabletopTransform();
+        } else {
+          orbitRadius = Math.max(0.35, orbitRadius * 0.80);
+          applyOrbitToRig();
+        }
       }
     });
 
     document.getElementById('btn-ar-rotate').addEventListener('click', (e) => {
       e.stopPropagation();
       playUISound();
-      worldRoot.rotation.y += Math.PI / 4;
+      if (currentMode === 4 && renderer.xr.isPresenting) {
+        tabletopYaw += Math.PI / 4;
+        applyTabletopTransform();
+      } else if (!renderer.xr.isPresenting) {
+        yaw += Math.PI / 4;
+        applyOrbitToRig();
+      } else {
+        worldRoot.rotation.y += Math.PI / 4;
+      }
     });
 
     // =========================================================================
@@ -1621,10 +2065,10 @@
       await endCurrentXRSessionIfAny();
       setActiveModeButton(1);
       arActionBar.classList.remove('visible');
+      arTouchSurface.classList.remove('active');
       btnExitXR.style.display = 'none';
 
-      scene.background = skyBgColor;
-      scene.fog = new THREE.FogExp2(0xdbeafe, 0.012);
+      applySceneBackgroundForCurrentState();
       renderer.shadowMap.enabled = !IS_MOBILE;
 
       worldRoot.position.set(0, 0, 0);
@@ -1639,6 +2083,7 @@
     async function activateMode2() {
       await endCurrentXRSessionIfAny();
       setActiveModeButton(2);
+      arTouchSurface.classList.remove('active');
 
       if (!navigator.xr) {
         setStatus('WEBXR NOT AVAILABLE — OPEN ON META QUEST FOR VR');
@@ -1660,8 +2105,7 @@
         await renderer.xr.setSession(session);
         if (renderer.xr.setFoveation) renderer.xr.setFoveation(1.0);
 
-        scene.background = skyBgColor;
-        scene.fog = new THREE.FogExp2(0xdbeafe, 0.012);
+        applySceneBackgroundForCurrentState();
         worldRoot.position.set(0, 0, 0);
         worldRoot.rotation.set(0, 0, 0);
         worldRoot.scale.set(1, 1, 1);
@@ -1690,32 +2134,33 @@
       const isDollhouse = targetMode === 4;
       document.getElementById('btn-ar-scale-down').style.display = isDollhouse ? 'inline-flex' : 'none';
       document.getElementById('btn-ar-scale-up').style.display = isDollhouse ? 'inline-flex' : 'none';
+      arTouchSurface.classList.toggle('active', isDollhouse);
 
       if (isDollhouse) {
-        setRoofVisibility(false);
-        setContextVisibility(false);
+        // Tabletop AR: Show the ENTIRE model including Context_Group and Roof_Group
+        setRoofVisibility(true);
+        setContextVisibility(true);
+        tabletopYaw = -0.55;
+        dollhouseScale = computeFitTabletopScale(0.85);
         arStatusLabel.textContent = 'Tabletop · Pinch to Scale';
-        if (!renderer.xr.isPresenting) {
-          rig.position.set(-4.2, 4.8, 5.2);
-          yaw = -0.68;
-          pitch = -0.58;
-          camera.rotation.set(pitch, yaw, 0);
-        }
       } else {
+        // Mode 3 (1:1 AR Walk): Unchanged!
         setRoofVisibility(true);
         setContextVisibility(false);
         arStatusLabel.textContent = '1:1 AR Walk';
       }
 
       if (!navigator.xr) {
-        setStatus(isDollhouse ? 'DOLLHOUSE CUTAWAY PREVIEW ACTIVE' : '1:1 WALK PREVIEW ACTIVE');
+        if (isDollhouse) frameFullModelExtentsIn3D();
+        setStatus(isDollhouse ? 'TABLETOP FULL-SITE PREVIEW · PINCH TO ZOOM' : '1:1 WALK PREVIEW ACTIVE');
         return;
       }
 
       try {
         const supported = await navigator.xr.isSessionSupported('immersive-ar');
         if (!supported) {
-          setStatus(isDollhouse ? 'DOLLHOUSE CUTAWAY ACTIVE (3D PREVIEW)' : '1:1 WALK MODE ACTIVE (3D PREVIEW)');
+          if (isDollhouse) frameFullModelExtentsIn3D();
+          setStatus(isDollhouse ? 'TABLETOP FULL-SITE PREVIEW · PINCH TO ZOOM' : '1:1 WALK MODE ACTIVE (3D PREVIEW)');
           return;
         }
 
@@ -1739,7 +2184,11 @@
 
         rig.position.set(0, 0, 0);
         rig.rotation.set(0, 0, 0);
+        camera.position.set(0, 0, 0);
+        camera.rotation.set(0, 0, 0);
+        rig.updateMatrixWorld(true);
 
+        hasViewerPose = false;
         needInitialARAnchor = true;
         hitTestSourceRequested = false;
         hitTestSource = null;
@@ -1747,6 +2196,7 @@
         session.addEventListener('end', onXRSessionEnded);
       } catch (err) {
         console.error('AR session error:', err);
+        if (isDollhouse) frameFullModelExtentsIn3D();
         setStatus(`AR PREVIEW (${err.message || 'HTTPS REQUIRED'})`);
       }
     }
@@ -1754,14 +2204,15 @@
     function onXRSessionEnded() {
       hitTestSourceRequested = false;
       hitTestSource = null;
+      hasViewerPose = false;
       arHitReticle.visible = false;
       vrTeleportReticle.visible = false;
       vrHudMesh.visible = false;
       btnExitXR.style.display = 'none';
       arActionBar.classList.remove('visible');
+      arTouchSurface.classList.remove('active');
 
-      scene.background = skyBgColor;
-      scene.fog = new THREE.FogExp2(0xdbeafe, 0.012);
+      applySceneBackgroundForCurrentState();
       renderer.shadowMap.enabled = !IS_MOBILE;
 
       worldRoot.position.set(0, 0, 0);
@@ -1812,14 +2263,27 @@
         const session = renderer.xr.getSession();
         const refSpace = renderer.xr.getReferenceSpace();
 
+        if (refSpace) {
+          const viewerPose = frame.getViewerPose(refSpace);
+          if (viewerPose) {
+            const p = viewerPose.transform.position;
+            const o = viewerPose.transform.orientation;
+            lastViewerPos.set(p.x, p.y, p.z);
+            lastViewerQuat.set(o.x, o.y, o.z, o.w);
+            hasViewerPose = true;
+          }
+        }
+
         if (needInitialARAnchor) {
-          needInitialARAnchor = false;
           if (currentMode === 3) {
+            needInitialARAnchor = false;
             if (currentRoomIndex === 0 || currentRoomIndex === 12) {
               updateRoomUI(4);
             }
             anchor1to1ARRoom(ROOMS[currentRoomIndex]);
-          } else if (currentMode === 4) {
+          } else if (currentMode === 4 && hasViewerPose) {
+            needInitialARAnchor = false;
+            dollhouseScale = computeFitTabletopScale(0.85);
             placeDollhouseAtReticleOrFront(true);
           }
         }
