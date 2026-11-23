@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>9-Tsubo House (Koizumi Studio, 1999) — 4-Mode WebXR</title>
+  <title>9-Tsubo House (Koizumi Studio, 1999) — WebXR, Apple USDZ &amp; Android AR</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -637,9 +637,11 @@
         <div class="quick-toggles">
           <button id="btn-toggle-roof" class="btn btn-sm toggle-on" title="Toggle Roof_Group">🏠 Roof: ON</button>
           <button id="btn-toggle-context" class="btn btn-sm toggle-on" title="Toggle Context_Group">🌳 Context: ON</button>
+          <button id="btn-toggle-lighting" class="btn btn-sm toggle-on" title="Cycle Lighting: Daylight / Warm Evening / Soft AR (Hotkey: F)">💡 Light: Day</button>
           <button id="btn-toggle-lines" class="btn btn-sm" title="Toggle Subtle Hidden-Line CAD Render (Hotkey: L)">✏️ Lines: OFF</button>
           <button id="btn-toggle-style" class="btn btn-sm style-btn" title="Switch UI Style: German DIN 1451 vs Star Trek LCARS (Hotkey: T)">📐 Style: DIN</button>
-          <button id="btn-changelog" class="btn btn-sm" title="View Version Changelog">📋 v0.4</button>
+          <a class="btn btn-sm" href="./ar.html" title="Dedicated Apple iOS USDZ Quick Look &amp; Android Scene Viewer AR Page" style="text-decoration:none;">🍎/🤖 AR</a>
+          <button id="btn-changelog" class="btn btn-sm" title="View Version Changelog">📋 v0.5</button>
           <button id="btn-exit-xr" class="btn btn-sm danger" style="display:none;">✕ Exit XR</button>
         </div>
       </div>
@@ -681,7 +683,11 @@
           <button id="btn-close-changelog" class="btn btn-sm">✕ Close</button>
         </div>
         <div class="changelog-entry">
-          <div class="changelog-ver">v0.4.0 · 2026-11-08 (Current)</div>
+          <div class="changelog-ver">v0.5.0 · 2026-11-22 (Current)</div>
+          <div class="changelog-desc">• Lighting &amp; PBR Refinement (No AR/3D Blowout): Calibrated all 35 Blender PBR material albedos &amp; emissives, fixed coplanar Z-fighting overlaps, and balanced Three.js ACES Filmic exposure with a dedicated AR passthrough profile plus <code>💡 Light</code> mode cycling (Daylight / Warm Evening / Soft AR, hotkey <code>[F]</code>).<br>• Modeled Koizumi Architectural Light Fixtures: Added 36 low-poly architectural fixture meshes (dining &amp; living cord pendants, kitchen ceiling duct rail + 3 spots, hinoki tatami drum &amp; cove LED, loft ridge track + 3 spots, bedside brass sconce, vanity opal bar, wet-rated bath downlights, entry porch sconce) with light sources anchored directly inside the fixtures while staying under the 60k-tri mobile/AR cap.<br>• Apple iOS / iPadOS / visionOS Native USDZ AR: Exported native uncompressed <code>9_tsubo_house_1to1.usdz</code> (277 KB) and <code>9_tsubo_house_tabletop.usdz</code> (1:50 full-site, 2.1 MB) with automatic Apple AR Quick Look launch in Modes 3 &amp; 4 plus dedicated cross-platform <code>ar.html</code> (<code>&lt;model-viewer&gt;</code> WebXR + Scene Viewer + Quick Look).</div>
+        </div>
+        <div class="changelog-entry">
+          <div class="changelog-ver">v0.4.0 · 2026-11-08 (`e7f9c1c`)</div>
           <div class="changelog-desc">• Phone 3D Navigation: True 1-finger 360° orbit, 2-finger pinch zoom &amp; 2-finger pan around viewpoint targets (desktop mouse/WASD preserved).<br>• Tabletop AR (Mode 4): Auto-scales view to full extents of the entire model including neighborhood context, fixes WebXR first-frame pose anchor, and enables smooth 2-finger pinch scaling.<br>• Hidden-Line Render (`✏️ Lines` / `[L]`): Subtle CAD edge-line overlay with depth-occluded paper shading.<br>• Added GitHub `CHANGELOG.md` and in-app version history tracker.</div>
         </div>
         <div class="changelog-entry">
@@ -705,6 +711,13 @@
         </div>
       </div>
     </div>
+    <!-- Hidden Native Apple AR Quick Look Launchers (iOS / iPadOS / visionOS USDZ) -->
+    <a id="ios-ar-1to1" rel="ar" href="./assets/9_tsubo_house_1to1.usdz#allowsContentScaling=0" style="display:none;" aria-hidden="true">
+      <img src="./assets/poster.png" alt="9-Tsubo House 1:1 Scale Apple AR Quick Look" />
+    </a>
+    <a id="ios-ar-tabletop" rel="ar" href="./assets/9_tsubo_house_tabletop.usdz#allowsContentScaling=1" style="display:none;" aria-hidden="true">
+      <img src="./assets/poster.png" alt="9-Tsubo House 1:50 Tabletop Apple AR Quick Look" />
+    </a>
   </div>
 
   <script type="module">
@@ -774,6 +787,12 @@
     ];
 
     const IS_MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+    const IS_APPLE_AR = (() => {
+      const a = document.createElement('a');
+      const supportsQuickLook = !!(a.relList && typeof a.relList.supports === 'function' && a.relList.supports('ar'));
+      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      return supportsQuickLook || isIOS;
+    })();
     const DOLLHOUSE_DEFAULT_SCALE = 0.012; // Fits entire 33m x 32.3m model + context on screen
 
     // =========================================================================
@@ -804,23 +823,23 @@
       alpha: true,
       powerPreference: 'high-performance'
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, IS_MOBILE ? 1.75 : 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.08;
+    renderer.toneMappingExposure = 0.88;
     renderer.shadowMap.enabled = !IS_MOBILE;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.xr.enabled = true;
     container.appendChild(renderer.domElement);
 
     // =========================================================================
-    // 3. ARCHITECTURAL LIGHTING SETUP (Warm Interior + Crisp Daylight)
+    // 3. CALIBRATED ARCHITECTURAL LIGHTING RIG (Fixture-Anchored, No AR Blowout)
     // =========================================================================
-    const hemiLight = new THREE.HemisphereLight(0xf0f7ff, 0xc8b8a6, 1.35);
+    const hemiLight = new THREE.HemisphereLight(0xeef5ff, 0x9b8b7a, 0.58);
     hemiLight.position.set(0, 25, 0);
     scene.add(hemiLight);
 
-    const sunLight = new THREE.DirectionalLight(0xfff6e6, 2.1);
+    const sunLight = new THREE.DirectionalLight(0xfff5e4, 1.25);
     sunLight.position.set(-14, 24, 18);
     if (!IS_MOBILE) {
       sunLight.castShadow = true;
@@ -832,24 +851,81 @@
       sunLight.shadow.camera.right = d;
       sunLight.shadow.camera.top = d;
       sunLight.shadow.camera.bottom = -d;
-      sunLight.shadow.bias = -0.0005;
+      sunLight.shadow.bias = -0.0004;
+      sunLight.shadow.normalBias = 0.02;
     }
     scene.add(sunLight);
 
-    const fillLight = new THREE.DirectionalLight(0xdbeafe, 0.75);
+    const fillLight = new THREE.DirectionalLight(0xdbeafe, 0.24);
     fillLight.position.set(16, 12, -14);
     scene.add(fillLight);
 
-    function addInteriorPointLight(x, y, z, intensity = 1.6, distance = 7.5) {
-      const pt = new THREE.PointLight(0xffdca8, intensity, distance, 1.4);
-      pt.position.set(x, y, z);
+    // Fixture-anchored interior point lights positioned at exact modeled Blender luminaires
+    // (Blender -> Three.js coords: x = bx, y = bz, z = -by). Capped on mobile GPUs for 60fps AR.
+    const fixtureLights = [];
+    const FIXTURE_LIGHT_SPECS = [
+      { id: 'L-01A Dining Pendant',    pos: [-0.35, 2.30,  1.40], baseInt: 0.65, dist: 4.5, mobile: true  },
+      { id: 'L-05 Loft Ridge Track',   pos: [ 0.05, 4.90, -0.15], baseInt: 0.72, dist: 5.4, mobile: true  },
+      { id: 'L-02 Kitchen Track',      pos: [ 1.62, 2.12,  1.30], baseInt: 0.55, dist: 4.0, mobile: true  },
+      { id: 'L-03 Tatami Shoji Drum',  pos: [-0.69, 2.22, -1.66], baseInt: 0.52, dist: 4.0, mobile: false },
+      { id: 'L-01B Living Pendant',    pos: [-1.30, 3.16,  1.15], baseInt: 0.45, dist: 4.6, mobile: false },
+      { id: 'L-07/08 Bath Suite',      pos: [ 1.45, 2.20, -1.45], baseInt: 0.42, dist: 3.4, mobile: false }
+    ];
+    FIXTURE_LIGHT_SPECS.forEach((spec) => {
+      if (IS_MOBILE && !spec.mobile) return;
+      const pt = new THREE.PointLight(0xffdfb3, spec.baseInt, spec.dist, 2.0);
+      pt.position.set(...spec.pos);
+      pt.userData.baseInt = spec.baseInt;
       worldRoot.add(pt);
+      fixtureLights.push(pt);
+    });
+
+    const LIGHTING_PROFILES = [
+      {
+        id: 'day',
+        label: '💡 Light: Day',
+        exposure: 0.88,
+        hemi: 0.58,
+        sun: 1.25,
+        fill: 0.24,
+        fixtureMult: 0.72,
+        skyHex: 0xdbeafe
+      },
+      {
+        id: 'warm',
+        label: '💡 Light: Warm',
+        exposure: 0.84,
+        hemi: 0.26,
+        sun: 0.35,
+        fill: 0.12,
+        fixtureMult: 1.65,
+        skyHex: 0x1e293b
+      },
+      {
+        id: 'ar-soft',
+        label: '💡 Light: Soft',
+        exposure: 0.76,
+        hemi: 0.48,
+        sun: 0.82,
+        fill: 0.16,
+        fixtureMult: 0.55,
+        skyHex: 0xe2e8f0
+      }
+    ];
+    let currentLightingIdx = 0;
+
+    function applyLightingProfile(profileIdx, isARPassthrough = false) {
+      const p = isARPassthrough ? LIGHTING_PROFILES[2] : LIGHTING_PROFILES[profileIdx];
+      renderer.toneMappingExposure = p.exposure;
+      hemiLight.intensity = p.hemi;
+      sunLight.intensity = p.sun;
+      fillLight.intensity = p.fill;
+      fixtureLights.forEach((pt) => {
+        pt.intensity = pt.userData.baseInt * p.fixtureMult;
+      });
+      skyBgColor.setHex(p.skyHex);
+      applySceneBackgroundForCurrentState();
     }
-    addInteriorPointLight(-0.8, 2.25, 1.2, 1.8, 8.0);
-    addInteriorPointLight(-1.6, 2.25, -1.2, 1.5, 6.5);
-    addInteriorPointLight(1.4, 2.20, -1.0, 1.3, 5.5);
-    addInteriorPointLight(0.0, 4.35, 0.2, 2.0, 9.0);
-    addInteriorPointLight(-0.9, 3.80, -3.9, 1.6, 5.0);
 
     // =========================================================================
     // 4. STATE, ORBIT PIVOT, FULL MODEL EXTENTS & HIDDEN-LINE RENDER STATE
@@ -939,12 +1015,34 @@
     const arTouchSurface = document.getElementById('ar-touch-surface');
     const btnToggleRoof = document.getElementById('btn-toggle-roof');
     const btnToggleContext = document.getElementById('btn-toggle-context');
+    const btnToggleLighting = document.getElementById('btn-toggle-lighting');
     const btnToggleLines = document.getElementById('btn-toggle-lines');
     const btnToggleStyle = document.getElementById('btn-toggle-style');
     const btnChangelog = document.getElementById('btn-changelog');
     const btnCloseChangelog = document.getElementById('btn-close-changelog');
     const changelogModal = document.getElementById('changelog-modal');
     const btnExitXR = document.getElementById('btn-exit-xr');
+    const iosAr1to1Link = document.getElementById('ios-ar-1to1');
+    const iosArTabletopLink = document.getElementById('ios-ar-tabletop');
+
+    function cycleLightingMode() {
+      currentLightingIdx = (currentLightingIdx + 1) % LIGHTING_PROFILES.length;
+      const p = LIGHTING_PROFILES[currentLightingIdx];
+      btnToggleLighting.textContent = p.label;
+      applyLightingProfile(currentLightingIdx, false);
+      setStatus(`LIGHTING PROFILE: ${p.id.toUpperCase()} (EXPOSURE ${p.exposure.toFixed(2)})`);
+    }
+
+    btnToggleLighting.addEventListener('click', (e) => {
+      e.stopPropagation();
+      playUISound();
+      cycleLightingMode();
+    });
+
+    if (IS_APPLE_AR) {
+      document.getElementById('btn-mode-3').textContent = '🍎 3 · 1:1 AR (USDZ)';
+      document.getElementById('btn-mode-4').textContent = '🍎 4 · Tabletop (USDZ)';
+    }
 
     if (IS_MOBILE && controlHintLabel) {
       controlHintLabel.textContent = '1-FINGER: ORBIT · PINCH: ZOOM · 2-FINGER: PAN';
@@ -1237,6 +1335,11 @@
       if (e.code === 'KeyL') {
         playUISound();
         setHiddenLineMode(!hiddenLineEnabled);
+        return;
+      }
+      if (e.code === 'KeyF') {
+        playUISound();
+        cycleLightingMode();
         return;
       }
       if (IS_MOBILE) return;
@@ -1565,7 +1668,7 @@
     // =========================================================================
     const loader = new GLTFLoader();
     loader.load(
-      './9_tsubo_house.glb',
+      './9_tsubo_house.glb?v=0.5',
       (gltf) => {
         const model = gltf.scene;
         worldRoot.add(model);
@@ -1620,6 +1723,7 @@
 
         setRoofVisibility(true);
         setContextVisibility(true);
+        applyLightingProfile(currentLightingIdx, false);
         goToRoom(0, false);
 
         statusDot.classList.add('ready');
@@ -2068,6 +2172,7 @@
       arTouchSurface.classList.remove('active');
       btnExitXR.style.display = 'none';
 
+      applyLightingProfile(currentLightingIdx, false);
       applySceneBackgroundForCurrentState();
       renderer.shadowMap.enabled = !IS_MOBILE;
 
@@ -2177,6 +2282,8 @@
         if (renderer.xr.setFoveation) renderer.xr.setFoveation(1.0);
         renderer.shadowMap.enabled = false;
 
+        // Soft calibrated AR passthrough exposure so whites & plywood never blow out in real-world AR!
+        applyLightingProfile(currentLightingIdx, true);
         scene.background = null;
         scene.fog = null;
         vrHudMesh.visible = false;
@@ -2212,6 +2319,7 @@
       arActionBar.classList.remove('visible');
       arTouchSurface.classList.remove('active');
 
+      applyLightingProfile(currentLightingIdx, false);
       applySceneBackgroundForCurrentState();
       renderer.shadowMap.enabled = !IS_MOBILE;
 
@@ -2238,11 +2346,21 @@
     document.getElementById('btn-mode-3').addEventListener('click', (e) => {
       e.stopPropagation();
       playUISound();
+      if (IS_APPLE_AR && !navigator.xr) {
+        setStatus('LAUNCHING APPLE AR QUICK LOOK (1:1 WALK-IN USDZ)...');
+        iosAr1to1Link.click();
+        return;
+      }
       activateARMode(3);
     });
     document.getElementById('btn-mode-4').addEventListener('click', (e) => {
       e.stopPropagation();
       playUISound();
+      if (IS_APPLE_AR && !navigator.xr) {
+        setStatus('LAUNCHING APPLE AR QUICK LOOK (1:50 TABLETOP USDZ)...');
+        iosArTabletopLink.click();
+        return;
+      }
       activateARMode(4);
     });
     btnExitXR.addEventListener('click', (e) => {

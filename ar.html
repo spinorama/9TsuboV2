@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>9-Tsubo House · Apple iOS (USDZ) &amp; Android AR Launcher</title>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      font-family: 'Bahnschrift', 'DIN Alternate', 'JetBrains Mono', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f4f4f0;
+      color: #050505;
+    }
+    model-viewer {
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at 50% 42%, #ffffff 0%, #e4e4e7 100%);
+      --poster-color: transparent;
+      --progress-bar-color: #050505;
+      --progress-bar-height: 3px;
+    }
+    .top-bar {
+      position: fixed;
+      top: max(12px, env(safe-area-inset-top));
+      left: 12px; right: 12px;
+      z-index: 25;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+      pointer-events: none;
+    }
+    .din-card {
+      pointer-events: auto;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1.5px solid #050505;
+      box-shadow: 3px 3px 0 #050505;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #050505;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .din-card:hover { background: #e4e4e7; }
+    .mode-switch {
+      pointer-events: auto;
+      display: inline-flex;
+      border: 1.5px solid #050505;
+      box-shadow: 3px 3px 0 #050505;
+      background: #ffffff;
+    }
+    .mode-btn {
+      border: none;
+      background: #f4f4f5;
+      color: #050505;
+      font-family: inherit;
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 7px 12px;
+      cursor: pointer;
+    }
+    .mode-btn.active {
+      background: #050505;
+      color: #ffffff;
+    }
+    .scale-hud {
+      position: fixed;
+      top: max(64px, calc(env(safe-area-inset-top) + 52px));
+      right: 12px;
+      z-index: 20;
+      pointer-events: none;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1.5px solid #050505;
+      box-shadow: 3px 3px 0 #050505;
+      padding: 7px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 3px;
+    }
+    .scale-sub { font-size: 10px; color: #52525b; }
+    .bottom-actions {
+      position: fixed;
+      bottom: max(18px, env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 25;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      width: calc(100% - 24px);
+      max-width: 460px;
+      pointer-events: none;
+    }
+    .ar-launch-btn {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 22px;
+      background: #050505;
+      color: #ffffff;
+      border: 2px solid #050505;
+      box-shadow: 4px 4px 0 rgba(5, 5, 5, 0.35);
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .alt-row {
+      pointer-events: auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px;
+    }
+    .alt-link {
+      background: rgba(255, 255, 255, 0.94);
+      border: 1.5px solid #050505;
+      color: #050505;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 6px 10px;
+      text-decoration: none;
+    }
+    .alt-link:hover { background: #e4e4e7; }
+    .spec-note {
+      background: rgba(255, 255, 255, 0.90);
+      border: 1px solid #050505;
+      padding: 5px 10px;
+      font-size: 10.5px;
+      color: #3f3f46;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <a class="din-card" href="./index.html">← 4-Mode 3D / VR</a>
+    <div class="mode-switch" role="group" aria-label="AR Scale Mode">
+      <button id="btn-ar-tabletop" class="mode-btn active">🏡 1:50 Tabletop (Full Site)</button>
+      <button id="btn-ar-1to1" class="mode-btn">🚪 1:1 Walk-In House</button>
+    </div>
+    <div class="din-card" id="ar-status-pill">Calibrated AR Ready</div>
+  </div>
+
+  <!-- Calibrated Neutral Tone Mapping + Controlled Exposure (0.84) Prevents Blown-Out Whites in AR -->
+  <model-viewer
+    id="mv"
+    src="./assets/9_tsubo_house_tabletop.glb?v=0.5"
+    ios-src="./assets/9_tsubo_house_tabletop.usdz?v=0.5#allowsContentScaling=1"
+    poster="./assets/poster.png?v=0.5"
+    alt="9-Tsubo House (Koizumi Studio, 1999) Architectural AR Model"
+    ar
+    ar-modes="webxr scene-viewer quick-look"
+    ar-placement="floor"
+    ar-scale="auto"
+    camera-controls
+    touch-action="pan-y"
+    camera-orbit="-36deg 62deg 115%"
+    shadow-intensity="0.85"
+    shadow-softness="0.90"
+    exposure="0.84"
+    tone-mapping="neutral"
+  >
+    <div class="scale-hud">
+      <div id="hud-mode">1:50 ARCHITECTURAL TABLETOP</div>
+      <div id="hud-spec" class="scale-sub">0.66m × 0.65m SITE · 56.5K TRIS · USDZ + GLB</div>
+    </div>
+
+    <button slot="ar-button" class="ar-launch-btn" style="position:fixed; bottom:max(72px, calc(env(safe-area-inset-bottom) + 58px)); left:50%; transform:translateX(-50%);">
+      📱 Launch Native AR (iOS / Android)
+    </button>
+  </model-viewer>
+
+  <div class="bottom-actions">
+    <div class="alt-row">
+      <a id="direct-usdz-1to1" class="alt-link" rel="ar" href="./assets/9_tsubo_house_1to1.usdz?v=0.5#allowsContentScaling=0">
+        <img src="./assets/poster.png" alt="" style="display:none;" />🍎 Apple 1:1 USDZ (278 KB)
+      </a>
+      <a id="direct-usdz-table" class="alt-link" rel="ar" href="./assets/9_tsubo_house_tabletop.usdz?v=0.5#allowsContentScaling=1">
+        <img src="./assets/poster.png" alt="" style="display:none;" />🍎 Apple 1:50 USDZ (2.1 MB)
+      </a>
+      <a id="android-sv-link" class="alt-link" href="#" style="display:none;">🤖 Google Scene Viewer</a>
+    </div>
+    <div class="spec-note" id="spec-note">
+      iPhone / iPad / Vision Pro: Native USDZ Quick Look · Android: WebXR / ARCore Scene Viewer
+    </div>
+  </div>
+
+  <script>
+    const mv = document.getElementById('mv');
+    const statusPill = document.getElementById('ar-status-pill');
+    const hudMode = document.getElementById('hud-mode');
+    const hudSpec = document.getElementById('hud-spec');
+    const btnTable = document.getElementById('btn-ar-tabletop');
+    const btn1to1 = document.getElementById('btn-ar-1to1');
+    const svLink = document.getElementById('android-sv-link');
+
+    const isAndroid = /Android/i.test(navigator.userAgent || '');
+    const isApple = /iPhone|iPad|iPod/i.test(navigator.userAgent || '') || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+    let currentPreset = 'tabletop';
+
+    function updateAndroidIntent() {
+      if (!isAndroid) return;
+      const glbRel = currentPreset === '1to1'
+        ? './assets/9_tsubo_house_1to1.glb?v=0.5'
+        : './assets/9_tsubo_house_tabletop.glb?v=0.5';
+      const glbAbs = new URL(glbRel, window.location.href).href;
+      const title = currentPreset === '1to1'
+        ? '9-Tsubo House (1:1 Scale Walk-In)'
+        : '9-Tsubo House (1:50 Full-Site Tabletop)';
+      const resizable = currentPreset === '1to1' ? 'false' : 'true';
+      svLink.href = `intent://arvr.google.com/scene-viewer/1.0?file=${encodeURIComponent(glbAbs)}&mode=ar_preferred&resizable=${resizable}&title=${encodeURIComponent(title)}#Intent;scheme=https;package=com.google.ar.core;action=android.intent.action.VIEW;S.browser_fallback_url=${encodeURIComponent(window.location.href)};end;`;
+      svLink.style.display = 'inline-flex';
+    }
+
+    function setPreset(preset) {
+      currentPreset = preset;
+      btnTable.classList.toggle('active', preset === 'tabletop');
+      btn1to1.classList.toggle('active', preset === '1to1');
+
+      if (preset === '1to1') {
+        mv.setAttribute('src', './assets/9_tsubo_house_1to1.glb?v=0.5');
+        mv.setAttribute('ios-src', './assets/9_tsubo_house_1to1.usdz?v=0.5#allowsContentScaling=0');
+        mv.setAttribute('ar-scale', 'fixed');
+        mv.setAttribute('camera-orbit', '-38deg 72deg 130%');
+        hudMode.textContent = '1:1 TRUE ARCHITECTURAL SCALE';
+        hudSpec.textContent = '5.6m × 5.5m × 5.5m HOUSE · 10.1K TRIS · 278 KB USDZ';
+      } else {
+        mv.setAttribute('src', './assets/9_tsubo_house_tabletop.glb?v=0.5');
+        mv.setAttribute('ios-src', './assets/9_tsubo_house_tabletop.usdz?v=0.5#allowsContentScaling=1');
+        mv.setAttribute('ar-scale', 'auto');
+        mv.setAttribute('camera-orbit', '-36deg 62deg 115%');
+        hudMode.textContent = '1:50 ARCHITECTURAL TABLETOP';
+        hudSpec.textContent = '0.66m × 0.65m SITE · 56.5K TRIS · PINCH TO SCALE';
+      }
+      updateAndroidIntent();
+    }
+
+    btnTable.addEventListener('click', () => setPreset('tabletop'));
+    btn1to1.addEventListener('click', () => setPreset('1to1'));
+
+    mv.addEventListener('load', () => {
+      if (isApple) statusPill.textContent = 'Apple Quick Look (USDZ) Ready';
+      else if (isAndroid) statusPill.textContent = 'Android WebXR / ARCore Ready';
+      else statusPill.textContent = '3D Preview · Open on Phone for AR';
+    });
+
+    updateAndroidIntent();
+  </script>
+</body>
+</html>

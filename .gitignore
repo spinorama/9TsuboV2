@@ -1,0 +1,9 @@
+# Blender backups & temp files
+*.blend1
+*.blend2
+*.tmp
+
+# Legacy scratch render folder (contains unrelated local backup blends)
+9_tsubo_house_renders/
+.DS_Store
+Thumbs.db
