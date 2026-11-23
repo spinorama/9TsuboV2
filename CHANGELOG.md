@@ -3,10 +3,22 @@
 All notable versions, Blender refinements, WebXR/AR/USDZ releases, and BIM drawing milestones for the **9-Tsubo House (*Sumire Aoi House*, 1999 by Makoto Koizumi / Koizumi Studio)**.
 
 - **Repository:** [https://github.com/spinorama/9TsuboV2](https://github.com/spinorama/9TsuboV2)
-- **Live 4-Mode WebXR App:** [https://spinorama.github.io/9TsuboV2/](https://spinorama.github.io/9TsuboV2/)
+- **Live 4-Mode WebXR App:** [https://spinorama.github.io/9TsuboV2/](https://spinorama.github.io/9TsuboV2/) ([🌸 Direct Anime Mode Launch](https://spinorama.github.io/9TsuboV2/?anime=1))
 - **ISO 19650 / IFC4 BIM Viewer:** [https://spinorama.github.io/9TsuboV2/bim.html](https://spinorama.github.io/9TsuboV2/bim.html)
 - **12-Sheet Construction Drawing Binder:** [https://spinorama.github.io/9TsuboV2/drawings/index.html](https://spinorama.github.io/9TsuboV2/drawings/index.html)
 - **Apple USDZ & Android AR Launcher:** [https://spinorama.github.io/9TsuboV2/ar.html](https://spinorama.github.io/9TsuboV2/ar.html)
+
+---
+
+## [v1.1.0] — 2026-11-22 (Real-Time WebXR Japanese Summer Anime Mode & 24-View Render Gallery)
+### Added
+- **Live WebXR Japanese Summer Anime Toggle (`index.html` — `🌸 Anime` button, Hotkey `[V]`, Quest VR 3D HUD button & `?anime=1` URL parameter):**
+  - Works seamlessly across all 4 WebXR modes: **Desktop 3D**, **Meta Quest VR**, **1:1 AR Walk**, and **Tabletop Dollhouse AR** (including live Tabletop rotation/scale-synced sun & procedural shaders, plus automatic sky-dome hiding for transparent AR passthrough).
+  - **Studio-Calibrated 85-Material Cel Shader Suite:** Exact warm pastel cream vs. cool cerulean shadow palettes matching the finalized Blender v2.1 anime renders, smooth painterly wood & white interiors (zero point-light bullseyes), smooth-normal Makoto Shinkai pastel Sakura & lush summer foliage, procedural terracotta *kawara* clay roof ribs, and turquoise windows with diagonal glare slashes.
+  - **Dual-System Real-Time Ink Outlines:** Crisp `#141d2b` architectural edge lines + subtle `#3a5575` paver/panel seams + watertight inverted-hull organic ink silhouettes on the Sakura tree, foliage canopies, Tuxedo Kitty, and bedside opal sconce globe.
+  - **Procedural Makoto Shinkai Summer Sky Dome:** Electric cyan summer sky gradient with gently drifting 3-step cel-shaded towering cumulus clouds and distant misty turquoise horizon mountains.
+- **24-View Architectural PBR vs. Japanese Summer Anime Render Gallery (`renders/current/`, `renders/anime/`, `README.md`):**
+  - All 12 perspective cameras rendered at `1280×720` in both Cycles GPU (`OPTIX`, AgX) and EEVEE + 3-Pass Freestyle Ink + Mist/Glare Compositor.
 
 ---
 

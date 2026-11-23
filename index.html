@@ -130,7 +130,7 @@
       flex-direction: column;
       gap: 6px;
       width: 100%;
-      max-width: 1020px;
+      max-width: 1180px;
       margin: 0 auto;
       pointer-events: none;
     }
@@ -225,7 +225,7 @@
     .quick-toggles {
       display: flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       flex-shrink: 0;
       flex-wrap: wrap;
       justify-content: flex-end;
@@ -321,6 +321,18 @@
       border-color: #ffffff;
     }
 
+    .btn.anime-btn.toggle-on {
+      background: linear-gradient(135deg, #20d8ff 0%, #ff9ec9 100%);
+      color: #091526;
+      border-color: #091526;
+    }
+    body[data-style="lcars"] .btn.anime-btn.toggle-on {
+      background: linear-gradient(135deg, #38e8ff 0%, #ffa8d0 100%);
+      color: #000000;
+      border-color: #ffffff;
+      box-shadow: 0 0 12px rgba(56, 232, 255, 0.45);
+    }
+
     .btn.danger {
       background: var(--danger-bg);
       border-color: var(--danger-bg);
@@ -328,8 +340,8 @@
     }
 
     .btn-sm {
-      font-size: 11px;
-      padding: 6px 9px;
+      font-size: 10.5px;
+      padding: 5.5px 7.5px;
     }
 
     /* AR Contextual Action Bar (Shown in Mode 3 & Mode 4) */
@@ -368,7 +380,7 @@
       flex-direction: column;
       gap: 8px;
       width: 100%;
-      max-width: 1020px;
+      max-width: 1180px;
       margin: 0 auto;
       pointer-events: none;
     }
@@ -638,12 +650,13 @@
           <button id="btn-toggle-roof" class="btn btn-sm toggle-on" title="Toggle Roof_Group">🏠 Roof: ON</button>
           <button id="btn-toggle-context" class="btn btn-sm toggle-on" title="Toggle Context_Group">🌳 Context: ON</button>
           <button id="btn-toggle-lighting" class="btn btn-sm toggle-on" title="Cycle Lighting: Daylight / Warm Evening / Soft AR (Hotkey: F)">💡 Light: Day</button>
+          <button id="btn-toggle-anime" class="btn btn-sm anime-btn" title="Toggle Japanese Summer Anime Cel-Shading, Ink Outlines &amp; Cumulus Sky (Hotkey: V)">🌸 Anime: OFF</button>
           <button id="btn-toggle-lines" class="btn btn-sm" title="Toggle Subtle Hidden-Line CAD Render (Hotkey: L)">✏️ Lines: OFF</button>
           <button id="btn-toggle-style" class="btn btn-sm style-btn" title="Switch UI Style: German DIN 1451 vs Star Trek LCARS (Hotkey: T)">📐 Style: DIN</button>
           <a class="btn btn-sm" href="./bim.html" title="Open ISO 19650 / IFC4 BIM Coordination Viewer" style="text-decoration:none;">🏗️ BIM</a>
           <a class="btn btn-sm" href="./drawings/index.html" title="Open 12-Sheet Model-Derived Architectural Drawing Binder" style="text-decoration:none;">📐 Drawings</a>
           <a class="btn btn-sm" href="./ar.html" title="Dedicated Apple iOS USDZ Quick Look &amp; Android Scene Viewer AR Page" style="text-decoration:none;">🍎/🤖 AR</a>
-          <button id="btn-changelog" class="btn btn-sm" title="View Version Changelog">📋 v1.0</button>
+          <button id="btn-changelog" class="btn btn-sm" title="View Version Changelog">📋 v1.1</button>
           <button id="btn-exit-xr" class="btn btn-sm danger" style="display:none;">✕ Exit XR</button>
         </div>
       </div>
@@ -671,7 +684,7 @@
       <div class="camera-bar-wrap">
         <div class="camera-bar-header">
           <span id="active-room-label">📷 VIEWPOINT: 01 · EXT THREE-QUARTER</span>
-          <span id="control-hint-label" class="kbd-hint">DRAG: LOOK · RIGHT-DRAG: PAN · SCROLL / WASD: MOVE · [L]: LINES · [T]: STYLE</span>
+          <span id="control-hint-label" class="kbd-hint">DRAG: LOOK · RIGHT-DRAG: PAN · SCROLL / WASD: MOVE · [V]: ANIME · [L]: LINES · [T]: STYLE</span>
         </div>
         <div id="room-strip"></div>
       </div>
@@ -685,7 +698,11 @@
           <button id="btn-close-changelog" class="btn btn-sm">✕ Close</button>
         </div>
         <div class="changelog-entry">
-          <div class="changelog-ver">v1.0.0 · 2026-11-22 (Current — Tier 2 BIM &amp; 12-Sheet CAD Set)</div>
+          <div class="changelog-ver">v1.1.0 · 2026-11-22 (Current — Real-Time WebXR Japanese Summer Anime Mode)</div>
+          <div class="changelog-desc">• Live Japanese Summer Anime Toggle (<code>🌸 Anime</code> / Hotkey <code>[V]</code> + Quest VR 3D HUD button + <code>?anime=1</code> URL launch): Works seamlessly across all 4 WebXR modes (Desktop 3D, Quest VR, 1:1 AR Walk &amp; Tabletop Dollhouse AR).<br>• Studio-Calibrated 85-Material Cel Shader Suite: Exact warm sunlit cream vs. cerulean-teal shadow palettes, painterly wood/interior shading (zero point-light bullseyes), smooth-normal Makoto Shinkai pastel Sakura &amp; summer foliage, procedural terracotta <em>kawara</em> roof tiles, turquoise diagonal-glare windows, architectural ink edges + inverted-hull organic outlines, and a live 3-step cumulus anime sky dome (auto-hidden for transparent AR passthrough).</div>
+        </div>
+        <div class="changelog-entry">
+          <div class="changelog-ver">v1.0.0 · 2026-11-22 (Tier 2 BIM &amp; 12-Sheet CAD Set)</div>
           <div class="changelog-desc">• BIMCraft-Style Automated Model-to-Drawing Pipeline (<code>scripts/</code>): True 3D <code>bmesh.ops.bisect_plane</code> slicing + depth-sorted orthographic hidden-face projection directly from <code>9_tsubo_house.blend</code> (LOD-300 3D ≤ 60k tris → LOD-400 2D parametric construction assemblies).<br>• 12-Sheet Vector SVG Architectural Construction Set (<code>drawings/index.html</code>, <code>A-000</code>–<code>A-601</code>): Cover + Axonometric, Site Plan, 1F/2F Floor Plans, Roof &amp; Zairai-koho Timber Framing Plan, Reflected Ceiling &amp; Lighting Plan, 4 Exterior Elevations, Sections A-A &amp; B-B, Enlarged 1:25 Kitchen/Bath/Tatami Views, LOD-400 Wall/Footing/Eave/Ridge &amp; Glazing/Stair/Guardrail Construction Details, and Auto-Computed Schedules &amp; QTO.<br>• Dedicated ISO 19650 / IFC4 BIM Coordination Viewer (<code>bim.html</code> + <code>9_tsubo_bim_metadata.json</code>): 893 tagged elements, CSI MasterFormat 2020 trade filters, 6-plane Section Box, Laser Tape Measure (Metric/Imperial/Ken), LOD-400 Assembly Inspector, and live <code>.IFC</code> &amp; <code>.CSV</code> exports.</div>
         </div>
         <div class="changelog-entry">
@@ -861,6 +878,7 @@
       sunLight.shadow.normalBias = 0.02;
     }
     scene.add(sunLight);
+    scene.add(sunLight.target);
 
     const fillLight = new THREE.DirectionalLight(0xdbeafe, 0.24);
     fillLight.position.set(16, 12, -14);
@@ -920,10 +938,33 @@
     ];
     let currentLightingIdx = 0;
 
+    const DEFAULT_SUN_POS = new THREE.Vector3(-14, 24, 18);
+    const ANIME_SUN_DIR = new THREE.Vector3(0.76, 0.78, 0.58).normalize();
+    let animeEnabled = false;
+    let animeBuilt = false;
+    let modelLoaded = false;
+
     function applyLightingProfile(profileIdx, isARPassthrough = false) {
+      if (animeEnabled) {
+        renderer.toneMapping = THREE.NoToneMapping;
+        renderer.toneMappingExposure = 1.0;
+        hemiLight.intensity = 0.0;
+        sunLight.color.setHex(0xffffff);
+        sunLight.intensity = Math.PI;
+        fillLight.intensity = 0.0;
+        fixtureLights.forEach((pt) => { pt.intensity = 0.0; });
+        syncAnimeSunTransform();
+        applySceneBackgroundForCurrentState();
+        return;
+      }
+
       const p = isARPassthrough ? LIGHTING_PROFILES[2] : LIGHTING_PROFILES[profileIdx];
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = p.exposure;
       hemiLight.intensity = p.hemi;
+      sunLight.color.setHex(0xfff5e4);
+      sunLight.position.copy(DEFAULT_SUN_POS);
+      sunLight.target.position.set(0, 0, 0);
       sunLight.intensity = p.sun;
       fillLight.intensity = p.fill;
       fixtureLights.forEach((pt) => {
@@ -1022,6 +1063,7 @@
     const btnToggleRoof = document.getElementById('btn-toggle-roof');
     const btnToggleContext = document.getElementById('btn-toggle-context');
     const btnToggleLighting = document.getElementById('btn-toggle-lighting');
+    const btnToggleAnime = document.getElementById('btn-toggle-anime');
     const btnToggleLines = document.getElementById('btn-toggle-lines');
     const btnToggleStyle = document.getElementById('btn-toggle-style');
     const btnChangelog = document.getElementById('btn-changelog');
@@ -1032,6 +1074,9 @@
     const iosArTabletopLink = document.getElementById('ios-ar-tabletop');
 
     function cycleLightingMode() {
+      if (animeEnabled) {
+        setAnimeMode(false);
+      }
       currentLightingIdx = (currentLightingIdx + 1) % LIGHTING_PROFILES.length;
       const p = LIGHTING_PROFILES[currentLightingIdx];
       btnToggleLighting.textContent = p.label;
@@ -1081,8 +1126,8 @@
 
       const paperTint = new THREE.Color(0xfafaf7);
       worldRoot.traverse((child) => {
-        if (!child.isMesh || child.userData.isEdgeHelper) return;
-        child.userData.origMaterial = child.material;
+        if (!child.isMesh || child.userData.isEdgeHelper || child.userData.isAnimeHelper) return;
+        if (!child.userData.origMaterial) child.userData.origMaterial = child.material;
 
         const makeSubtlePaperMat = (mat) => {
           if (!mat) return mat;
@@ -1106,13 +1151,14 @@
         };
 
         if (Array.isArray(child.material)) {
-          child.userData.hlMaterial = child.material.map(makeSubtlePaperMat);
+          child.userData.hlMaterial = child.userData.origMaterial.map(makeSubtlePaperMat);
         } else {
-          child.userData.hlMaterial = makeSubtlePaperMat(child.material);
+          child.userData.hlMaterial = makeSubtlePaperMat(child.userData.origMaterial);
         }
 
-        if (child.geometry) {
-          const edgesGeo = new THREE.EdgesGeometry(child.geometry, 24);
+        const baseGeo = child.userData.origGeometry || child.geometry;
+        if (baseGeo) {
+          const edgesGeo = new THREE.EdgesGeometry(baseGeo, 24);
           const edgeSegments = new THREE.LineSegments(edgesGeo, sharedEdgeMaterial);
           edgeSegments.userData.isEdgeHelper = true;
           edgeSegments.raycast = () => {}; // Never interfere with VR floor teleport raycasting
@@ -1123,18 +1169,688 @@
       });
     }
 
+    // =========================================================================
+    // 5B. REAL-TIME WEBXR JAPANESE SUMMER ANIME ENGINE (All 4 Modes: 3D/VR/AR)
+    //     Exact Blender v2.1 Palette · 6 Cel Archetypes · Dual Ink Outlines
+    //     Procedural 3-Step Cumulus Sky Dome (Auto-Hidden in AR Passthrough)
+    // =========================================================================
+    const animeSkyBgColor = new THREE.Color(0x14d8ff);
+    const animeWorldRootInvUniform = { value: new THREE.Matrix4() };
+    const _animeTmpSun = new THREE.Vector3();
+    const _animeTmpCamPos = new THREE.Vector3();
+
+    function syncAnimeSunTransform() {
+      if (!animeEnabled) return;
+      _animeTmpSun.copy(ANIME_SUN_DIR).applyQuaternion(worldRoot.quaternion).multiplyScalar(28.0);
+      sunLight.position.copy(worldRoot.position).add(_animeTmpSun);
+    }
+
+    // Procedural Makoto Shinkai Japanese Summer Sky Dome (Electric Cyan + 3-Step Cumulus + Misty Horizon)
+    const animeSkyUniforms = {
+      uTime: { value: 0.0 },
+      uSunDir: { value: ANIME_SUN_DIR.clone() },
+      uSkyHoriz: { value: new THREE.Color('#9cfafa') },
+      uSkyAqua:  { value: new THREE.Color('#3cf2fc') },
+      uSkyCyan:  { value: new THREE.Color('#14d8ff') },
+      uSkyMid:   { value: new THREE.Color('#00a6f5') },
+      uSkyTop:   { value: new THREE.Color('#0074cc') },
+      uCloudShad:{ value: new THREE.Color('#6ec4e8') },
+      uCloudMid: { value: new THREE.Color('#baefff') },
+      uCloudLit: { value: new THREE.Color('#ebfbff') },
+      uCloudHi:  { value: new THREE.Color('#ffffff') },
+      uMtnNear:  { value: new THREE.Color('#2fa4bd') },
+      uMtnFar:   { value: new THREE.Color('#62d9e3') }
+    };
+
+    const animeSkyDome = new THREE.Mesh(
+      new THREE.SphereGeometry(185, 48, 32),
+      new THREE.ShaderMaterial({
+        side: THREE.BackSide,
+        depthWrite: false,
+        fog: false,
+        uniforms: animeSkyUniforms,
+        vertexShader: /* glsl */`
+          varying vec3 vSkyDir;
+          void main() {
+            vSkyDir = normalize(position);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: /* glsl */`
+          uniform float uTime;
+          uniform vec3 uSunDir;
+          uniform vec3 uSkyHoriz, uSkyAqua, uSkyCyan, uSkyMid, uSkyTop;
+          uniform vec3 uCloudShad, uCloudMid, uCloudLit, uCloudHi;
+          uniform vec3 uMtnNear, uMtnFar;
+          varying vec3 vSkyDir;
+
+          float aHash(vec3 p) {
+            p = fract(p * vec3(443.8975, 397.2973, 491.1871));
+            p += dot(p, p.yxz + 19.19);
+            return fract((p.x + p.y) * p.z);
+          }
+
+          float aNoise(vec3 p) {
+            vec3 i = floor(p);
+            vec3 f = fract(p);
+            f = f * f * (3.0 - 2.0 * f);
+            float n000 = aHash(i + vec3(0.0, 0.0, 0.0));
+            float n100 = aHash(i + vec3(1.0, 0.0, 0.0));
+            float n010 = aHash(i + vec3(0.0, 1.0, 0.0));
+            float n110 = aHash(i + vec3(1.0, 1.0, 0.0));
+            float n001 = aHash(i + vec3(0.0, 0.0, 1.0));
+            float n101 = aHash(i + vec3(1.0, 0.0, 1.0));
+            float n011 = aHash(i + vec3(0.0, 1.0, 1.0));
+            float n111 = aHash(i + vec3(1.0, 1.0, 1.0));
+            float nx00 = mix(n000, n100, f.x);
+            float nx10 = mix(n010, n110, f.x);
+            float nx01 = mix(n001, n101, f.x);
+            float nx11 = mix(n011, n111, f.x);
+            float nxy0 = mix(nx00, nx10, f.y);
+            float nxy1 = mix(nx01, nx11, f.y);
+            return mix(nxy0, nxy1, f.z);
+          }
+
+          float aFbm(vec3 p) {
+            float v = 0.0;
+            float a = 0.52;
+            for (int i = 0; i < 4; i++) {
+              v += a * aNoise(p);
+              p = p * 2.08 + vec3(13.1, 7.7, 5.3);
+              a *= 0.50;
+            }
+            return v;
+          }
+
+          float cloudDensity(vec3 dir) {
+            vec3 p = dir * vec3(2.25, 1.15, 2.25) + vec3(0.72 + uTime * 0.0025, -0.02, -0.28);
+            vec3 warp = vec3(
+              aNoise(p * 1.15 + vec3(1.7, 3.2, 2.1)),
+              aNoise(p * 1.15 + vec3(5.2, 1.3, 4.7)),
+              aNoise(p * 1.15 + vec3(2.8, 6.1, 1.9))
+            );
+            vec3 wp = mix(p, p + (warp - 0.5) * 1.45, 0.36);
+            float base = aFbm(wp * 1.18) + 0.18 * aNoise(wp * 4.2);
+            return base - 0.50 * max(dir.y, 0.0);
+          }
+
+          void main() {
+            vec3 d = normalize(vSkyDir);
+            float elev = clamp(d.y, 0.0, 1.0);
+
+            // Vivid electric Japanese summer cyan sky gradient
+            vec3 sky = mix(uSkyHoriz, uSkyAqua, smoothstep(0.0, 0.075, elev));
+            sky = mix(sky, uSkyCyan, smoothstep(0.075, 0.19, elev));
+            sky = mix(sky, uSkyMid,  smoothstep(0.19, 0.42, elev));
+            sky = mix(sky, uSkyTop,  smoothstep(0.42, 0.85, elev));
+
+            // Towering 3-step cel-shaded summer cumulus clouds
+            float c0 = cloudDensity(d);
+            float cSun = cloudDensity(normalize(d + uSunDir * 0.072));
+            float cloudMask = smoothstep(0.432, 0.444, c0) * smoothstep(0.005, 0.032, d.y);
+
+            float shade = (c0 - cSun) * 1.55 + elev * 0.32;
+            vec3 cloudCol = mix(uCloudShad, uCloudMid, smoothstep(0.015, 0.035, shade));
+            cloudCol = mix(cloudCol, uCloudLit, smoothstep(0.072, 0.092, shade));
+            cloudCol = mix(cloudCol, uCloudHi,  smoothstep(0.125, 0.148, shade));
+
+            vec3 col = mix(sky, cloudCol, cloudMask);
+
+            // Distant misty turquoise horizon mountains
+            float mtnNoise = aNoise(vec3(d.x * 4.2, 0.0, d.z * 4.2)) * 0.055 + aNoise(vec3(d.x * 11.0, 1.2, d.z * 11.0)) * 0.018;
+            float mtnMask = smoothstep(mtnNoise + 0.005, mtnNoise - 0.002, d.y) * smoothstep(-0.04, 0.002, d.y);
+            vec3 mtnCol = mix(uMtnFar, uMtnNear, smoothstep(0.0, 0.055, mtnNoise - d.y));
+            col = mix(col, mtnCol, mtnMask * 0.88);
+
+            // Soft aqua ground-plane horizon bounce below y = 0
+            if (d.y < 0.0) {
+              col = mix(col, uSkyHoriz * 0.85, smoothstep(0.0, -0.15, d.y));
+            }
+
+            gl_FragColor = vec4(col, 1.0);
+            #include <colorspace_fragment>
+          }
+        `
+      })
+    );
+    animeSkyDome.name = 'Anime_Summer_SkyDome';
+    animeSkyDome.frustumCulled = false;
+    animeSkyDome.renderOrder = -1000;
+    animeSkyDome.raycast = () => {};
+    animeSkyDome.visible = false;
+    scene.add(animeSkyDome);
+
+    // Exact 85-Material Palette Table Extracted from Finalized Blender v2.1 Anime Scene
+    // Format: [archetype, shadowHex, midHex, litHex, aoHex, hiHex?]
+    // Archetypes: 'ext' | 'int' | 'int_wood' | 'ext_wood' | 'foliage' | 'kawara' | 'window' | 'emissive' | 'glass_clear' | 'glass_shower'
+    const ANIME_PALETTES = {
+      // Exterior Architectural & Site
+      Wall_White_Cladding:   ['ext', '#6ca4c2', '#eaece3', '#fcf8df', '#477699'],
+      Wall_Seam_Groove:      ['ext', '#5482a1', '#b5c1c7', '#d4d4c5', '#385d7d'],
+      Roof_Dark_Metal:       ['ext', '#28476e', '#416991', '#5883ab', '#1b3152'],
+      Aluminum_Silver:       ['ext', '#5582a3', '#b3cad9', '#ddebf2', '#395e7d'],
+      Black_Mailbox:         ['ext', '#202b3b', '#313d4f', '#435163', '#141d2b'],
+      Concrete_Plinth:       ['ext', '#548bb0', '#c7ced1', '#e8e4d1', '#396587'],
+      Concrete_Step_Paver:   ['ext', '#508cb5', '#e0ddd0', '#f7f2d7', '#37688f'],
+      Crushed_Gravel:        ['ext', '#538bb0', '#d2d4cb', '#f0ead1', '#3a688a'],
+      Sandy_Soil_Ground:     ['ext', '#6590a6', '#e0c68f', '#f7e4b2', '#466c82'],
+      Deck_Cedar_Wood:       ['ext_wood', '#755c6b', '#cf8044', '#eb9f5e', '#523e52'],
+      Shoji_Lattice:         ['ext_wood', '#7a7f8c', '#cfa972', '#e8cb94', '#575e70'],
+      Shoji_Translucent:     ['ext', '#85b3c9', '#f0e9d3', '#fff8de', '#5e88a3'],
+      // Neighborhood Context Houses & Street
+      Ctx_Aluminum_Silver:   ['ext', '#537f9e', '#b0c8d9', '#d9e9f2', '#375c7a'],
+      Ctx_Asphalt_Road:      ['ext', '#4b8eb8', '#dedcd2', '#fff5d4', '#31658f'],
+      Ctx_Beige_Stucco:      ['ext', '#75a0b5', '#e3ca9b', '#fbe7bd', '#517891'],
+      Ctx_Charcoal_Cladding: ['ext', '#2b405c', '#455c75', '#5b738c', '#1c2c45'],
+      Ctx_Concrete_Block:    ['ext', '#4e84a6', '#c2c5bf', '#e3dec9', '#356180'],
+      Ctx_Concrete_Grey:     ['ext', '#5089ad', '#ccd2cf', '#eee9d7', '#366587'],
+      Ctx_Cream_Wall:        ['ext', '#6cb3a4', '#e3e0a1', '#faf6b4', '#4a8a87'],
+      Ctx_Grey_Siding:       ['ext', '#5a8fa8', '#b2cfc9', '#d9ebe6', '#3e6a85'],
+      Ctx_Manhole_Iron:      ['ext', '#5b80ac', '#83878b', '#9da2a6', '#426090'],
+      Ctx_Mirror_Orange:     ['ext', '#a14438', '#e36724', '#ff8838', '#752d2c'],
+      Ctx_Modern_OffWhite:   ['ext', '#68a2b8', '#d8e6db', '#f5f9e6', '#497d96'],
+      Ctx_Neighbor_RoomDark: ['ext', '#3e5c87', '#5476a3', '#6c90bd', '#2d476e'],
+      Ctx_PowerWire_Black:   ['ext', '#131c29', '#1a2536', '#243142', '#0d141f'],
+      Ctx_Road_WhiteLine:    ['ext', '#bd7d24', '#eba91e', '#ffcb2e', '#8f5b1d'],
+      Ctx_Roof_BlueSlate:    ['ext', '#254b75', '#396d9c', '#4f86b5', '#183559'],
+      Ctx_Roof_Charcoal:     ['ext', '#223a59', '#355373', '#476a8c', '#162842'],
+      Ctx_Roof_RedTile:      ['kawara', '#4e355c', '#6e4970', '#de5e42', '#3a2540', '#ff9d73'],
+      Ctx_Sakura_Bark:       ['ext', '#47394c', '#6e4844', '#8c6055', '#302538'],
+      Ctx_Tan_Seam:          ['ext', '#617d94', '#ba976c', '#d6b689', '#445e75'],
+      Ctx_Tan_Siding:        ['ext', '#7596ab', '#dbbd8f', '#f7ddb3', '#527087'],
+      Ctx_Tree_Bark:         ['ext', '#4f404c', '#7d563f', '#9e7251', '#362b38'],
+      Ctx_Trim_White:        ['ext', '#649ab8', '#e3eaea', '#fdfbf0', '#467594'],
+      Ctx_Wood_CedarSlat:    ['ext_wood', '#705a6b', '#c2793f', '#e0995a', '#503f52'],
+      // Tuxedo Kitty
+      Ctx_Kitty_DarkEye:     ['ext', '#0b101a', '#111824', '#1a2230', '#070b12'],
+      Ctx_Kitty_Pink:        ['ext', '#b35c82', '#ed809d', '#ffa6bd', '#8a4265'],
+      Ctx_Kitty_TuxBlack:    ['ext', '#161e2e', '#232c3d', '#343e52', '#0e1522'],
+      Ctx_Kitty_TuxWhite:    ['ext', '#a6bed4', '#f5f7fa', '#ffffff', '#7e9ab5'],
+      // Luminous Sakura & Summer Foliage (4-band)
+      Ctx_Sakura_BlushWhite: ['foliage', '#d69ac2', '#f5bfd8', '#ffe4ef', '#ba7fa9', '#fff9fc'],
+      Ctx_Sakura_PalePink:   ['foliage', '#cc89b7', '#f0a6c9', '#ffcce2', '#ad709c', '#ffedf5'],
+      Ctx_Sakura_MidPink:    ['foliage', '#bf78aa', '#e88db8', '#ffb3d4', '#9e5e8d', '#ffdaeb'],
+      Ctx_Foliage_Fresh:     ['foliage', '#1f735c', '#42ad58', '#80d64d', '#14524c', '#bff054'],
+      Ctx_Foliage_Mid:       ['foliage', '#186357', '#2e9454', '#5ec44d', '#104545', '#9be34d'],
+      Ctx_Foliage_Dark:      ['foliage', '#13524f', '#227d52', '#42ab52', '#0b383d', '#78cc4e'],
+      Plant_Foliage_Green:   ['foliage', '#1d6352', '#349954', '#65c752', '#12453f', '#a5e657'],
+      Ctx_Shrub_RedBronze:   ['foliage', '#7d354d', '#ba4f4f', '#e67358', '#59233d', '#ffa17a'],
+      // Interiors & Fixtures (Smooth Painterly, Zero Bullseyes)
+      Anime_Int_White:       ['int', '#aabccf', '#f3f1eb', '#fffdf7', '#8ba0b8'],
+      Interior_Plywood:      ['int_wood', '#b8a29c', '#f0d5a8', '#fff0cf', '#8a767d'],
+      Interior_Pine_Wood:    ['int_wood', '#a88a84', '#e6b87a', '#fae0a8', '#7a6269'],
+      Interior_Timber_Beam:  ['int_wood', '#997d7a', '#d6a160', '#f0c886', '#6e565e'],
+      Furniture_Warm_Wood:   ['int_wood', '#8c6d6e', '#cf8f4e', '#ebb26e', '#634c57'],
+      Wood_Frame_Casing:     ['int_wood', '#967c7a', '#d69f60', '#f2c788', '#6e575e'],
+      Interior_Ply_Seam:     ['int', '#7a6568', '#b08354', '#cfa26e', '#594750'],
+      Tatami_Straw_Mat:      ['int', '#94a18a', '#d6ca82', '#ede4a4', '#6f7e70'],
+      Tatami_Border_Heri:    ['int', '#5c6057', '#8a7a4f', '#a89765', '#424744'],
+      Bed_Cream_Duvet:       ['int', '#aab6c7', '#f0e7d5', '#fffbf0', '#7f8fa8'],
+      Ceramic_White:         ['int', '#9ab8cc', '#edf2f5', '#ffffff', '#6f90ab'],
+      Dining_Chair_Dark:     ['int', '#293345', '#414957', '#555d6b', '#1b2433'],
+      Genkan_Mortar_Floor:   ['int', '#7591a3', '#bfbfb6', '#dedcd0', '#536e85'],
+      Kitchen_Stainless:     ['int', '#7598b0', '#c4d8e3', '#e8f2f7', '#547591'],
+      Stove_Glass_Dark:      ['int', '#1a283b', '#2b3c4f', '#3b4d61', '#111d2e'],
+      Terracotta_Accent:     ['int', '#964752', '#d96443', '#f58762', '#6e313e'],
+      Wicker_Rattan:         ['int', '#917160', '#d49b50', '#edbc74', '#6b514b'],
+      Woven_Pattern_Rug:     ['int', '#949196', '#d6bfa0', '#f0dec2', '#706f7a'],
+      Bath_Bottle_Amber:     ['int', '#944e34', '#db7d2a', '#f7a248', '#6b3526'],
+      Bath_Bottle_Sage:      ['int', '#3c7a6a', '#68b57d', '#8fd69f', '#285952'],
+      Bath_Towel_Slate:      ['int', '#3b678a', '#5c93b3', '#7db3cf', '#284a69'],
+      Bathroom_Chrome:       ['int', '#6da1bf', '#c7e3f0', '#f0f9fd', '#497a9c'],
+      Bathroom_Mirror:       ['int', '#5fb3cf', '#a3e2f2', '#d9f7fd', '#408ba8'],
+      Shower_Floor_Tile:     ['int', '#709ab3', '#bad4db', '#dbecef', '#4f7894'],
+      Shower_Tile_Grout:     ['int', '#5f849c', '#9eb8c4', '#bed2d9', '#44657d'],
+      Shower_Wall_Tile:      ['int', '#89b4c9', '#dcecf2', '#f7fbfd', '#618ca6'],
+      Fixture_Brushed_Alum:  ['int', '#7394b0', '#b8cddb', '#dde9f2', '#51718f'],
+      Fixture_Enamel_White:  ['int', '#98b4c7', '#edf0f0', '#fffef7', '#708fa8'],
+      Fixture_Matte_Black:   ['int', '#1c2636', '#2d374a', '#3e495c', '#121a26'],
+      Fixture_Warm_Brass:    ['int', '#96723e', '#d9a443', '#f5cc6e', '#6e502d'],
+      // Special Windows, Glass & Emissives
+      Ctx_Window_DarkGlass:    ['window', '#1a5f80', '#2da4c2', '#8cf2ff', '#124361'],
+      Ctx_Window_ClearGlass:   ['glass_clear', '#9cf0fc'],
+      Ctx_KittyWin_TransGlass: ['glass_clear', '#9cf0fc'],
+      Shower_Glass_Door:       ['glass_shower', '#8ef2ff'],
+      Shoji_Warm_Glow:         ['emissive', '#fff6db'],
+      Fixture_Bulb_2700K:      ['emissive', '#fff9d9'],
+      Fixture_Opal_Diffuser:   ['emissive', '#fff5d1'],
+      Ctx_Kitty_EyeShine:      ['emissive', '#ffffff']
+    };
+
+    const INDOOR_WHITE_MESH_NAMES = new Set([
+      'Bath_Wall_Front_Header', 'Bath_Wall_Front_Left', 'Bath_Wall_Front_Right',
+      'Bath_Wall_West_AlcoveBack', 'Bath_Wall_West_Vanity',
+      'Loft_Rail_Post_Front', 'Loft_Rail_Post_Stair', 'Loft_Rail_Top_Rear', 'Loft_Rail_Top_Right',
+      'Shower_Wall_Header', 'Shower_Wall_LeftPier', 'Shower_Wall_RightWall',
+      'WC_Wall_FrontPier', 'WC_Wall_Header', 'WC_Wall_RearPier'
+    ]);
+
+    const KITTY_OUTLINE_MESH_NAMES = new Set([
+      'Ctx_Kitty_Body', 'Ctx_Kitty_Head', 'Ctx_Kitty_Ear_L', 'Ctx_Kitty_Ear_R',
+      'Ctx_Kitty_Paw_L', 'Ctx_Kitty_Paw_R', 'Ctx_Kitty_Tail'
+    ]);
+
+    const animeArchEdgeMat = new THREE.LineBasicMaterial({
+      color: 0x141d2b,
+      transparent: true,
+      opacity: 0.86,
+      depthTest: true,
+      depthWrite: false
+    });
+
+    const animeSubtleEdgeMat = new THREE.LineBasicMaterial({
+      color: 0x3a5575,
+      transparent: true,
+      opacity: 0.34,
+      depthTest: true,
+      depthWrite: false
+    });
+
+    const animeHullMatCache = new Map();
+    function getAnimeHullOutlineMaterial(widthMeters) {
+      const key = widthMeters.toFixed(4);
+      if (animeHullMatCache.has(key)) return animeHullMatCache.get(key);
+      const mat = new THREE.ShaderMaterial({
+        side: THREE.BackSide,
+        fog: true,
+        uniforms: THREE.UniformsUtils.merge([
+          THREE.UniformsLib.fog,
+          {
+            uInkColor: { value: new THREE.Color('#162033') },
+            uWidth: { value: widthMeters }
+          }
+        ]),
+        vertexShader: /* glsl */`
+          uniform float uWidth;
+          #include <fog_pars_vertex>
+          void main() {
+            vec3 extruded = position + normalize(normal) * uWidth;
+            vec4 mvPosition = modelViewMatrix * vec4(extruded, 1.0);
+            gl_Position = projectionMatrix * mvPosition;
+            #include <fog_vertex>
+          }
+        `,
+        fragmentShader: /* glsl */`
+          uniform vec3 uInkColor;
+          #include <fog_pars_fragment>
+          void main() {
+            gl_FragColor = vec4(uInkColor, 1.0);
+            #include <colorspace_fragment>
+            #include <fog_fragment>
+          }
+        `
+      });
+      animeHullMatCache.set(key, mat);
+      return mat;
+    }
+
+    // Builds watertight smooth normals (plus optional spherical canopy blend for lush anime foliage!)
+    function createSmoothOrganicGeometry(origGeo, radialBlend = 0.0) {
+      const geo = origGeo.clone();
+      const posAttr = geo.attributes.position;
+      if (!posAttr) return geo;
+      geo.computeVertexNormals();
+      geo.computeBoundingBox();
+      const center = new THREE.Vector3();
+      if (geo.boundingBox) geo.boundingBox.getCenter(center);
+
+      const normAttr = geo.attributes.normal;
+      const sumMap = new Map();
+      const vPos = new THREE.Vector3();
+      const vNorm = new THREE.Vector3();
+      const count = posAttr.count;
+
+      for (let i = 0; i < count; i++) {
+        vPos.fromBufferAttribute(posAttr, i);
+        vNorm.fromBufferAttribute(normAttr, i);
+        const key = `${Math.round(vPos.x * 1000)},${Math.round(vPos.y * 1000)},${Math.round(vPos.z * 1000)}`;
+        let acc = sumMap.get(key);
+        if (!acc) {
+          acc = new THREE.Vector3();
+          sumMap.set(key, acc);
+        }
+        acc.add(vNorm);
+      }
+
+      const vRad = new THREE.Vector3();
+      for (let i = 0; i < count; i++) {
+        vPos.fromBufferAttribute(posAttr, i);
+        const key = `${Math.round(vPos.x * 1000)},${Math.round(vPos.y * 1000)},${Math.round(vPos.z * 1000)}`;
+        vNorm.copy(sumMap.get(key)).normalize();
+        if (radialBlend > 0.0) {
+          vRad.subVectors(vPos, center);
+          if (vRad.lengthSq() > 1e-6) {
+            vRad.normalize();
+            vNorm.lerp(vRad, radialBlend).normalize();
+          }
+        }
+        normAttr.setXYZ(i, vNorm.x, vNorm.y, vNorm.z);
+      }
+      normAttr.needsUpdate = true;
+      return geo;
+    }
+
+    const ANIME_GLSL_NOISE = /* glsl */`
+      float aH3(vec3 p) {
+        p = fract(p * vec3(443.8975, 397.2973, 491.1871));
+        p += dot(p, p.yxz + 19.19);
+        return fract((p.x + p.y) * p.z);
+      }
+      float aN3(vec3 p) {
+        vec3 i = floor(p);
+        vec3 f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+        return mix(
+          mix(mix(aH3(i), aH3(i + vec3(1,0,0)), f.x),
+              mix(aH3(i + vec3(0,1,0)), aH3(i + vec3(1,1,0)), f.x), f.y),
+          mix(mix(aH3(i + vec3(0,0,1)), aH3(i + vec3(1,0,1)), f.x),
+              mix(aH3(i + vec3(0,1,1)), aH3(i + vec3(1,1,1)), f.x), f.y),
+          f.z
+        );
+      }
+    `;
+
+    const animeMatCache = new Map();
+    function getOrCreateAnimeMaterial(matKey, fallbackOrigMat) {
+      if (animeMatCache.has(matKey)) return animeMatCache.get(matKey);
+
+      let spec = ANIME_PALETTES[matKey];
+      if (!spec) {
+        // Fallback: synthesize balanced anime triad from original PBR color
+        const c = (fallbackOrigMat && fallbackOrigMat.color) ? fallbackOrigMat.color.clone() : new THREE.Color(0xd8dcd6);
+        const lit = '#' + c.clone().lerp(new THREE.Color(0xfffbe8), 0.22).getHexString();
+        const mid = '#' + c.getHexString();
+        const shd = '#' + c.clone().multiply(new THREE.Color(0x6398bd)).getHexString();
+        const ao  = '#' + c.clone().multiply(new THREE.Color(0x416c94)).getHexString();
+        spec = ['ext', shd, mid, lit, ao];
+      }
+
+      const [arch, c1, c2, c3, c4, c5] = spec;
+      let mat;
+
+      if (arch === 'emissive') {
+        mat = new THREE.MeshBasicMaterial({
+          color: new THREE.Color(c1),
+          side: THREE.DoubleSide
+        });
+      } else if (arch === 'glass_clear') {
+        mat = new THREE.MeshBasicMaterial({
+          color: new THREE.Color(c1),
+          transparent: true,
+          opacity: 0.08,
+          depthWrite: false,
+          side: THREE.DoubleSide
+        });
+      } else if (arch === 'glass_shower') {
+        mat = new THREE.MeshBasicMaterial({
+          color: new THREE.Color(c1),
+          transparent: true,
+          opacity: 0.24,
+          depthWrite: false,
+          side: THREE.DoubleSide
+        });
+      } else {
+        // Custom cel-shaded MeshLambertMaterial (inherits native WebGL/WebXR shadow maps, stereo & fog!)
+        mat = new THREE.MeshLambertMaterial({
+          color: 0xffffff,
+          side: THREE.DoubleSide,
+          polygonOffset: true,
+          polygonOffsetFactor: 1,
+          polygonOffsetUnits: 1
+        });
+        mat.customProgramCacheKey = () => `anime_cel_v1_${arch}`;
+        mat.onBeforeCompile = (shader) => {
+          shader.uniforms.uAnimeWorldRootInv = animeWorldRootInvUniform;
+          shader.uniforms.uShadowCol = { value: new THREE.Color(c1) };
+          shader.uniforms.uMidCol    = { value: new THREE.Color(c2 || c1) };
+          shader.uniforms.uLitCol    = { value: new THREE.Color(c3 || c2 || c1) };
+          shader.uniforms.uAoCol     = { value: new THREE.Color(c4 || c1) };
+          shader.uniforms.uHiCol     = { value: new THREE.Color(c5 || c3 || c1) };
+
+          shader.vertexShader = shader.vertexShader
+            .replace(
+              '#include <common>',
+              `#include <common>
+              uniform mat4 uAnimeWorldRootInv;
+              varying vec3 vAnimeModelPos;
+              varying vec3 vAnimeModelNormal;`
+            )
+            .replace(
+              '#include <project_vertex>',
+              `#include <project_vertex>
+              vec4 animeWp = modelMatrix * vec4(transformed, 1.0);
+              vAnimeModelPos = (uAnimeWorldRootInv * animeWp).xyz;
+              vAnimeModelNormal = normalize(mat3(uAnimeWorldRootInv) * mat3(modelMatrix) * objectNormal);`
+            );
+
+          let celBody = '';
+          if (arch === 'ext' || arch === 'ext_wood') {
+            celBody = /* glsl */`
+              float lum = clamp(reflectedLight.directDiffuse.r, 0.0, 1.0);
+              float s1 = smoothstep(0.13, 0.16, lum);
+              float s2 = smoothstep(0.41, 0.44, lum);
+              vec3 celCol = mix(uShadowCol, uMidCol, s1);
+              celCol = mix(celCol, uLitCol, s2);
+              float hGrad = clamp(vAnimeModelPos.y / 6.5, 0.0, 1.0);
+              celCol *= mix(vec3(0.93, 0.96, 1.01), vec3(1.03, 1.02, 0.98), hGrad);
+              ${arch === 'ext_wood'
+                ? 'float grain = aN3(vAnimeModelPos * vec3(14.0, 3.2, 14.0)); celCol *= mix(0.91, 1.04, grain);'
+                : 'float grain = aN3(vAnimeModelPos * 14.0); celCol *= mix(0.96, 1.03, grain);'}
+              float underAo = smoothstep(-0.85, 0.15, mNorm.y);
+              celCol = mix(mix(celCol, uAoCol, 0.35), celCol, underAo);
+              vec3 outgoingLight = celCol;
+            `;
+          } else if (arch === 'int' || arch === 'int_wood') {
+            celBody = /* glsl */`
+              float sunHit = clamp(reflectedLight.directDiffuse.r, 0.0, 1.0);
+              float nGrad = clamp(0.56 + mNorm.y * 0.24 + dot(mNorm, normalize(vec3(0.45, 0.55, 0.70))) * 0.16, 0.0, 1.0);
+              vec3 celCol = mix(uShadowCol, uMidCol, smoothstep(0.14, 0.72, nGrad));
+              float beam = smoothstep(0.56, 0.62, sunHit);
+              celCol = mix(celCol, uLitCol, beam);
+              ${arch === 'int_wood'
+                ? 'float grain = aN3(vAnimeModelPos * vec3(16.0, 2.6, 16.0)); celCol *= mix(0.92, 1.04, grain);'
+                : 'float grain = aN3(vAnimeModelPos * 9.0); celCol *= mix(0.97, 1.02, grain);'}
+              float ceilAo = smoothstep(-0.95, 0.10, mNorm.y);
+              celCol = mix(mix(celCol, uAoCol, 0.26), celCol, ceilAo);
+              vec3 outgoingLight = celCol;
+            `;
+          } else if (arch === 'foliage') {
+            celBody = /* glsl */`
+              float lum = clamp(reflectedLight.directDiffuse.r, 0.0, 1.0);
+              float crownLift = clamp(mNorm.y, -1.0, 1.0) * 0.14;
+              float dab = (aN3(vAnimeModelPos * 15.0) - 0.5) * 0.13 + (aN3(vAnimeModelPos * 29.0) - 0.5) * 0.06;
+              float fVal = clamp(lum * 0.92 + crownLift + 0.14 + dab, 0.0, 1.0);
+              vec3 celCol = mix(uShadowCol, uMidCol, smoothstep(0.17, 0.20, fVal));
+              celCol = mix(celCol, uLitCol, smoothstep(0.38, 0.41, fVal));
+              celCol = mix(celCol, uHiCol,  smoothstep(0.64, 0.67, fVal));
+              float underAo = smoothstep(-0.9, 0.15, mNorm.y);
+              celCol = mix(mix(celCol, uAoCol, 0.45), celCol, underAo);
+              vec3 outgoingLight = celCol;
+            `;
+          } else if (arch === 'kawara') {
+            celBody = /* glsl */`
+              float lum = clamp(reflectedLight.directDiffuse.r, 0.0, 1.0);
+              float rib = 0.5 + 0.5 * sin((vAnimeModelPos.x * 36.0 + vAnimeModelPos.z * 36.0));
+              float row = smoothstep(0.82, 0.95, sin(vAnimeModelPos.y * 28.0));
+              float litMask = smoothstep(0.16, 0.20, lum);
+              vec3 shadTile = mix(uShadowCol, uMidCol, smoothstep(0.38, 0.62, rib));
+              vec3 litTile  = mix(uLitCol, uHiCol, smoothstep(0.38, 0.62, rib));
+              vec3 celCol   = mix(shadTile, litTile, litMask);
+              celCol = mix(celCol, uAoCol, row * 0.24);
+              vec3 outgoingLight = celCol;
+            `;
+          } else if (arch === 'window') {
+            celBody = /* glsl */`
+              float diag = fract((vAnimeModelPos.x + vAnimeModelPos.z + vAnimeModelPos.y * 1.15) * 0.44);
+              float vGrad = clamp((vAnimeModelPos.y - 0.5) * 0.22, 0.0, 1.0);
+              vec3 celCol = mix(uShadowCol, uMidCol, 0.35 + 0.65 * vGrad);
+              float slash1 = smoothstep(0.56, 0.58, diag) * (1.0 - smoothstep(0.68, 0.70, diag));
+              float slash2 = smoothstep(0.75, 0.765, diag) * (1.0 - smoothstep(0.80, 0.815, diag));
+              celCol = mix(celCol, uLitCol, clamp(slash1 + slash2 * 0.85, 0.0, 1.0));
+              vec3 outgoingLight = celCol;
+            `;
+          }
+
+          shader.fragmentShader = shader.fragmentShader
+            .replace(
+              '#include <common>',
+              `#include <common>
+              uniform vec3 uShadowCol, uMidCol, uLitCol, uAoCol, uHiCol;
+              varying vec3 vAnimeModelPos;
+              varying vec3 vAnimeModelNormal;
+              ${ANIME_GLSL_NOISE}`
+            )
+            .replace(
+              'vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance;',
+              `vec3 mNorm = gl_FrontFacing ? normalize(vAnimeModelNormal) : -normalize(vAnimeModelNormal);
+              ${celBody}`
+            );
+        };
+      }
+
+      animeMatCache.set(matKey, mat);
+      return mat;
+    }
+
+    function buildAnimeMaterialsIfNeeded() {
+      if (animeBuilt) return;
+      animeBuilt = true;
+
+      const foliagePattern = /blossom|leaf|bush|shrub|plant/i;
+      const subtleSeamPattern = /seam|grout/i;
+      const noEdgePattern = /glass|pane|bulb|lens|diffuser|globe|glow|wire|eyeshine|eye_|nose|mouth|innerear|petal|blossom|leaf|bush|shrub|plant/i;
+
+      worldRoot.traverse((child) => {
+        if (!child.isMesh || child.userData.isEdgeHelper || child.userData.isAnimeHelper) return;
+        if (!child.userData.origMaterial) child.userData.origMaterial = child.material;
+        if (!child.userData.origGeometry) child.userData.origGeometry = child.geometry;
+
+        const name = child.name || '';
+        const isIndoorWhiteOverride = INDOOR_WHITE_MESH_NAMES.has(name);
+        const isKitchenSteelOverride = (name === 'Prop_Kitchen_Laptop_Base' || name === 'Prop_Kitchen_RiceCooker');
+        const isFoliageMesh = foliagePattern.test(name);
+        const isKittyOutline = KITTY_OUTLINE_MESH_NAMES.has(name);
+
+        const mapOneMat = (origMat) => {
+          if (!origMat) return origMat;
+          let key = origMat.name || '';
+          if (isIndoorWhiteOverride && key === 'Wall_White_Cladding') key = 'Anime_Int_White';
+          if (isKitchenSteelOverride && key === 'Aluminum_Silver') key = 'Kitchen_Stainless';
+          return getOrCreateAnimeMaterial(key, origMat);
+        };
+
+        if (Array.isArray(child.userData.origMaterial)) {
+          child.userData.animeMaterial = child.userData.origMaterial.map(mapOneMat);
+        } else {
+          child.userData.animeMaterial = mapOneMat(child.userData.origMaterial);
+        }
+
+        // Smooth rounded geometry + inverted-hull anime ink shell for foliage, Sakura, Kitty & opal globe!
+        const isGlobeOutline = /sconceglobe/i.test(name);
+        if (isFoliageMesh || isKittyOutline || isGlobeOutline) {
+          const radialBlend = isFoliageMesh ? 0.65 : 0.0;
+          const smoothGeo = createSmoothOrganicGeometry(child.userData.origGeometry, radialBlend);
+          child.userData.animeGeometry = smoothGeo;
+
+          const outlineWidth = (isKittyOutline || isGlobeOutline)
+            ? 0.0040
+            : (/sakura|tree/i.test(name) ? 0.013 : 0.008);
+          const hullMesh = new THREE.Mesh(smoothGeo, getAnimeHullOutlineMaterial(outlineWidth));
+          hullMesh.userData.isAnimeHelper = true;
+          hullMesh.raycast = () => {};
+          hullMesh.castShadow = false;
+          hullMesh.receiveShadow = false;
+          hullMesh.visible = false;
+          child.add(hullMesh);
+          child.userData.animeOutlineMesh = hullMesh;
+        } else if (child.userData.origGeometry && !noEdgePattern.test(name) && !isKittyOutline) {
+          const isSubtle = subtleSeamPattern.test(name);
+          const edgeAngle = isSubtle ? 20 : 26;
+          const edgesGeo = new THREE.EdgesGeometry(child.userData.origGeometry, edgeAngle);
+          const edgeLines = new THREE.LineSegments(edgesGeo, isSubtle ? animeSubtleEdgeMat : animeArchEdgeMat);
+          edgeLines.userData.isAnimeHelper = true;
+          edgeLines.raycast = () => {};
+          edgeLines.visible = false;
+          child.add(edgeLines);
+          child.userData.animeEdgeSegments = edgeLines;
+        }
+      });
+    }
+
     function applySceneBackgroundForCurrentState() {
-      if (renderer.xr.isPresenting && (currentMode === 3 || currentMode === 4)) {
+      const isARPresenting = renderer.xr.isPresenting && (currentMode === 3 || currentMode === 4);
+      if (isARPresenting) {
+        animeSkyDome.visible = false;
         scene.background = null;
         scene.fog = null;
         return;
       }
+      if (animeEnabled) {
+        animeSkyDome.visible = true;
+        scene.background = animeSkyBgColor;
+        scene.fog = new THREE.Fog(0x7be9fa, 26, 95);
+        return;
+      }
+      animeSkyDome.visible = false;
       const bg = hiddenLineEnabled ? paperSkyColor : skyBgColor;
       scene.background = bg;
       scene.fog = new THREE.FogExp2(bg.getHex(), 0.012);
     }
 
+    function setAnimeMode(enabled) {
+      if (!modelLoaded && enabled) {
+        animeEnabled = true;
+        return;
+      }
+      if (enabled && hiddenLineEnabled) {
+        setHiddenLineMode(false);
+      }
+      if (enabled) {
+        buildAnimeMaterialsIfNeeded();
+      }
+      animeEnabled = enabled;
+
+      worldRoot.traverse((child) => {
+        if (!child.isMesh || child.userData.isEdgeHelper || child.userData.isAnimeHelper) return;
+        if (child.userData.origMaterial && child.userData.animeMaterial) {
+          child.material = enabled ? child.userData.animeMaterial : child.userData.origMaterial;
+        }
+        if (child.userData.origGeometry && child.userData.animeGeometry) {
+          child.geometry = enabled ? child.userData.animeGeometry : child.userData.origGeometry;
+        }
+        if (child.userData.animeEdgeSegments) {
+          child.userData.animeEdgeSegments.visible = enabled;
+        }
+        if (child.userData.animeOutlineMesh) {
+          child.userData.animeOutlineMesh.visible = enabled;
+        }
+      });
+
+      btnToggleAnime.classList.toggle('toggle-on', enabled);
+      btnToggleAnime.textContent = enabled ? '🌸 Anime: ON' : '🌸 Anime: OFF';
+
+      const isARPresenting = renderer.xr.isPresenting && (currentMode === 3 || currentMode === 4);
+      applyLightingProfile(currentLightingIdx, isARPresenting);
+      updateVRHudCanvas();
+
+      if (enabled) {
+        setStatus('JAPANESE SUMMER ANIME MODE ACTIVE · CEL SHADING + INK OUTLINES');
+      } else {
+        const isLcars = document.body.getAttribute('data-style') === 'lcars';
+        setStatus(isLcars ? 'LCARS TELEMETRY ONLINE · STARFLEET CORPS OF ENGINEERS' : 'DIN 1451 TECHNICAL SPEC · 13 CAMERAS READY');
+      }
+    }
+
+    btnToggleAnime.addEventListener('click', (e) => {
+      e.stopPropagation();
+      playUISound();
+      setAnimeMode(!animeEnabled);
+    });
+
     function setHiddenLineMode(enabled) {
+      if (enabled && animeEnabled) {
+        setAnimeMode(false);
+      }
       buildHiddenLineMaterialsIfNeeded();
       hiddenLineEnabled = enabled;
 
@@ -1142,7 +1858,7 @@
       sharedEdgeMaterial.color.setHex(isLcars ? 0x18181b : 0x27272a);
 
       worldRoot.traverse((child) => {
-        if (!child.isMesh || child.userData.isEdgeHelper) return;
+        if (!child.isMesh || child.userData.isEdgeHelper || child.userData.isAnimeHelper) return;
         if (child.userData.origMaterial && child.userData.hlMaterial) {
           child.material = enabled ? child.userData.hlMaterial : child.userData.origMaterial;
         }
@@ -1346,6 +2062,11 @@
       if (e.code === 'KeyF') {
         playUISound();
         cycleLightingMode();
+        return;
+      }
+      if (e.code === 'KeyV') {
+        playUISound();
+        setAnimeMode(!animeEnabled);
         return;
       }
       if (IS_MOBILE) return;
@@ -1727,13 +2448,23 @@
           fullModelMaxSpan = Math.max(fullModelSize.x, fullModelSize.z, 10.0);
         }
 
+        modelLoaded = true;
         setRoofVisibility(true);
         setContextVisibility(true);
         applyLightingProfile(currentLightingIdx, false);
-        goToRoom(0, false);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialRoom = parseInt(urlParams.get('room') || '0', 10);
+        goToRoom(Number.isFinite(initialRoom) ? initialRoom : 0, false);
+
+        const wantAnime = animeEnabled || urlParams.get('anime') === '1' || urlParams.get('anime') === 'true';
+        if (wantAnime) {
+          setAnimeMode(true);
+        } else {
+          setStatus('DIN 1451 TECHNICAL SPEC · 13 CAMERAS READY');
+        }
 
         statusDot.classList.add('ready');
-        setStatus('DIN 1451 TECHNICAL SPEC · 13 CAMERAS READY');
         loadingScreen.classList.add('hidden');
       },
       (xhr) => {
@@ -1821,21 +2552,27 @@
       vrHudCtx.fillText(`ROOM: ${room.name.toUpperCase()}`, 24, 80);
 
       vrHudCtx.fillStyle = isLcars ? '#cc99cc' : '#444444';
-      vrHudCtx.font = '16px sans-serif';
-      vrHudCtx.fillText('• Aim at Floor + Trigger/Grip = Teleport Here', 24, 116);
-      vrHudCtx.fillText('• Left Stick = Walk  |  Right Stick = Snap Turn', 24, 144);
-      vrHudCtx.fillText('• A/B or X/Y Buttons = Next / Prev Room', 24, 172);
+      vrHudCtx.font = '15px sans-serif';
+      vrHudCtx.fillText('• Aim at Floor + Trigger/Grip = Teleport Here', 24, 114);
+      vrHudCtx.fillText('• Left Stick = Walk  |  Right Stick = Snap Turn', 24, 140);
+      vrHudCtx.fillText('• Laser + Trigger on Buttons = Room / Roof / Anime', 24, 166);
 
-      vrHudCtx.fillStyle = isLcars ? '#ff9900' : '#050505';
-      vrHudCtx.fillRect(24, 194, 140, 42);
-      vrHudCtx.fillRect(184, 194, 140, 42);
-      vrHudCtx.fillRect(344, 194, 144, 42);
+      const btnBg = isLcars ? '#ff9900' : '#050505';
+      const btnFg = isLcars ? '#000000' : '#ffffff';
+      vrHudCtx.fillStyle = btnBg;
+      vrHudCtx.fillRect(18, 192, 114, 44);
+      vrHudCtx.fillRect(140, 192, 114, 44);
+      vrHudCtx.fillRect(262, 192, 110, 44);
+      vrHudCtx.fillStyle = animeEnabled ? '#20d8ff' : btnBg;
+      vrHudCtx.fillRect(380, 192, 114, 44);
 
-      vrHudCtx.fillStyle = isLcars ? '#000000' : '#ffffff';
-      vrHudCtx.font = 'bold 15px sans-serif';
-      vrHudCtx.fillText('◀ PREV ROOM', 40, 221);
-      vrHudCtx.fillText('NEXT ROOM ▶', 200, 221);
-      vrHudCtx.fillText(roofVisible ? 'ROOF: ON' : 'ROOF: OFF', 374, 221);
+      vrHudCtx.fillStyle = btnFg;
+      vrHudCtx.font = 'bold 14px sans-serif';
+      vrHudCtx.fillText('◀ PREV', 44, 219);
+      vrHudCtx.fillText('NEXT ▶', 166, 219);
+      vrHudCtx.fillText(roofVisible ? 'ROOF: ON' : 'ROOF: OFF', 278, 219);
+      vrHudCtx.fillStyle = animeEnabled ? '#091526' : btnFg;
+      vrHudCtx.fillText(animeEnabled ? 'ANIME: ON' : 'ANIME: OFF', 392, 219);
 
       vrHudTex.needsUpdate = true;
     }
@@ -1891,10 +2628,11 @@
           const hudHits = vrRaycaster.intersectObject(vrHudMesh, false);
           if (hudHits.length > 0 && hudHits[0].uv) {
             const uv = hudHits[0].uv;
-            if (uv.y < 0.32) {
-              if (uv.x < 0.35) goToRoom(currentRoomIndex - 1, false);
-              else if (uv.x < 0.68) goToRoom(currentRoomIndex + 1, false);
-              else setRoofVisibility(!roofVisible);
+            if (uv.y < 0.34) {
+              if (uv.x < 0.26) goToRoom(currentRoomIndex - 1, false);
+              else if (uv.x < 0.50) goToRoom(currentRoomIndex + 1, false);
+              else if (uv.x < 0.74) setRoofVisibility(!roofVisible);
+              else setAnimeMode(!animeEnabled);
               return;
             }
           }
@@ -2446,6 +3184,19 @@
         }
       } else {
         updateDesktopMovement(dt);
+      }
+
+      if (animeEnabled) {
+        worldRoot.updateMatrixWorld();
+        animeWorldRootInvUniform.value.copy(worldRoot.matrixWorld).invert();
+        sunLight.target.position.copy(worldRoot.position);
+        syncAnimeSunTransform();
+        if (animeSkyDome.visible) {
+          animeSkyUniforms.uTime.value = (timestamp || performance.now()) * 0.001;
+          const activeCam = renderer.xr.isPresenting ? renderer.xr.getCamera() : camera;
+          activeCam.getWorldPosition(_animeTmpCamPos);
+          animeSkyDome.position.copy(_animeTmpCamPos);
+        }
       }
 
       renderer.render(scene, camera);
