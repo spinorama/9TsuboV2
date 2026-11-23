@@ -640,8 +640,10 @@
           <button id="btn-toggle-lighting" class="btn btn-sm toggle-on" title="Cycle Lighting: Daylight / Warm Evening / Soft AR (Hotkey: F)">💡 Light: Day</button>
           <button id="btn-toggle-lines" class="btn btn-sm" title="Toggle Subtle Hidden-Line CAD Render (Hotkey: L)">✏️ Lines: OFF</button>
           <button id="btn-toggle-style" class="btn btn-sm style-btn" title="Switch UI Style: German DIN 1451 vs Star Trek LCARS (Hotkey: T)">📐 Style: DIN</button>
+          <a class="btn btn-sm" href="./bim.html" title="Open ISO 19650 / IFC4 BIM Coordination Viewer" style="text-decoration:none;">🏗️ BIM</a>
+          <a class="btn btn-sm" href="./drawings/index.html" title="Open 12-Sheet Model-Derived Architectural Drawing Binder" style="text-decoration:none;">📐 Drawings</a>
           <a class="btn btn-sm" href="./ar.html" title="Dedicated Apple iOS USDZ Quick Look &amp; Android Scene Viewer AR Page" style="text-decoration:none;">🍎/🤖 AR</a>
-          <button id="btn-changelog" class="btn btn-sm" title="View Version Changelog">📋 v0.5</button>
+          <button id="btn-changelog" class="btn btn-sm" title="View Version Changelog">📋 v1.0</button>
           <button id="btn-exit-xr" class="btn btn-sm danger" style="display:none;">✕ Exit XR</button>
         </div>
       </div>
@@ -683,7 +685,11 @@
           <button id="btn-close-changelog" class="btn btn-sm">✕ Close</button>
         </div>
         <div class="changelog-entry">
-          <div class="changelog-ver">v0.5.0 · 2026-11-22 (Current)</div>
+          <div class="changelog-ver">v1.0.0 · 2026-11-22 (Current — Tier 2 BIM &amp; 12-Sheet CAD Set)</div>
+          <div class="changelog-desc">• BIMCraft-Style Automated Model-to-Drawing Pipeline (<code>scripts/</code>): True 3D <code>bmesh.ops.bisect_plane</code> slicing + depth-sorted orthographic hidden-face projection directly from <code>9_tsubo_house.blend</code> (LOD-300 3D ≤ 60k tris → LOD-400 2D parametric construction assemblies).<br>• 12-Sheet Vector SVG Architectural Construction Set (<code>drawings/index.html</code>, <code>A-000</code>–<code>A-601</code>): Cover + Axonometric, Site Plan, 1F/2F Floor Plans, Roof &amp; Zairai-koho Timber Framing Plan, Reflected Ceiling &amp; Lighting Plan, 4 Exterior Elevations, Sections A-A &amp; B-B, Enlarged 1:25 Kitchen/Bath/Tatami Views, LOD-400 Wall/Footing/Eave/Ridge &amp; Glazing/Stair/Guardrail Construction Details, and Auto-Computed Schedules &amp; QTO.<br>• Dedicated ISO 19650 / IFC4 BIM Coordination Viewer (<code>bim.html</code> + <code>9_tsubo_bim_metadata.json</code>): 893 tagged elements, CSI MasterFormat 2020 trade filters, 6-plane Section Box, Laser Tape Measure (Metric/Imperial/Ken), LOD-400 Assembly Inspector, and live <code>.IFC</code> &amp; <code>.CSV</code> exports.</div>
+        </div>
+        <div class="changelog-entry">
+          <div class="changelog-ver">v0.5.0 · 2026-11-22 (`cbb53a6` — Tier 1 Lighting, Fixtures &amp; Apple USDZ)</div>
           <div class="changelog-desc">• Lighting &amp; PBR Refinement (No AR/3D Blowout): Calibrated all 35 Blender PBR material albedos &amp; emissives, fixed coplanar Z-fighting overlaps, and balanced Three.js ACES Filmic exposure with a dedicated AR passthrough profile plus <code>💡 Light</code> mode cycling (Daylight / Warm Evening / Soft AR, hotkey <code>[F]</code>).<br>• Modeled Koizumi Architectural Light Fixtures: Added 36 low-poly architectural fixture meshes (dining &amp; living cord pendants, kitchen ceiling duct rail + 3 spots, hinoki tatami drum &amp; cove LED, loft ridge track + 3 spots, bedside brass sconce, vanity opal bar, wet-rated bath downlights, entry porch sconce) with light sources anchored directly inside the fixtures while staying under the 60k-tri mobile/AR cap.<br>• Apple iOS / iPadOS / visionOS Native USDZ AR: Exported native uncompressed <code>9_tsubo_house_1to1.usdz</code> (277 KB) and <code>9_tsubo_house_tabletop.usdz</code> (1:50 full-site, 2.1 MB) with automatic Apple AR Quick Look launch in Modes 3 &amp; 4 plus dedicated cross-platform <code>ar.html</code> (<code>&lt;model-viewer&gt;</code> WebXR + Scene Viewer + Quick Look).</div>
         </div>
         <div class="changelog-entry">

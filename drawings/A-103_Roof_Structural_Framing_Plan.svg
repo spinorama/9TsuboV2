@@ -1,0 +1,531 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1280" width="1920" height="1280">
+  <defs>
+    <!-- Exterior Wall Cut Poché (Dense 45° Timber/Insulated Wall) -->
+    <pattern id="hatch-wall-cut" width="6" height="6" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+      <rect width="6" height="6" fill="#e2e8f0"/>
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#1e293b" stroke-width="1.35"/>
+    </pattern>
+    <!-- Interior Partition Cut Poché (Lighter 45°) -->
+    <pattern id="hatch-part-cut" width="8" height="8" patternTransform="rotate(-45 0 0)" patternUnits="userSpaceOnUse">
+      <rect width="8" height="8" fill="#f1f5f9"/>
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#475569" stroke-width="0.95"/>
+    </pattern>
+    <!-- Reinforced Concrete Stipple + Aggregate Triangles -->
+    <pattern id="hatch-concrete" width="22" height="22" patternUnits="userSpaceOnUse">
+      <rect width="22" height="22" fill="#e5e7eb"/>
+      <polygon points="4,5 8,4 6,8" fill="none" stroke="#334155" stroke-width="0.75"/>
+      <polygon points="15,14 19,15 16,19" fill="none" stroke="#334155" stroke-width="0.75"/>
+      <polygon points="5,18 9,16 8,20" fill="#64748b"/>
+      <circle cx="14" cy="6" r="0.85" fill="#334155"/>
+      <circle cx="19" cy="9" r="0.65" fill="#475569"/>
+      <circle cx="9" cy="12" r="0.7" fill="#334155"/>
+      <circle cx="2" cy="13" r="0.6" fill="#475569"/>
+    </pattern>
+    <!-- Undisturbed Earth / Grade Hatch (Standard ANSI/JIS Triple Diagonal) -->
+    <pattern id="hatch-earth" width="24" height="24" patternUnits="userSpaceOnUse">
+      <rect width="24" height="24" fill="#f5f3ee"/>
+      <line x1="0" y1="8" x2="8" y2="0" stroke="#64748b" stroke-width="0.75"/>
+      <line x1="0" y1="13" x2="13" y2="0" stroke="#64748b" stroke-width="0.75"/>
+      <line x1="0" y1="18" x2="18" y2="0" stroke="#64748b" stroke-width="0.75"/>
+      <line x1="12" y1="12" x2="20" y2="20" stroke="#64748b" stroke-width="0.75"/>
+      <line x1="15" y1="9" x2="23" y2="17" stroke="#64748b" stroke-width="0.75"/>
+      <line x1="9" y1="15" x2="17" y2="23" stroke="#64748b" stroke-width="0.75"/>
+    </pattern>
+    <!-- Crushed Gravel Capillary Drainage Sub-Base -->
+    <pattern id="hatch-gravel" width="18" height="14" patternUnits="userSpaceOnUse">
+      <rect width="18" height="14" fill="#eef0f2"/>
+      <ellipse cx="4" cy="4" rx="2.4" ry="1.5" fill="none" stroke="#475569" stroke-width="0.75"/>
+      <ellipse cx="12" cy="5" rx="2.8" ry="1.7" fill="none" stroke="#475569" stroke-width="0.75"/>
+      <ellipse cx="8" cy="10" rx="2.5" ry="1.6" fill="none" stroke="#475569" stroke-width="0.75"/>
+      <ellipse cx="15" cy="11" rx="2.0" ry="1.3" fill="none" stroke="#475569" stroke-width="0.75"/>
+    </pattern>
+    <!-- Rigid XPS Foam Insulation Cross-Hatch -->
+    <pattern id="hatch-xps" width="10" height="10" patternUnits="userSpaceOnUse">
+      <rect width="10" height="10" fill="#fefce8"/>
+      <line x1="0" y1="0" x2="10" y2="10" stroke="#92400e" stroke-width="0.65"/>
+      <line x1="10" y1="0" x2="0" y2="10" stroke="#92400e" stroke-width="0.65"/>
+    </pattern>
+    <!-- Steel / Metal Cross-Section Hatch -->
+    <pattern id="hatch-steel" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+      <rect width="8" height="8" fill="#cbd5e1"/>
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#0f172a" stroke-width="1.0"/>
+      <line x1="2.5" y1="0" x2="2.5" y2="8" stroke="#0f172a" stroke-width="0.6"/>
+    </pattern>
+    <!-- Plywood Multi-Ply Laminate -->
+    <pattern id="hatch-plywood" width="12" height="6" patternUnits="userSpaceOnUse">
+      <rect width="12" height="6" fill="#f7efe2"/>
+      <line x1="0" y1="2" x2="12" y2="2" stroke="#78350f" stroke-width="0.5"/>
+      <line x1="0" y1="4.5" x2="12" y2="4.5" stroke="#78350f" stroke-width="0.5"/>
+      <line x1="3" y1="2" x2="5" y2="4.5" stroke="#92400e" stroke-width="0.45"/>
+      <line x1="9" y1="2" x2="11" y2="4.5" stroke="#92400e" stroke-width="0.45"/>
+    </pattern>
+    <!-- Timber Grain (Longitudinal) -->
+    <pattern id="hatch-wood" width="16" height="8" patternUnits="userSpaceOnUse">
+      <rect width="16" height="8" fill="#f6ead8"/>
+      <path d="M 0 2 Q 8 1 16 2 M 0 6 Q 8 7 16 6" fill="none" stroke="#92400e" stroke-width="0.55" stroke-opacity="0.55"/>
+    </pattern>
+    <!-- Tatami Igusa Rush Fine Weave -->
+    <pattern id="hatch-tatami" width="6" height="6" patternUnits="userSpaceOnUse">
+      <rect width="6" height="6" fill="#f4f1df"/>
+      <line x1="0" y1="3" x2="6" y2="3" stroke="#a39e7a" stroke-width="0.5"/>
+    </pattern>
+    <!-- Ceramic Tile Grid -->
+    <pattern id="hatch-tile" width="10" height="10" patternUnits="userSpaceOnUse">
+      <rect width="10" height="10" fill="#f8fafc"/>
+      <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#94a3b8" stroke-width="0.55"/>
+    </pattern>
+    <!-- Subtle Background Drafting Grid -->
+    <pattern id="draft-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ebe9e1" stroke-width="0.55"/>
+    </pattern>
+    <!-- Arrowhead Markers -->
+    <marker id="arr-dark" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#0f172a"/>
+    </marker>
+    <marker id="arr-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" fill="#1d4ed8"/>
+    </marker>
+    <marker id="dot-dark" viewBox="0 0 8 8" refX="4" refY="4" markerWidth="5" markerHeight="5">
+      <circle cx="4" cy="4" r="2.6" fill="#0f172a"/>
+    </marker>
+    <style>
+      text { font-family: 'Bahnschrift', 'DIN Alternate', 'Roboto Condensed', 'Consolas', sans-serif; fill: #0f172a; }
+      .mono { font-family: 'JetBrains Mono', 'Consolas', 'Courier New', monospace; }
+      .tb-brand { font-size: 15px; font-weight: 800; fill: #f8fafc; letter-spacing: 1.8px; }
+      .tb-sub { font-size: 9.5px; font-weight: 600; fill: #cbd5e1; letter-spacing: 0.9px; }
+      .tb-hdr { font-size: 10.5px; font-weight: 700; fill: #0f172a; letter-spacing: 0.9px; }
+      .tb-lbl { font-size: 8.5px; font-weight: 700; fill: #64748b; letter-spacing: 0.7px; }
+      .tb-val { font-size: 11px; font-weight: 700; fill: #0f172a; }
+      .sheet-num { font-size: 36px; font-weight: 800; fill: #0f172a; letter-spacing: 1.5px; }
+      .vp-title { font-size: 13.5px; font-weight: 800; fill: #0f172a; letter-spacing: 0.8px; }
+      .vp-scale { font-size: 10px; font-weight: 700; fill: #475569; letter-spacing: 0.5px; }
+      .dim-txt { font-size: 9.5px; font-weight: 700; fill: #0f172a; text-anchor: middle; }
+      .dim-sub { font-size: 8px; font-weight: 600; fill: #64748b; text-anchor: middle; }
+      .grid-txt { font-size: 11px; font-weight: 800; fill: #0f172a; text-anchor: middle; }
+      .room-num { font-size: 8.5px; font-weight: 700; fill: #475569; text-anchor: middle; }
+      .room-name { font-size: 10px; font-weight: 800; fill: #0f172a; text-anchor: middle; letter-spacing: 0.4px; }
+      .room-area { font-size: 8.5px; font-weight: 600; fill: #334155; text-anchor: middle; }
+      .note-txt { font-size: 9.5px; font-weight: 600; fill: #1e293b; }
+      .note-bold { font-size: 9.8px; font-weight: 800; fill: #0f172a; }
+      .datum-txt { font-size: 9.2px; font-weight: 700; fill: #1d4ed8; }
+      .tag-txt { font-size: 8.5px; font-weight: 800; fill: #0f172a; text-anchor: middle; }
+    </style>
+  </defs>
+  <!-- Archival Drafting Vellum -->
+  <rect x="0" y="0" width="1920" height="1280" fill="#fdfcf8"/>
+  <rect x="26" y="26" width="1594" height="1228" fill="url(#draft-grid)"/>
+  <!-- Double CAD Sheet Border -->
+  <rect x="16" y="16" width="1888" height="1248" fill="none" stroke="#0f172a" stroke-width="2.8"/>
+  <rect x="26" y="26" width="1594" height="1228" fill="none" stroke="#0f172a" stroke-width="1.4"/>
+  <!-- RIGHT-HAND ISO 19650 / DIN / AIA ARCHITECTURAL TITLE BLOCK (x = 1620..1902) -->
+  <g transform="translate(1620, 26)">
+    <rect x="0" y="0" width="282" height="1228" fill="#fafaf7" stroke="#0f172a" stroke-width="1.8"/>
+    <rect x="0" y="0" width="282" height="84" fill="#0f172a"/>
+    <text x="141" y="28" text-anchor="middle" class="tb-brand">9-TSUBO HOUSE</text>
+    <text x="141" y="47" text-anchor="middle" class="tb-sub">SUMIRE AOI HOUSE · MAKOTO KOIZUMI (1999)</text>
+    <text x="141" y="65" text-anchor="middle" style="font-size:9px;font-weight:700;fill:#38bdf8;letter-spacing:1.1px;">MODEL-DERIVED BIM CONSTRUCTION SET</text>
+
+    <!-- Project Identification -->
+    <text x="12" y="102" class="tb-lbl">PROTOTYPE / ARCHITECTURAL SYSTEM</text>
+    <text x="12" y="117" class="tb-val">3×3 KEN (5,460 × 5,460mm) · 9 TSUBO</text>
+    <text x="12" y="132" style="font-size:9.5px;fill:#334155;">AFTER MASUZAWA MINIMUM HOUSE (1952)</text>
+    <text x="12" y="150" class="tb-lbl">DIGITAL TWIN / REPOSITORY</text>
+    <text x="12" y="164" class="mono" style="font-size:9.5px;font-weight:700;fill:#0f172a;">github.com/spinorama/9TsuboV2</text>
+    <line x1="0" y1="176" x2="282" y2="176" stroke="#0f172a" stroke-width="1.2"/>
+
+    <!-- ISO 19650 Information Container -->
+    <rect x="0" y="176" width="282" height="22" fill="#e2e8f0" stroke="#0f172a" stroke-width="1.0"/>
+    <text x="141" y="191" text-anchor="middle" class="tb-hdr">ISO 19650-2 / IFC4 BIM REGISTER</text>
+    <text x="12" y="214" class="tb-lbl">INFORMATION CONTAINER ID</text>
+    <text x="12" y="229" class="mono" style="font-size:11px;font-weight:800;fill:#1d4ed8;">9TS-KOI-B1-L3-DR-S-0103</text>
+    <text x="12" y="248" class="tb-lbl">SUITABILITY / REVISION</text>
+    <text x="12" y="262" class="tb-val">S4 CONSTRUCTION · REV P05.0</text>
+    <text x="12" y="282" class="tb-lbl">SCHEMA / LOD STRATEGY</text>
+    <text x="12" y="296" class="tb-val">IFC4 ADD2 · 3D LOD300 / 2D LOD400</text>
+    <text x="12" y="316" class="tb-lbl">DISCIPLINE</text>
+    <text x="12" y="330" class="tb-val">ARCHITECTURE / STRUCT</text>
+    <text x="150" y="316" class="tb-lbl">UNITS / DATUM</text>
+    <text x="150" y="330" class="tb-val">mm / EL ±0.000 GL</text>
+    <line x1="0" y1="344" x2="282" y2="344" stroke="#0f172a" stroke-width="1.2"/>
+
+    <!-- Revision Schedule -->
+    <rect x="0" y="344" width="282" height="22" fill="#e2e8f0" stroke="#0f172a" stroke-width="1.0"/>
+    <text x="141" y="359" text-anchor="middle" class="tb-hdr">ISSUE &amp; REVISION LOG</text>
+    <text x="10" y="378" class="tb-lbl">REV</text>
+    <text x="52" y="378" class="tb-lbl">DATE</text>
+    <text x="122" y="378" class="tb-lbl">DESCRIPTION</text>
+    <line x1="0" y1="384" x2="282" y2="384" stroke="#94a3b8" stroke-width="0.8"/>
+    <text x="10" y="399" style="font-size:9px;font-weight:700;">P01.0</text>
+    <text x="52" y="399" style="font-size:9px;">2026-11-02</text>
+    <text x="122" y="399" style="font-size:9px;">INITIAL 3D / WEBXR ISSUE</text>
+    <text x="10" y="414" style="font-size:9px;font-weight:700;">P04.0</text>
+    <text x="52" y="414" style="font-size:9px;">2026-11-08</text>
+    <text x="122" y="414" style="font-size:9px;">TABLETOP AR &amp; HIDDEN LINE</text>
+    <text x="10" y="429" style="font-size:9px;font-weight:700;">P04.5</text>
+    <text x="52" y="429" style="font-size:9px;">2026-11-22</text>
+    <text x="122" y="429" style="font-size:9px;">FIXTURES + APPLE USDZ AR</text>
+    <rect x="2" y="435" width="278" height="17" fill="#eff6ff"/>
+    <text x="10" y="447" style="font-size:9px;font-weight:800;fill:#1d4ed8;">P05.0</text>
+    <text x="52" y="447" style="font-size:9px;font-weight:700;fill:#1d4ed8;">2026-11-22</text>
+    <text x="122" y="447" style="font-size:9px;font-weight:800;fill:#1d4ed8;">FULL BIM CD SET (12 SHEETS)</text>
+    <line x1="0" y1="456" x2="282" y2="456" stroke="#0f172a" stroke-width="1.2"/>
+
+    <!-- Modular 9-Tsubo Key Plan Diagram -->
+    <text x="141" y="474" text-anchor="middle" class="tb-lbl">KEY PLAN · 3×3 KEN STRUCTURAL MODULE</text>
+    <g transform="translate(46, 486)">
+      <rect x="0" y="0" width="190" height="150" fill="#f8fafc" stroke="#0f172a" stroke-width="1.0"/>
+      <!-- Road at South (bottom) -->
+      <rect x="0" y="122" width="190" height="28" fill="#e2e8f0"/>
+      <text x="95" y="139" text-anchor="middle" style="font-size:8px;font-weight:700;fill:#475569;">SOUTH STREET FRONTAGE</text>
+      <!-- 9-Tsubo square house -->
+      <rect x="52" y="28" width="86" height="84" fill="#ffffff" stroke="#0f172a" stroke-width="1.8"/>
+      <!-- 3x3 grid inside house -->
+      <line x1="80.7" y1="28" x2="80.7" y2="112" stroke="#94a3b8" stroke-width="0.6" stroke-dasharray="3,2"/>
+      <line x1="109.3" y1="28" x2="109.3" y2="112" stroke="#94a3b8" stroke-width="0.6" stroke-dasharray="3,2"/>
+      <line x1="52" y1="56" x2="138" y2="56" stroke="#94a3b8" stroke-width="0.6" stroke-dasharray="3,2"/>
+      <line x1="52" y1="84" x2="138" y2="84" stroke="#94a3b8" stroke-width="0.6" stroke-dasharray="3,2"/>
+      <!-- Engawa deck -->
+      <rect x="54" y="112" width="66" height="10" fill="#f6ead8" stroke="#0f172a" stroke-width="0.9"/>
+      <!-- Entry pavers West -->
+      <rect x="16" y="42" width="36" height="62" fill="#f1f5f9" stroke="#64748b" stroke-width="0.7"/>
+      <text x="95" y="73" text-anchor="middle" style="font-size:8.5px;font-weight:800;fill:#0f172a;">9 TSUBO</text>
+      <text x="95" y="84" text-anchor="middle" style="font-size:7.5px;font-weight:600;fill:#475569;">29.81 m²</text>
+    </g>
+
+    <!-- North Arrow &amp; Scale Block -->
+    <line x1="0" y1="652" x2="282" y2="652" stroke="#0f172a" stroke-width="1.2"/>
+    <g transform="translate(232, 700)">
+      <circle cx="0" cy="0" r="22" fill="#ffffff" stroke="#0f172a" stroke-width="1.5"/>
+      <polygon points="0,-20 -6,8 0,2 6,8" fill="#0f172a"/>
+      <text x="0" y="-25" text-anchor="middle" style="font-size:11px;font-weight:800;">N</text>
+    </g>
+    <text x="14" y="676" class="tb-lbl">PRIMARY DRAWING SCALE</text>
+    <text x="14" y="698" style="font-size:14px;font-weight:800;fill:#0f172a;">1 : 50</text>
+    <text x="14" y="716" style="font-size:9px;fill:#475569;">1 KEN = 1,820mm · 1 SHAKU = 303mm</text>
+    <text x="14" y="730" style="font-size:9px;fill:#475569;">9 TSUBO = 18 TATAMI = 29.81 m²</text>
+    <line x1="0" y1="744" x2="282" y2="744" stroke="#0f172a" stroke-width="1.2"/>
+
+    <!-- BIM Generation Notes &amp; Performance Cap -->
+    <rect x="0" y="744" width="282" height="22" fill="#e2e8f0" stroke="#0f172a" stroke-width="1.0"/>
+    <text x="141" y="759" text-anchor="middle" class="tb-hdr">BIM-TO-CAD DERIVATION NOTES</text>
+    <text x="12" y="782" style="font-size:8.8px;fill:#334155;">1. Plans, elevations &amp; sections are</text>
+    <text x="12" y="795" style="font-size:8.8px;fill:#334155;">   automatically sliced &amp; projected from</text>
+    <text x="12" y="808" style="font-size:8.8px;font-weight:700;fill:#0f172a;">   9_tsubo_house.blend (893 IFC4 objs).</text>
+    <text x="12" y="826" style="font-size:8.8px;fill:#334155;">2. 3D model capped ≤ 60k tris (10.1k</text>
+    <text x="12" y="839" style="font-size:8.8px;fill:#334155;">   house) for mobile WebXR &amp; Apple USDZ.</text>
+    <text x="12" y="857" style="font-size:8.8px;fill:#334155;">3. Framing, flashing, rebar &amp; cavity</text>
+    <text x="12" y="870" style="font-size:8.8px;fill:#334155;">   assemblies derived parametrically</text>
+    <text x="12" y="883" style="font-size:8.8px;fill:#334155;">   at 2D LOD-400 (BIMCraft paradigm).</text>
+    <text x="12" y="901" style="font-size:8.8px;fill:#334155;">4. All dimensions in millimeters (mm)</text>
+    <text x="12" y="914" style="font-size:8.8px;fill:#334155;">   unless noted. Verify all on site.</text>
+    <line x1="0" y1="932" x2="282" y2="932" stroke="#0f172a" stroke-width="1.2"/>
+
+    <!-- Stamp -->
+    <g transform="translate(141, 986)">
+      <rect x="-118" y="-32" width="236" height="64" fill="#ffffff" stroke="#0f172a" stroke-width="1.5"/>
+      <text x="0" y="-11" text-anchor="middle" style="font-size:10px;font-weight:800;letter-spacing:1.1px;">ISSUED FOR CONSTRUCTION STUDY</text>
+      <text x="0" y="6" text-anchor="middle" style="font-size:8.8px;font-weight:700;fill:#1d4ed8;">MODEL-SYNCED · BLENDER 5.2 + IFC4</text>
+      <text x="0" y="21" text-anchor="middle" style="font-size:8.2px;fill:#475569;">AUTO-GENERATED · ZERO MANUAL TRACE</text>
+    </g>
+
+    <!-- Sheet Title &amp; Sheet Number -->
+    <line x1="0" y1="1040" x2="282" y2="1040" stroke="#0f172a" stroke-width="1.8"/>
+    <text x="12" y="1058" class="tb-lbl">SHEET TITLE</text>
+    <text x="12" y="1084" style="font-size:14.0px;font-weight:800;fill:#0f172a;letter-spacing:0.3px;">ROOF &amp; TIMBER FRAMING PLANS</text>
+    <text x="12" y="1104" style="font-size:9.5px;font-weight:600;fill:#475569;">9-TSUBO HOUSE (KOIZUMI STUDIO, 1999)</text>
+    <line x1="0" y1="1124" x2="282" y2="1124" stroke="#0f172a" stroke-width="1.8"/>
+    <rect x="0" y="1124" width="282" height="104" fill="#f1f5f9"/>
+    <text x="12" y="1146" class="tb-lbl">SHEET NUMBER</text>
+    <text x="141" y="1196" text-anchor="middle" class="sheet-num">A-103</text>
+    <text x="270" y="1218" text-anchor="end" style="font-size:9.5px;font-weight:700;fill:#475569;">OF 12 SHEETS</text>
+  </g>
+  <!-- MAIN DRAWING FIELD (x = 26..1620, y = 26..1254) -->
+  <g id="drawing-content">
+<line x1="200.6" y1="274.0" x2="200.6" y2="872.4" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="14,4,2,4"/>
+<circle cx="200.6" cy="259.0" r="12" fill="#ffffff" stroke="#0f172a" stroke-width="1.4"/>
+<text x="200.6" y="263.0" class="grid-txt">1</text>
+<line x1="371.4" y1="274.0" x2="371.4" y2="872.4" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="14,4,2,4"/>
+<circle cx="371.4" cy="259.0" r="12" fill="#ffffff" stroke="#0f172a" stroke-width="1.4"/>
+<text x="371.4" y="263.0" class="grid-txt">2</text>
+<line x1="514.8" y1="274.0" x2="514.8" y2="872.4" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="14,4,2,4"/>
+<circle cx="514.8" cy="259.0" r="12" fill="#ffffff" stroke="#0f172a" stroke-width="1.4"/>
+<text x="514.8" y="263.0" class="grid-txt">3</text>
+<line x1="679.4" y1="274.0" x2="679.4" y2="872.4" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="14,4,2,4"/>
+<circle cx="679.4" cy="259.0" r="12" fill="#ffffff" stroke="#0f172a" stroke-width="1.4"/>
+<text x="679.4" y="263.0" class="grid-txt">4</text>
+<line x1="92.4" y1="793.2" x2="730.4" y2="793.2" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="14,4,2,4"/>
+<circle cx="77.4" cy="793.2" r="12" fill="#ffffff" stroke="#0f172a" stroke-width="1.4"/>
+<text x="77.4" y="797.2" class="grid-txt">A</text>
+<line x1="92.4" y1="546.8" x2="730.4" y2="546.8" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="14,4,2,4"/>
+<circle cx="77.4" cy="546.8" r="12" fill="#ffffff" stroke="#0f172a" stroke-width="1.4"/>
+<text x="77.4" y="550.8" class="grid-txt">B</text>
+<line x1="92.4" y1="326.8" x2="730.4" y2="326.8" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="14,4,2,4"/>
+<circle cx="77.4" cy="326.8" r="12" fill="#ffffff" stroke="#0f172a" stroke-width="1.4"/>
+<text x="77.4" y="330.8" class="grid-txt">C</text>
+<polygon points="121.4,590.8 195.4,590.8 195.4,469.1 121.4,469.1" fill="#e5e7eb" stroke="#1e293b" stroke-width="1.05" stroke-linejoin="round"/>
+<polygon points="199.2,934.0 214.5,934.0 214.5,802.0 199.2,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="215.2,934.0 230.5,934.0 230.5,802.0 215.2,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="231.2,934.0 246.5,934.0 246.5,802.0 231.2,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="247.2,934.0 262.5,934.0 262.5,802.0 247.2,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="263.2,934.0 278.5,934.0 278.5,802.0 263.2,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="279.2,934.0 294.4,934.0 294.4,802.0 279.2,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="295.2,934.0 310.4,934.0 310.4,802.0 295.2,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="311.1,934.0 326.4,934.0 326.4,802.0 311.1,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="327.1,934.0 342.4,934.0 342.4,802.0 327.1,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="343.1,934.0 358.4,934.0 358.4,802.0 343.1,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="359.1,934.0 374.4,934.0 374.4,802.0 359.1,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="375.1,934.0 390.4,934.0 390.4,802.0 375.1,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="391.1,934.0 406.4,934.0 406.4,802.0 391.1,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="407.1,934.0 422.3,934.0 422.3,802.0 407.1,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="423.0,934.0 438.3,934.0 438.3,802.0 423.0,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="439.0,934.0 454.3,934.0 454.3,802.0 439.0,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="455.0,934.0 470.3,934.0 470.3,802.0 455.0,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="471.0,934.0 486.3,934.0 486.3,802.0 471.0,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="487.0,934.0 502.3,934.0 502.3,802.0 487.0,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="503.0,934.0 518.3,934.0 518.3,802.0 503.0,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="519.0,934.0 534.2,934.0 534.2,802.0 519.0,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="535.0,934.0 550.2,934.0 550.2,802.0 535.0,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="550.9,934.0 566.2,934.0 566.2,802.0 550.9,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="566.9,934.0 582.2,934.0 582.2,802.0 566.9,802.0" fill="#f6ead8" stroke="#475569" stroke-width="0.65" stroke-linejoin="round"/>
+<polygon points="128.9,573.2 194.0,573.2 194.0,571.4 128.9,571.4" fill="#e2e8f0" stroke="#1e293b" stroke-width="0.85" stroke-linejoin="round"/>
+<polygon points="128.9,488.5 194.0,488.5 194.0,486.7 128.9,486.7" fill="#e2e8f0" stroke="#1e293b" stroke-width="0.85" stroke-linejoin="round"/>
+<polygon points="128.1,573.2 128.9,573.2 128.9,571.4 128.1,571.4" fill="#e2e8f0" stroke="#1e293b" stroke-width="0.85" stroke-linejoin="round"/>
+<polygon points="128.1,488.5 128.9,488.5 128.9,486.7 128.1,486.7" fill="#e2e8f0" stroke="#1e293b" stroke-width="0.85" stroke-linejoin="round"/>
+<polygon points="193.6,579.4 193.6,480.6 121.4,480.6 121.4,579.4" fill="#e2e8f0" stroke="#1e293b" stroke-width="0.85" stroke-linejoin="round"/>
+<polygon points="689.0,800.8 688.2,800.7 687.3,800.8 686.6,801.3 686.1,802.0 686.0,802.9 686.1,803.7 686.6,804.4 687.3,804.9 688.2,805.1 689.0,804.9 689.7,804.4 690.2,803.7 690.4,802.9 690.2,802.0 689.7,801.3" fill="#e2e8f0" stroke="#1e293b" stroke-width="0.85" stroke-linejoin="round"/>
+<polygon points="187.0,812.6 693.0,812.6 693.0,807.3 187.0,807.3" fill="#e2e8f0" stroke="#1e293b" stroke-width="0.85" stroke-linejoin="round"/>
+<polygon points="672.3,546.8 672.3,333.8 207.7,333.8 207.7,546.8" fill="#faf7f2" stroke="#334155" stroke-width="0.70" stroke-linejoin="round"/>
+<polygon points="690.4,546.8 690.4,312.7 189.6,312.7 189.6,546.8" fill="#cbd5e1" stroke="#0f172a" stroke-width="1.35" stroke-linejoin="round"/>
+<polygon points="411.3,679.5 409.2,679.0 407.1,679.5 405.5,681.1 405.0,683.2 405.5,685.3 407.1,686.9 409.2,687.4 411.3,686.9 412.9,685.3 413.4,683.2 412.9,681.1" fill="#fef3c7" stroke="#0f172a" stroke-width="0.85" stroke-linejoin="round"/>
+<polygon points="672.3,786.2 672.3,546.8 207.7,546.8 207.7,786.2" fill="#faf7f2" stroke="#334155" stroke-width="0.70" stroke-linejoin="round"/>
+<polygon points="690.4,807.3 690.4,546.8 189.6,546.8 189.6,807.3" fill="#cbd5e1" stroke="#0f172a" stroke-width="1.35" stroke-linejoin="round"/>
+<polygon points="327.7,657.5 325.6,657.0 323.5,657.5 321.9,659.1 321.4,661.2 321.9,663.3 323.5,664.9 325.6,665.4 327.7,664.9 329.3,663.3 329.8,661.2 329.3,659.1" fill="#fef3c7" stroke="#0f172a" stroke-width="0.85" stroke-linejoin="round"/>
+<polygon points="207.7,553.0 672.3,553.0 672.3,540.6 207.7,540.6" fill="#f5e8d4" stroke="#0f172a" stroke-width="1.15" stroke-linejoin="round"/>
+<line x1="199.8" y1="807.3" x2="199.8" y2="312.7" stroke="#64748b" stroke-width="0.6"/>
+<line x1="239.8" y1="807.3" x2="239.8" y2="312.7" stroke="#64748b" stroke-width="0.6"/>
+<line x1="279.8" y1="807.3" x2="279.8" y2="312.7" stroke="#64748b" stroke-width="0.6"/>
+<line x1="319.9" y1="807.3" x2="319.9" y2="312.7" stroke="#64748b" stroke-width="0.6"/>
+<line x1="359.9" y1="807.3" x2="359.9" y2="312.7" stroke="#64748b" stroke-width="0.6"/>
+<line x1="400.0" y1="807.3" x2="400.0" y2="312.7" stroke="#64748b" stroke-width="0.6"/>
+<line x1="440.0" y1="807.3" x2="440.0" y2="312.7" stroke="#64748b" stroke-width="0.6"/>
+<line x1="480.0" y1="807.3" x2="480.0" y2="312.7" stroke="#64748b" stroke-width="0.6"/>
+<line x1="520.1" y1="807.3" x2="520.1" y2="312.7" stroke="#64748b" stroke-width="0.6"/>
+<line x1="560.1" y1="807.3" x2="560.1" y2="312.7" stroke="#64748b" stroke-width="0.6"/>
+<line x1="600.2" y1="807.3" x2="600.2" y2="312.7" stroke="#64748b" stroke-width="0.6"/>
+<line x1="640.2" y1="807.3" x2="640.2" y2="312.7" stroke="#64748b" stroke-width="0.6"/>
+<line x1="680.2" y1="807.3" x2="680.2" y2="312.7" stroke="#64748b" stroke-width="0.6"/>
+<line x1="189.6" y1="546.8" x2="690.4" y2="546.8" stroke="#0f172a" stroke-width="2.6"/>
+<text x="440.0" y="539.8" text-anchor="middle" style="font-size:9.5px;font-weight:800;fill:#0f172a;">RIDGE LINE EL +5.460m (Y = +150mm)</text>
+<line x1="440.0" y1="511.6" x2="440.0" y2="353.2" stroke="#1d4ed8" stroke-width="1.6" marker-end="url(#arr-blue)"/>
+<text x="448.0" y="432.4" class="datum-txt">SLOPE 23.1° (4.26:10)</text>
+<text x="448.0" y="444.4" style="font-size:8.5px;fill:#334155;">EAVE EL +4.308m</text>
+<line x1="440.0" y1="586.4" x2="440.0" y2="766.8" stroke="#1d4ed8" stroke-width="1.6" marker-end="url(#arr-blue)"/>
+<text x="448.0" y="676.6" class="datum-txt">SLOPE 16.0° (2.87:10)</text>
+<text x="448.0" y="688.6" style="font-size:8.5px;fill:#334155;">EAVE EL +4.568m</text>
+<rect x="193.6" y="319.8" width="492.8" height="480.5" fill="none" stroke="#475569" stroke-width="1.0" stroke-dasharray="5,3"/>
+<g class="dim-h">
+  <line x1="189.6" y1="312.7" x2="189.6" y2="233.8" stroke="#64748b" stroke-width="0.65"/>
+  <line x1="690.4" y1="312.7" x2="690.4" y2="233.8" stroke="#64748b" stroke-width="0.65"/>
+  <line x1="185.6" y1="238.8" x2="694.4" y2="238.8" stroke="#b91c1c" stroke-width="0.9"/>
+  <line x1="185.6" y1="242.8" x2="193.6" y2="234.8" stroke="#b91c1c" stroke-width="1.6"/>
+  <line x1="686.4" y1="242.8" x2="694.4" y2="234.8" stroke="#b91c1c" stroke-width="1.6"/>
+  <rect x="366.4" y="226.3" width="147.2" height="11" fill="#fdfcf8" fill-opacity="0.92"/>
+  <text x="440.0" y="235.3" class="dim-txt" style="fill:#b91c1c;">5,690 ROOF OVERALL (E–W)</text>
+</g>
+<g class="dim-v">
+  <line x1="690.4" y1="312.7" x2="748.6" y2="312.7" stroke="#64748b" stroke-width="0.65"/>
+  <line x1="690.4" y1="807.3" x2="748.6" y2="807.3" stroke="#64748b" stroke-width="0.65"/>
+  <line x1="743.6" y1="308.7" x2="743.6" y2="811.3" stroke="#b91c1c" stroke-width="0.9"/>
+  <line x1="739.6" y1="316.7" x2="747.6" y2="308.7" stroke="#b91c1c" stroke-width="1.6"/>
+  <line x1="739.6" y1="811.3" x2="747.6" y2="803.3" stroke="#b91c1c" stroke-width="1.6"/>
+  <g transform="translate(739.6,560.0) rotate(-90)">
+    <rect x="-73.6" y="-10" width="147.2" height="11" fill="#fdfcf8" fill-opacity="0.92"/>
+    <text x="0" y="-1" class="dim-txt" style="fill:#b91c1c;">5,620 ROOF OVERALL (N–S)</text>
+  </g>
+</g>
+<g class="leader-note">
+  <polyline points="688.2,809.9 612.0,915.0 600.0,915.0" fill="none" stroke="#0f172a" stroke-width="0.95" marker-start="url(#dot-dark)"/>
+  <rect x="445.2" y="907.0" width="153.8" height="40.0" fill="#fdfcf8" fill-opacity="0.88"/>
+  <text x="596.0" y="918.0" text-anchor="end" class="note-bold">ALUMINUM EAVE GUTTER &amp;</text>
+  <text x="596.0" y="930.0" text-anchor="end" class="note-txt">Ø50mm DOWNSPOUT (SE CORNER)</text>
+  <text x="596.0" y="942.0" text-anchor="end" class="note-txt">DISCHARGE TO GRAVEL APRON</text>
+</g>
+<g class="leader-note">
+  <polyline points="158.4,530.1 112.0,880.0 100.0,880.0" fill="none" stroke="#0f172a" stroke-width="0.95" marker-start="url(#dot-dark)"/>
+  <rect x="-76.4" y="872.0" width="175.4" height="28.0" fill="#fdfcf8" fill-opacity="0.88"/>
+  <text x="96.0" y="883.0" text-anchor="end" class="note-bold">CANTILEVERED ALUM. ENTRY CANOPY</text>
+  <text x="96.0" y="895.0" text-anchor="end" class="note-txt">820 × 1,122mm W/ TENSION STRUTS</text>
+</g>
+<g class="vp-header">
+  <circle cx="71.0" cy="1214.0" r="14" fill="#0f172a"/>
+  <text x="71.0" y="1218.5" text-anchor="middle" style="font-size:12px;font-weight:800;fill:#ffffff;">1</text>
+  <text x="93.0" y="1212.0" class="vp-title">ROOF DRAINAGE &amp; CLADDING PLAN</text>
+  <text x="93.0" y="1226.0" class="vp-scale">SCALE 1 : 50</text>
+  <line x1="86.0" y1="1215.5" x2="496.0" y2="1215.5" stroke="#0f172a" stroke-width="1.6"/>
+</g>
+<line x1="980.6" y1="274.0" x2="980.6" y2="872.4" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="14,4,2,4"/>
+<circle cx="980.6" cy="259.0" r="12" fill="#ffffff" stroke="#0f172a" stroke-width="1.4"/>
+<text x="980.6" y="263.0" class="grid-txt">1</text>
+<line x1="1151.4" y1="274.0" x2="1151.4" y2="872.4" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="14,4,2,4"/>
+<circle cx="1151.4" cy="259.0" r="12" fill="#ffffff" stroke="#0f172a" stroke-width="1.4"/>
+<text x="1151.4" y="263.0" class="grid-txt">2</text>
+<line x1="1294.8" y1="274.0" x2="1294.8" y2="872.4" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="14,4,2,4"/>
+<circle cx="1294.8" cy="259.0" r="12" fill="#ffffff" stroke="#0f172a" stroke-width="1.4"/>
+<text x="1294.8" y="263.0" class="grid-txt">3</text>
+<line x1="1459.4" y1="274.0" x2="1459.4" y2="872.4" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="14,4,2,4"/>
+<circle cx="1459.4" cy="259.0" r="12" fill="#ffffff" stroke="#0f172a" stroke-width="1.4"/>
+<text x="1459.4" y="263.0" class="grid-txt">4</text>
+<line x1="925.2" y1="793.2" x2="1510.4" y2="793.2" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="14,4,2,4"/>
+<circle cx="910.2" cy="793.2" r="12" fill="#ffffff" stroke="#0f172a" stroke-width="1.4"/>
+<text x="910.2" y="797.2" class="grid-txt">A</text>
+<line x1="925.2" y1="546.8" x2="1510.4" y2="546.8" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="14,4,2,4"/>
+<circle cx="910.2" cy="546.8" r="12" fill="#ffffff" stroke="#0f172a" stroke-width="1.4"/>
+<text x="910.2" y="550.8" class="grid-txt">B</text>
+<line x1="925.2" y1="326.8" x2="1510.4" y2="326.8" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="14,4,2,4"/>
+<circle cx="910.2" cy="326.8" r="12" fill="#ffffff" stroke="#0f172a" stroke-width="1.4"/>
+<text x="910.2" y="330.8" class="grid-txt">C</text>
+<rect x="973.6" y="319.8" width="492.8" height="480.5" fill="#fdfcf8" stroke="#0f172a" stroke-width="1.2"/>
+<rect x="973.6" y="319.8" width="14.1" height="480.5" fill="url(#hatch-wall-cut)" stroke="#0f172a" stroke-width="1.6"/>
+<rect x="1452.3" y="319.8" width="14.1" height="480.5" fill="url(#hatch-wall-cut)" stroke="#0f172a" stroke-width="1.6"/>
+<rect x="987.7" y="319.8" width="464.6" height="14.1" fill="url(#hatch-wall-cut)" stroke="#0f172a" stroke-width="1.6"/>
+<rect x="1318.6" y="786.2" width="133.8" height="14.1" fill="url(#hatch-wall-cut)" stroke="#0f172a" stroke-width="1.6"/>
+<line x1="1027.7" y1="538.9" x2="1027.7" y2="333.8" stroke="#92400e" stroke-width="0.95" stroke-dasharray="6,3"/>
+<line x1="1067.8" y1="538.9" x2="1067.8" y2="333.8" stroke="#92400e" stroke-width="0.95" stroke-dasharray="6,3"/>
+<line x1="1107.8" y1="538.9" x2="1107.8" y2="333.8" stroke="#92400e" stroke-width="0.95" stroke-dasharray="6,3"/>
+<line x1="1147.8" y1="538.9" x2="1147.8" y2="333.8" stroke="#92400e" stroke-width="0.95" stroke-dasharray="6,3"/>
+<line x1="1187.9" y1="538.9" x2="1187.9" y2="333.8" stroke="#92400e" stroke-width="0.95" stroke-dasharray="6,3"/>
+<line x1="1227.9" y1="538.9" x2="1227.9" y2="333.8" stroke="#92400e" stroke-width="0.95" stroke-dasharray="6,3"/>
+<line x1="1268.0" y1="538.9" x2="1268.0" y2="333.8" stroke="#92400e" stroke-width="0.95" stroke-dasharray="6,3"/>
+<line x1="1308.0" y1="538.9" x2="1308.0" y2="333.8" stroke="#92400e" stroke-width="0.95" stroke-dasharray="6,3"/>
+<line x1="1348.0" y1="538.9" x2="1348.0" y2="333.8" stroke="#92400e" stroke-width="0.95" stroke-dasharray="6,3"/>
+<line x1="1388.1" y1="538.9" x2="1388.1" y2="333.8" stroke="#92400e" stroke-width="0.95" stroke-dasharray="6,3"/>
+<line x1="1428.1" y1="538.9" x2="1428.1" y2="333.8" stroke="#92400e" stroke-width="0.95" stroke-dasharray="6,3"/>
+<line x1="1302.7" y1="746.1" x2="1452.3" y2="746.1" stroke="#92400e" stroke-width="0.95" stroke-dasharray="6,3"/>
+<line x1="1302.7" y1="706.1" x2="1452.3" y2="706.1" stroke="#92400e" stroke-width="0.95" stroke-dasharray="6,3"/>
+<line x1="1302.7" y1="666.0" x2="1452.3" y2="666.0" stroke="#92400e" stroke-width="0.95" stroke-dasharray="6,3"/>
+<line x1="1302.7" y1="626.0" x2="1452.3" y2="626.0" stroke="#92400e" stroke-width="0.95" stroke-dasharray="6,3"/>
+<line x1="1302.7" y1="586.0" x2="1452.3" y2="586.0" stroke="#92400e" stroke-width="0.95" stroke-dasharray="6,3"/>
+<rect x="987.7" y="536.2" width="301.8" height="15.8" fill="#f6ead8" stroke="#0f172a" stroke-width="1.8"/>
+<rect x="1289.5" y="536.2" width="15.8" height="249.9" fill="#f6ead8" stroke="#0f172a" stroke-width="1.8"/>
+<line x1="987.7" y1="546.8" x2="1452.3" y2="546.8" stroke="#b91c1c" stroke-width="2.0" stroke-dasharray="10,4"/>
+<rect x="976.0" y="788.6" width="9.2" height="9.2" fill="#f6ead8" stroke="#0f172a" stroke-width="1.3"/>
+<line x1="976.0" y1="788.6" x2="985.3" y2="797.8" stroke="#0f172a" stroke-width="0.7"/>
+<line x1="985.3" y1="788.6" x2="976.0" y2="797.8" stroke="#0f172a" stroke-width="0.7"/>
+<rect x="976.0" y="708.5" width="9.2" height="9.2" fill="#f6ead8" stroke="#0f172a" stroke-width="1.3"/>
+<line x1="976.0" y1="708.5" x2="985.3" y2="717.7" stroke="#0f172a" stroke-width="0.7"/>
+<line x1="985.3" y1="708.5" x2="976.0" y2="717.7" stroke="#0f172a" stroke-width="0.7"/>
+<rect x="976.0" y="628.4" width="9.2" height="9.2" fill="#f6ead8" stroke="#0f172a" stroke-width="1.3"/>
+<line x1="976.0" y1="628.4" x2="985.3" y2="637.7" stroke="#0f172a" stroke-width="0.7"/>
+<line x1="985.3" y1="628.4" x2="976.0" y2="637.7" stroke="#0f172a" stroke-width="0.7"/>
+<rect x="976.0" y="542.2" width="9.2" height="9.2" fill="#f6ead8" stroke="#0f172a" stroke-width="1.3"/>
+<line x1="976.0" y1="542.2" x2="985.3" y2="551.4" stroke="#0f172a" stroke-width="0.7"/>
+<line x1="985.3" y1="542.2" x2="976.0" y2="551.4" stroke="#0f172a" stroke-width="0.7"/>
+<rect x="976.0" y="462.1" width="9.2" height="9.2" fill="#f6ead8" stroke="#0f172a" stroke-width="1.3"/>
+<line x1="976.0" y1="462.1" x2="985.3" y2="471.3" stroke="#0f172a" stroke-width="0.7"/>
+<line x1="985.3" y1="462.1" x2="976.0" y2="471.3" stroke="#0f172a" stroke-width="0.7"/>
+<rect x="976.0" y="392.6" width="9.2" height="9.2" fill="#f6ead8" stroke="#0f172a" stroke-width="1.3"/>
+<line x1="976.0" y1="392.6" x2="985.3" y2="401.8" stroke="#0f172a" stroke-width="0.7"/>
+<line x1="985.3" y1="392.6" x2="976.0" y2="401.8" stroke="#0f172a" stroke-width="0.7"/>
+<rect x="976.0" y="322.2" width="9.2" height="9.2" fill="#f6ead8" stroke="#0f172a" stroke-width="1.3"/>
+<line x1="976.0" y1="322.2" x2="985.3" y2="331.4" stroke="#0f172a" stroke-width="0.7"/>
+<line x1="985.3" y1="322.2" x2="976.0" y2="331.4" stroke="#0f172a" stroke-width="0.7"/>
+<rect x="1454.7" y="788.6" width="9.2" height="9.2" fill="#f6ead8" stroke="#0f172a" stroke-width="1.3"/>
+<line x1="1454.7" y1="788.6" x2="1464.0" y2="797.8" stroke="#0f172a" stroke-width="0.7"/>
+<line x1="1464.0" y1="788.6" x2="1454.7" y2="797.8" stroke="#0f172a" stroke-width="0.7"/>
+<rect x="1454.7" y="708.5" width="9.2" height="9.2" fill="#f6ead8" stroke="#0f172a" stroke-width="1.3"/>
+<line x1="1454.7" y1="708.5" x2="1464.0" y2="717.7" stroke="#0f172a" stroke-width="0.7"/>
+<line x1="1464.0" y1="708.5" x2="1454.7" y2="717.7" stroke="#0f172a" stroke-width="0.7"/>
+<rect x="1454.7" y="628.4" width="9.2" height="9.2" fill="#f6ead8" stroke="#0f172a" stroke-width="1.3"/>
+<line x1="1454.7" y1="628.4" x2="1464.0" y2="637.7" stroke="#0f172a" stroke-width="0.7"/>
+<line x1="1464.0" y1="628.4" x2="1454.7" y2="637.7" stroke="#0f172a" stroke-width="0.7"/>
+<rect x="1454.7" y="542.2" width="9.2" height="9.2" fill="#f6ead8" stroke="#0f172a" stroke-width="1.3"/>
+<line x1="1454.7" y1="542.2" x2="1464.0" y2="551.4" stroke="#0f172a" stroke-width="0.7"/>
+<line x1="1464.0" y1="542.2" x2="1454.7" y2="551.4" stroke="#0f172a" stroke-width="0.7"/>
+<rect x="1454.7" y="462.1" width="9.2" height="9.2" fill="#f6ead8" stroke="#0f172a" stroke-width="1.3"/>
+<line x1="1454.7" y1="462.1" x2="1464.0" y2="471.3" stroke="#0f172a" stroke-width="0.7"/>
+<line x1="1464.0" y1="462.1" x2="1454.7" y2="471.3" stroke="#0f172a" stroke-width="0.7"/>
+<rect x="1454.7" y="392.6" width="9.2" height="9.2" fill="#f6ead8" stroke="#0f172a" stroke-width="1.3"/>
+<line x1="1454.7" y1="392.6" x2="1464.0" y2="401.8" stroke="#0f172a" stroke-width="0.7"/>
+<line x1="1464.0" y1="392.6" x2="1454.7" y2="401.8" stroke="#0f172a" stroke-width="0.7"/>
+<rect x="1454.7" y="322.2" width="9.2" height="9.2" fill="#f6ead8" stroke="#0f172a" stroke-width="1.3"/>
+<line x1="1454.7" y1="322.2" x2="1464.0" y2="331.4" stroke="#0f172a" stroke-width="0.7"/>
+<line x1="1464.0" y1="322.2" x2="1454.7" y2="331.4" stroke="#0f172a" stroke-width="0.7"/>
+<rect x="1061.4" y="322.2" width="9.2" height="9.2" fill="#f6ead8" stroke="#0f172a" stroke-width="1.3"/>
+<line x1="1061.4" y1="322.2" x2="1070.6" y2="331.4" stroke="#0f172a" stroke-width="0.7"/>
+<line x1="1070.6" y1="322.2" x2="1061.4" y2="331.4" stroke="#0f172a" stroke-width="0.7"/>
+<rect x="1146.7" y="322.2" width="9.2" height="9.2" fill="#f6ead8" stroke="#0f172a" stroke-width="1.3"/>
+<line x1="1146.7" y1="322.2" x2="1156.0" y2="331.4" stroke="#0f172a" stroke-width="0.7"/>
+<line x1="1156.0" y1="322.2" x2="1146.7" y2="331.4" stroke="#0f172a" stroke-width="0.7"/>
+<rect x="1290.2" y="322.2" width="9.2" height="9.2" fill="#f6ead8" stroke="#0f172a" stroke-width="1.3"/>
+<line x1="1290.2" y1="322.2" x2="1299.4" y2="331.4" stroke="#0f172a" stroke-width="0.7"/>
+<line x1="1299.4" y1="322.2" x2="1290.2" y2="331.4" stroke="#0f172a" stroke-width="0.7"/>
+<rect x="1372.0" y="322.2" width="9.2" height="9.2" fill="#f6ead8" stroke="#0f172a" stroke-width="1.3"/>
+<line x1="1372.0" y1="322.2" x2="1381.3" y2="331.4" stroke="#0f172a" stroke-width="0.7"/>
+<line x1="1381.3" y1="322.2" x2="1372.0" y2="331.4" stroke="#0f172a" stroke-width="0.7"/>
+<rect x="1315.7" y="788.6" width="9.2" height="9.2" fill="#f6ead8" stroke="#0f172a" stroke-width="1.3"/>
+<line x1="1315.7" y1="788.6" x2="1324.9" y2="797.8" stroke="#0f172a" stroke-width="0.7"/>
+<line x1="1324.9" y1="788.6" x2="1315.7" y2="797.8" stroke="#0f172a" stroke-width="0.7"/>
+<rect x="1387.9" y="788.6" width="9.2" height="9.2" fill="#f6ead8" stroke="#0f172a" stroke-width="1.3"/>
+<line x1="1387.9" y1="788.6" x2="1397.1" y2="797.8" stroke="#0f172a" stroke-width="0.7"/>
+<line x1="1397.1" y1="788.6" x2="1387.9" y2="797.8" stroke="#0f172a" stroke-width="0.7"/>
+<circle cx="1151.4" cy="546.8" r="7.7" fill="#d97706" fill-opacity="0.35" stroke="#0f172a" stroke-width="2.2"/>
+<circle cx="1151.4" cy="546.8" r="2.2" fill="#0f172a"/>
+<g class="tag-badge">
+  <rect x="1135.4" y="518.8" width="32" height="16" fill="#ffffff" stroke="#b91c1c" stroke-width="1.1"/>
+  <text x="1151.4" y="529.8" class="tag-txt" style="fill:#b91c1c;">C-1</text>
+</g>
+<circle cx="1294.8" cy="546.8" r="7.7" fill="#d97706" fill-opacity="0.35" stroke="#0f172a" stroke-width="2.2"/>
+<circle cx="1294.8" cy="546.8" r="2.2" fill="#0f172a"/>
+<g class="tag-badge">
+  <rect x="1278.8" y="518.8" width="32" height="16" fill="#ffffff" stroke="#b91c1c" stroke-width="1.1"/>
+  <text x="1294.8" y="529.8" class="tag-txt" style="fill:#b91c1c;">C-2</text>
+</g>
+<line x1="991.2" y1="740.4" x2="991.2" y2="546.8" stroke="#0f172a" stroke-width="2.0"/>
+<line x1="1047.5" y1="740.4" x2="1047.5" y2="546.8" stroke="#0f172a" stroke-width="2.0"/>
+<g class="leader-note">
+  <polyline points="1151.4,546.8 943.0,865.0 955.0,865.0" fill="none" stroke="#0f172a" stroke-width="0.95" marker-start="url(#dot-dark)"/>
+  <rect x="956.0" y="857.0" width="170.0" height="40.0" fill="#fdfcf8" fill-opacity="0.88"/>
+  <text x="959.0" y="868.0" text-anchor="start" class="note-bold">C-1 / C-2: Ø176mm TURNED CEDAR</text>
+  <text x="959.0" y="880.0" text-anchor="start" class="note-txt">FULL HEIGHT EL +0.36 → +5.32m</text>
+  <text x="959.0" y="892.0" text-anchor="start" class="note-txt">CONCEALED STEEL CAP TO RIDGE</text>
+</g>
+<g class="leader-note">
+  <polyline points="1297.4,665.6 1298.0,885.0 1310.0,885.0" fill="none" stroke="#0f172a" stroke-width="0.95" marker-start="url(#dot-dark)"/>
+  <rect x="1311.0" y="877.0" width="170.0" height="40.0" fill="#fdfcf8" fill-opacity="0.88"/>
+  <text x="1314.0" y="888.0" text-anchor="start" class="note-bold">G-1 / G-2: 180×205mm LOFT</text>
+  <text x="1314.0" y="900.0" text-anchor="start" class="note-txt">RIM GIRDERS (EL +2.32..+2.52m)</text>
+  <text x="1314.0" y="912.0" text-anchor="start" class="note-txt">45×96 JOISTS @ 455mm O.C.</text>
+</g>
+<g class="leader-note">
+  <polyline points="1378.4,546.8 1298.0,185.0 1310.0,185.0" fill="none" stroke="#0f172a" stroke-width="0.95" marker-start="url(#dot-dark)"/>
+  <rect x="1311.0" y="177.0" width="170.0" height="40.0" fill="#fdfcf8" fill-opacity="0.88"/>
+  <text x="1314.0" y="188.0" text-anchor="start" class="note-bold">RB-1: 140×180mm RIDGE BEAM</text>
+  <text x="1314.0" y="200.0" text-anchor="start" class="note-txt">45×100 ROOF RAFTERS @ 455 O.C.</text>
+  <text x="1314.0" y="212.0" text-anchor="start" class="note-txt">12mm PLYWOOD DIAPHRAGM DECK</text>
+</g>
+<g class="leader-note">
+  <polyline points="980.6,466.7 932.0,185.0 920.0,185.0" fill="none" stroke="#0f172a" stroke-width="0.95" marker-start="url(#dot-dark)"/>
+  <rect x="770.6" y="177.0" width="148.4" height="40.0" fill="#fdfcf8" fill-opacity="0.88"/>
+  <text x="916.0" y="188.0" text-anchor="end" class="note-bold">105×105mm HINOKI POSTS</text>
+  <text x="916.0" y="200.0" text-anchor="end" class="note-txt">@ 910mm HALF-KEN MODULE</text>
+  <text x="916.0" y="212.0" text-anchor="end" class="note-txt">+ 12mm JAS SHEAR SHEATHING</text>
+</g>
+<g class="vp-header">
+  <circle cx="875.0" cy="1214.0" r="14" fill="#0f172a"/>
+  <text x="875.0" y="1218.5" text-anchor="middle" style="font-size:12px;font-weight:800;fill:#ffffff;">2</text>
+  <text x="897.0" y="1212.0" class="vp-title">ZAIRAI-KOHO TIMBER FRAMING &amp; SHEAR PLAN</text>
+  <text x="897.0" y="1226.0" class="vp-scale">SCALE 1 : 50</text>
+  <line x1="890.0" y1="1215.5" x2="1380.0" y2="1215.5" stroke="#0f172a" stroke-width="1.6"/>
+</g>
+<g class="scale-bar">
+  <rect x="530.0" y="1212.0" width="88.0" height="6" fill="#0f172a" stroke="#0f172a" stroke-width="0.9"/>
+  <rect x="618.0" y="1212.0" width="88.0" height="6" fill="#ffffff" stroke="#0f172a" stroke-width="0.9"/>
+  <rect x="706.0" y="1212.0" width="88.0" height="6" fill="#0f172a" stroke="#0f172a" stroke-width="0.9"/>
+  <text x="530.0" y="1209.0" text-anchor="middle" style="font-size:8.5px;font-weight:700;fill:#334155;">0</text>
+  <text x="618.0" y="1209.0" text-anchor="middle" style="font-size:8.5px;font-weight:700;fill:#334155;">1</text>
+  <text x="706.0" y="1209.0" text-anchor="middle" style="font-size:8.5px;font-weight:700;fill:#334155;">2</text>
+  <text x="794.0" y="1209.0" text-anchor="middle" style="font-size:8.5px;font-weight:700;fill:#334155;">3m</text>
+</g>
+  </g>
+</svg>

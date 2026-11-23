@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>9-Tsubo House — ISO 19650 / IFC4 BIM Coordination &amp; Federation Viewer</title>
+  <style>
+    :root {
+      --bg-dark: #060b13;
+      --bg-panel: #0b1322;
+      --bg-card: #111d33;
+      --bg-hover: #182947;
+      --border: #1f3458;
+      --border-light: #2c4a7c;
+      --accent: #38bdf8;
+      --accent-gold: #f59e0b;
+      --accent-green: #10b981;
+      --accent-purple: #a855f7;
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+      --font-mono: 'JetBrains Mono', 'Consolas', 'Courier New', monospace;
+      --font-sans: 'Bahnschrift', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg-dark); color: var(--text-main); font-family: var(--font-sans);
+      width: 100vw; height: 100vh; overflow: hidden; display: flex; flex-direction: column; user-select: none;
+    }
+    header.cde-header {
+      height: 52px; background: var(--bg-panel); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; padding: 0 12px;
+      flex-shrink: 0; gap: 8px; z-index: 30;
+    }
+    .cde-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .badge {
+      font-family: var(--font-mono); font-size: 10.5px; font-weight: 700; padding: 3px 7px;
+      border-radius: 4px; white-space: nowrap;
+    }
+    .badge-iso { background: rgba(56, 189, 248, 0.14); border: 1px solid var(--accent); color: var(--accent); }
+    .badge-s4 { background: rgba(16, 185, 129, 0.14); border: 1px solid var(--accent-green); color: var(--accent-green); }
+    .badge-ifc { background: rgba(168, 85, 247, 0.14); border: 1px solid var(--accent-purple); color: #c084fc; }
+    .project-title h1 { font-size: 13px; font-weight: 700; color: #f8fafc; white-space: nowrap; }
+    .project-title span { font-size: 10px; font-family: var(--font-mono); color: var(--text-muted); display: block; }
+    .cde-kpis {
+      display: flex; align-items: center; gap: 12px; background: var(--bg-dark);
+      border: 1px solid var(--border); padding: 4px 10px; border-radius: 5px;
+    }
+    .kpi-item { display: flex; flex-direction: column; align-items: flex-end; }
+    .kpi-label { font-size: 8.5px; font-family: var(--font-mono); color: var(--text-muted); text-transform: uppercase; }
+    .kpi-val { font-size: 11.5px; font-family: var(--font-mono); font-weight: 700; color: var(--accent); }
+    .cde-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .btn {
+      background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border);
+      padding: 5px 9px; border-radius: 4px; font-size: 11px; font-weight: 600;
+      cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+      white-space: nowrap; transition: all 0.14s ease;
+    }
+    .btn:hover { background: var(--bg-hover); border-color: var(--accent); color: #fff; }
+    .btn.active { background: rgba(56, 189, 248, 0.22); border-color: var(--accent); color: var(--accent); }
+    .btn-gold { background: rgba(245, 158, 11, 0.16); border-color: var(--accent-gold); color: var(--accent-gold); }
+    .btn-gold:hover { background: var(--accent-gold); color: #060b13; }
+    .btn-green { background: rgba(16, 185, 129, 0.16); border-color: var(--accent-green); color: var(--accent-green); }
+    .btn-green:hover { background: var(--accent-green); color: #060b13; }
+    .btn-primary { background: rgba(56, 189, 248, 0.16); border-color: var(--accent); color: var(--accent); }
+    .btn-primary:hover { background: var(--accent); color: #060b13; }
+
+    .main-split { flex: 1; display: flex; overflow: hidden; min-height: 0; }
+    aside.left-explorer {
+      width: 330px; background: var(--bg-panel); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; flex-shrink: 0; min-height: 0;
+    }
+    .tab-bar { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--border); background: var(--bg-dark); flex-shrink: 0; }
+    .tab-btn {
+      background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-muted);
+      padding: 8px 4px; font-size: 10.5px; font-weight: 600; cursor: pointer; text-align: center;
+    }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(56, 189, 248, 0.08); }
+    .tab-pane { display: none; flex: 1; overflow-y: auto; padding: 9px; flex-direction: column; gap: 9px; }
+    .tab-pane.active { display: flex; }
+    .panel-section {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 5px;
+      padding: 9px; display: flex; flex-direction: column; gap: 6px;
+    }
+    .section-hdr {
+      display: flex; align-items: center; justify-content: space-between; font-size: 10.5px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent);
+      padding-bottom: 4px; border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .quick-chip-row { display: flex; flex-wrap: wrap; gap: 4px; }
+    .chip-btn {
+      background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-muted);
+      font-size: 10px; padding: 4px 7px; border-radius: 3px; cursor: pointer; font-family: var(--font-mono);
+    }
+    .chip-btn:hover, .chip-btn.active { border-color: var(--accent); color: #fff; background: rgba(56, 189, 248, 0.16); }
+    .filter-list { display: flex; flex-direction: column; gap: 3px; }
+    .filter-row {
+      display: flex; align-items: center; justify-content: space-between; padding: 4px 6px;
+      border-radius: 4px; background: rgba(6, 11, 19, 0.55); border: 1px solid transparent; font-size: 11px;
+    }
+    .filter-row:hover { background: var(--bg-hover); border-color: var(--border); }
+    .filter-left { display: flex; align-items: center; gap: 6px; min-width: 0; flex: 1; cursor: pointer; }
+    .swatch { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.3); }
+    .filter-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-mono); font-size: 10.5px; color: #f1f5f9; }
+    .filter-right { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+    .count-pill { font-family: var(--font-mono); font-size: 9.5px; color: var(--text-muted); background: var(--bg-dark); padding: 1px 5px; border-radius: 3px; }
+    .mini-btn {
+      background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-muted);
+      font-size: 9.5px; padding: 2px 5px; border-radius: 3px; cursor: pointer; font-family: var(--font-mono);
+    }
+    .mini-btn:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+
+    .slider-row { display: flex; flex-direction: column; gap: 3px; }
+    .slider-top { display: flex; justify-content: space-between; font-size: 10px; font-family: var(--font-mono); color: var(--text-muted); }
+    .slider-top strong { color: var(--accent); }
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+    main.viewport-center { flex: 1; position: relative; display: flex; flex-direction: column; min-width: 0; background: #0a101d; }
+    .viewport-toolbar {
+      height: 40px; background: var(--bg-panel); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; padding: 0 10px; gap: 6px; flex-shrink: 0;
+    }
+    .toolbar-group { display: flex; align-items: center; gap: 4px; flex-wrap: nowrap; }
+    .cad-select {
+      background: var(--bg-dark); color: var(--text-main); border: 1px solid var(--border);
+      padding: 4px 8px; border-radius: 4px; font-size: 11px; font-family: var(--font-mono);
+    }
+    #bim-canvas-container { flex: 1; position: relative; overflow: hidden; min-height: 0; }
+    #loading-overlay {
+      position: absolute; inset: 0; background: rgba(6, 11, 19, 0.92); z-index: 20;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+    }
+    #loading-overlay.hidden { display: none; }
+    .spinner { width: 34px; height: 34px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .legend-overlay {
+      position: absolute; left: 10px; bottom: 10px; max-width: 260px; max-height: 185px; overflow-y: auto;
+      background: rgba(11, 19, 34, 0.88); backdrop-filter: blur(8px); border: 1px solid var(--border);
+      border-radius: 5px; padding: 7px 9px; z-index: 12; pointer-events: auto;
+    }
+    .legend-title { font-family: var(--font-mono); font-size: 9.5px; font-weight: 700; color: var(--accent); text-transform: uppercase; margin-bottom: 4px; }
+    .legend-grid { display: flex; flex-direction: column; gap: 2px; font-family: var(--font-mono); font-size: 9.5px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; color: var(--text-main); }
+
+    .measure-banner {
+      display: none; position: absolute; top: 48px; left: 50%; transform: translateX(-50%);
+      background: rgba(11, 19, 34, 0.94); border: 1px solid var(--accent-gold); border-radius: 5px;
+      padding: 7px 14px; font-family: var(--font-mono); font-size: 11px; z-index: 15; text-align: center;
+    }
+    .measure-banner.active { display: block; }
+
+    aside.right-inspector {
+      width: 340px; background: var(--bg-panel); border-left: 1px solid var(--border);
+      display: flex; flex-direction: column; flex-shrink: 0; min-height: 0;
+    }
+    .inspector-header {
+      padding: 9px 10px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .inspector-header h2 { font-size: 11.5px; font-weight: 700; color: #f8fafc; }
+    .inspector-body { flex: 1; overflow-y: auto; padding: 9px; display: flex; flex-direction: column; gap: 9px; }
+    .pset-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 5px; overflow: hidden; }
+    .pset-title {
+      background: rgba(56, 189, 248, 0.1); padding: 5px 9px; font-family: var(--font-mono); font-size: 10px;
+      font-weight: 700; color: var(--accent); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;
+    }
+    .pset-table { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+    .pset-table tr { border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .pset-table td { padding: 4px 8px; vertical-align: top; }
+    .pset-key { color: var(--text-muted); font-family: var(--font-mono); font-size: 9.8px; width: 40%; }
+    .pset-val { color: #f8fafc; font-family: var(--font-mono); font-size: 10px; word-break: break-word; }
+
+    .asm-layer-row {
+      display: flex; justify-content: space-between; gap: 6px; padding: 4px 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 10px; font-family: var(--font-mono);
+    }
+    .asm-layer-thk { color: var(--accent-gold); font-weight: 700; white-space: nowrap; }
+
+    section.boq-drawer {
+      height: 195px; background: var(--bg-panel); border-top: 2px solid var(--border-light);
+      display: flex; flex-direction: column; flex-shrink: 0; transition: height 0.18s ease; z-index: 25;
+    }
+    section.boq-drawer.collapsed { height: 34px; }
+    section.boq-drawer.expanded { height: 410px; }
+    .boq-bar {
+      height: 34px; background: var(--bg-dark); border-bottom: 1px solid var(--border);
+      padding: 0 10px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+    .boq-bar-left { display: flex; align-items: center; gap: 9px; }
+    .boq-title { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--accent-gold); }
+    .boq-search {
+      background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main);
+      padding: 3px 8px; border-radius: 4px; font-size: 10.5px; width: 250px; font-family: var(--font-mono);
+    }
+    .boq-table-wrap { flex: 1; overflow: auto; }
+    table.boq-table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 10.5px; }
+    table.boq-table thead th {
+      position: sticky; top: 0; background: #0e192d; color: var(--accent); text-align: left;
+      padding: 5px 8px; font-size: 9.5px; text-transform: uppercase; border-bottom: 1px solid var(--border); cursor: pointer; white-space: nowrap;
+    }
+    table.boq-table tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); cursor: pointer; }
+    table.boq-table tbody tr:hover { background: var(--bg-hover); }
+    table.boq-table tbody tr.selected { background: rgba(56, 189, 248, 0.22); color: #fff; }
+    table.boq-table td { padding: 4px 8px; white-space: nowrap; }
+
+    .sheet-modal-backdrop {
+      position: fixed; inset: 0; background: rgba(3, 7, 18, 0.85); backdrop-filter: blur(4px);
+      z-index: 60; display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .sheet-modal-backdrop.open { display: flex; }
+    .sheet-modal {
+      width: 94vw; height: 90vh; background: var(--bg-panel); border: 1px solid var(--accent);
+      border-radius: 6px; display: flex; flex-direction: column; overflow: hidden;
+    }
+    .sheet-modal-hdr {
+      height: 44px; background: var(--bg-dark); border-bottom: 1px solid var(--border);
+      padding: 0 14px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .sheet-modal-body {
+      flex: 1; overflow: auto; background: #050911; display: flex; align-items: center; justify-content: center; padding: 12px;
+    }
+    .sheet-modal-body img { max-width: 100%; max-height: 100%; object-fit: contain; background: #fdfcf8; }
+
+    @media (max-width: 1020px) {
+      aside.right-inspector, .cde-kpis { display: none; }
+      aside.left-explorer { width: 250px; }
+    }
+  </style>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <header class="cde-header">
+    <div class="cde-left">
+      <span class="badge badge-iso">9TS-KOI-ZZ-ZZ-M3-A-0001</span>
+      <span class="badge badge-s4">S4 · REV P05.0</span>
+      <span class="badge badge-ifc">IFC4 · 56.5K/60K CAP</span>
+      <div class="project-title">
+        <h1>9-TSUBO HOUSE (KOIZUMI STUDIO, 1999) — BIM FEDERATION VIEWER</h1>
+        <span>3×3 Ken (5,460×5,460mm) · Hybrid LOD-300 3D / LOD-400 Auto-CAD Drawings</span>
+      </div>
+    </div>
+
+    <div class="cde-kpis">
+      <div class="kpi-item"><span class="kpi-label">Visible Elements</span><span class="kpi-val" id="kpi-elements">893 / 893</span></div>
+      <div class="kpi-item"><span class="kpi-label">Visible Tris</span><span class="kpi-val" id="kpi-tris">56,538</span></div>
+      <div class="kpi-item"><span class="kpi-label">Filtered Area</span><span class="kpi-val" id="kpi-area">0 m²</span></div>
+    </div>
+
+    <div class="cde-actions">
+      <a class="btn btn-gold" href="./drawings/index.html">📐 Drawings (12)</a>
+      <button class="btn btn-green" id="btn-export-ifc">📥 Export .IFC</button>
+      <button class="btn btn-primary" id="btn-export-csv">📊 BOQ .CSV</button>
+      <a class="btn" href="./ar.html">🍎/🤖 AR</a>
+      <a class="btn" href="./index.html">🥽 WebXR</a>
+    </div>
+  </header>
+
+  <div class="main-split">
+    <aside class="left-explorer">
+      <div class="tab-bar">
+        <button class="tab-btn active" data-tab="tab-ifc">🏛️ IFC4</button>
+        <button class="tab-btn" data-tab="tab-csi">👷 CSI</button>
+        <button class="tab-btn" data-tab="tab-section">✂️ Cut/Tape</button>
+        <button class="tab-btn" data-tab="tab-sheets">📐 Sheets</button>
+      </div>
+
+      <div class="tab-pane active" id="tab-ifc">
+        <div class="panel-section">
+          <div class="section-hdr"><span>🎨 3D Federation Color Mode</span></div>
+          <div class="quick-chip-row" id="color-mode-chips">
+            <button class="chip-btn active" data-colormode="pbr">PBR Calibrated</button>
+            <button class="chip-btn" data-colormode="ifc">By IFC4 Class</button>
+            <button class="chip-btn" data-colormode="csi">By CSI Trade</button>
+            <button class="chip-btn" data-colormode="storey">By Storey</button>
+            <button class="chip-btn" data-colormode="discipline">By Discipline</button>
+            <button class="chip-btn" data-colormode="wireframe">CAD Wireframe</button>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="section-hdr"><span>⚡ Quick Discipline Presets</span></div>
+          <div class="quick-chip-row">
+            <button class="chip-btn" id="preset-all">Show All (893)</button>
+            <button class="chip-btn" id="preset-house">House Only (No Context)</button>
+            <button class="chip-btn" id="preset-no-roof">Dollhouse (No Roof)</button>
+            <button class="chip-btn" id="preset-struct">Timber &amp; Plinth Struct</button>
+            <button class="chip-btn" id="preset-envelope">Envelope &amp; Shoji</button>
+            <button class="chip-btn" id="preset-fixtures">36 Light Fixtures (MEP)</button>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <div class="section-hdr"><span>🏢 IfcBuilding Spatial Tree</span></div>
+          <div class="filter-list" id="building-filter-list"></div>
+        </div>
+
+        <div class="panel-section">
+          <div class="section-hdr"><span>📑 IfcBuildingStorey (L00–L03)</span></div>
+          <div class="filter-list" id="storey-filter-list"></div>
+        </div>
+
+        <div class="panel-section">
+          <div class="section-hdr">
+            <span>🧱 IFC4 Entity Classes</span>
+            <button class="mini-btn" id="btn-all-ifc-on">All On</button>
+          </div>
+          <div class="filter-list" id="ifc-class-list"></div>
+        </div>
+      </div>
+
+      <div class="tab-pane" id="tab-csi">
+        <div class="panel-section">
+          <div class="section-hdr">
+            <span>👷 CSI MasterFormat 2020</span>
+            <button class="mini-btn" id="btn-all-csi-on">All Trades</button>
+          </div>
+          <div class="filter-list" id="csi-filter-list"></div>
+        </div>
+      </div>
+
+      <div class="tab-pane" id="tab-section">
+        <div class="panel-section">
+          <div class="section-hdr">
+            <span>✂️ 6-Plane 3D Section Box</span>
+            <button class="mini-btn" id="btn-reset-section">Reset</button>
+          </div>
+          <div class="quick-chip-row">
+            <button class="chip-btn" data-cut="none">Full Uncut</button>
+            <button class="chip-btn" data-cut="plan-1f">1F Plan (+1.25m)</button>
+            <button class="chip-btn" data-cut="plan-2f">2F Plan (+3.55m)</button>
+            <button class="chip-btn" data-cut="sec-aa">Section A-A (E–W)</button>
+            <button class="chip-btn" data-cut="sec-bb">Section B-B (N–S)</button>
+            <button class="chip-btn" data-cut="house-box">House Lot Box</button>
+          </div>
+
+          <div class="slider-row"><div class="slider-top"><span>Top Cut (EL m)</span><strong id="val-ymax">+9.0m</strong></div><input type="range" id="clip-ymax" min="0" max="9" step="0.05" value="9" /></div>
+          <div class="slider-row"><div class="slider-top"><span>Bottom Cut (EL m)</span><strong id="val-ymin">-1.0m</strong></div><input type="range" id="clip-ymin" min="-1" max="6" step="0.05" value="-1" /></div>
+          <div class="slider-row"><div class="slider-top"><span>West Cut (X Min)</span><strong id="val-xmin">-18.0m</strong></div><input type="range" id="clip-xmin" min="-18" max="6" step="0.1" value="-18" /></div>
+          <div class="slider-row"><div class="slider-top"><span>East Cut (X Max)</span><strong id="val-xmax">+18.0m</strong></div><input type="range" id="clip-xmax" min="-6" max="18" step="0.1" value="18" /></div>
+          <div class="slider-row"><div class="slider-top"><span>North Cut (Z Min)</span><strong id="val-zmin">-18.0m</strong></div><input type="range" id="clip-zmin" min="-18" max="6" step="0.1" value="-18" /></div>
+          <div class="slider-row"><div class="slider-top"><span>South Cut (Z Max)</span><strong id="val-zmax">+18.0m</strong></div><input type="range" id="clip-zmax" min="-6" max="18" step="0.1" value="18" /></div>
+        </div>
+
+        <div class="panel-section">
+          <div class="section-hdr">
+            <span>📏 3D Laser Tape [M] (Metric / Imp / Ken)</span>
+            <button class="mini-btn" id="btn-clear-measures">Clear</button>
+          </div>
+          <button class="btn" id="btn-toggle-measure-side" style="justify-content:center;">📏 Toggle Laser Measure [M]</button>
+          <div id="measure-history-list" style="display:flex; flex-direction:column; gap:4px; margin-top:4px;"></div>
+        </div>
+      </div>
+
+      <div class="tab-pane" id="tab-sheets">
+        <div class="panel-section">
+          <div class="section-hdr">
+            <span>📐 12 Model-Derived CAD Sheets</span>
+            <a class="mini-btn" href="./drawings/index.html" style="text-decoration:none;">Binder ↗</a>
+          </div>
+          <div class="filter-list" id="linked-sheets-list"></div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="viewport-center">
+      <div class="viewport-toolbar">
+        <div class="toolbar-group">
+          <button class="btn" id="btn-cam-ortho">📐 Ortho [O]</button>
+          <button class="btn" data-view="TOP">TOP</button>
+          <button class="btn" data-view="SOUTH">SOUTH</button>
+          <button class="btn" data-view="WEST">WEST</button>
+          <button class="btn" data-view="NORTH">NORTH</button>
+          <button class="btn" data-view="EAST">EAST</button>
+          <button class="btn" data-view="ISO">ISO SW</button>
+        </div>
+        <div class="toolbar-group">
+          <select class="cad-select" id="station-jump-select">
+            <option value="">📍 Jump to Station...</option>
+            <option value="EXT_3Q">01 · Exterior Three-Quarter</option>
+            <option value="ENGAWA">02 · Front Engawa &amp; Shoji</option>
+            <option value="LIVING">03 · 1F Living, Dining &amp; Kitchen</option>
+            <option value="TATAMI">04 · 1F 6-Mat Tatami Room</option>
+            <option value="BATH">05 · 1F 3-Zone Bathroom Suite</option>
+            <option value="LOFT">06 · 2F Loft &amp; Central Columns</option>
+            <option value="KITTY">07 · 2F Bed Window → Tuxedo Kitty</option>
+          </select>
+        </div>
+        <div class="toolbar-group">
+          <button class="btn" id="btn-isolate-sel">🎯 Isolate [I]</button>
+          <button class="btn" id="btn-hide-sel">🙈 Hide [H]</button>
+          <button class="btn" id="btn-xray-toggle">👻 X-Ray [X]</button>
+          <button class="btn" id="btn-measure-tool">📏 Tape [M]</button>
+          <button class="btn" id="btn-reset-all">🔄 Reset [R]</button>
+        </div>
+      </div>
+
+      <div id="bim-canvas-container">
+        <div id="loading-overlay">
+          <div class="spinner"></div>
+          <div style="font-family:var(--font-mono); font-size:12.5px; color:var(--accent);">LOADING 9-TSUBO IFC4 BIM MODEL (893 ELEMENTS)...</div>
+          <div id="loading-sub" style="font-family:var(--font-mono); font-size:10.5px; color:var(--text-muted);">9_tsubo_house.glb + 9_tsubo_bim_metadata.json</div>
+        </div>
+      </div>
+
+      <div class="legend-overlay" id="legend-overlay" style="display:none;">
+        <div class="legend-title" id="legend-title">Federation Legend</div>
+        <div class="legend-grid" id="legend-grid"></div>
+      </div>
+
+      <div class="measure-banner" id="measure-banner">
+        <div style="color:var(--accent-gold); font-weight:700;">📏 3D LASER TAPE MEASURE ACTIVE</div>
+        <div id="measure-status-text">Click Point A on any 3D BIM element...</div>
+      </div>
+    </main>
+
+    <aside class="right-inspector">
+      <div class="inspector-header">
+        <h2>🔍 IFC4 &amp; LOD-400 Inspector</h2>
+        <span class="badge badge-ifc" id="insp-class-badge">No Selection</span>
+      </div>
+      <div class="inspector-body">
+        <div class="pset-card">
+          <div class="pset-title"><span>Pset_ISO19650_Identification</span><span>CDE S4</span></div>
+          <table class="pset-table">
+            <tr><td class="pset-key">Element Name</td><td class="pset-val" id="prop-name">Click any 3D element or BOQ row</td></tr>
+            <tr><td class="pset-key">IFC GlobalId</td><td class="pset-val" id="prop-guid">—</td></tr>
+            <tr><td class="pset-key">Building</td><td class="pset-val" id="prop-bldg">—</td></tr>
+            <tr><td class="pset-key">Storey</td><td class="pset-val" id="prop-storey">—</td></tr>
+            <tr><td class="pset-key">Discipline</td><td class="pset-val" id="prop-disc">—</td></tr>
+          </table>
+        </div>
+
+        <div class="pset-card">
+          <div class="pset-title"><span>Pset_Classification &amp; Quantities</span><span>IFC4 / CSI</span></div>
+          <table class="pset-table">
+            <tr><td class="pset-key">IFC4 Entity</td><td class="pset-val" id="prop-ifc">—</td></tr>
+            <tr><td class="pset-key">CSI Code</td><td class="pset-val" id="prop-csi">—</td></tr>
+            <tr><td class="pset-key">Material</td><td class="pset-val" id="prop-mat">—</td></tr>
+            <tr><td class="pset-key">L × W × H</td><td class="pset-val" id="prop-dims">—</td></tr>
+            <tr><td class="pset-key">Elevation</td><td class="pset-val" id="prop-elev">—</td></tr>
+            <tr><td class="pset-key">Area / Vol</td><td class="pset-val" id="prop-qto">—</td></tr>
+            <tr><td class="pset-key">Mesh Budget</td><td class="pset-val" id="prop-topo">—</td></tr>
+          </table>
+        </div>
+
+        <!-- Hybrid LOD-300 -> LOD-400 Construction Assembly Card -->
+        <div class="pset-card" id="assembly-card">
+          <div class="pset-title">
+            <span>Pset_ConstructionAssembly</span>
+            <span id="asm-code-badge" style="color:var(--accent-gold);">LOD-400 2D</span>
+          </div>
+          <div id="asm-body" style="padding:7px 8px; font-size:10.5px; color:var(--text-muted); line-height:1.4;">
+            Select any Wall, Roof, Floor, Plinth, Window, Stair, or Light Fixture to inspect its full multi-layer LOD-400 construction assembly &amp; linked CAD detail sheet.
+          </div>
+        </div>
+
+        <div class="pset-card">
+          <div class="pset-title"><span>Pset_SpecificationNotes</span><span>A-601</span></div>
+          <div id="prop-notes" style="padding:7px 8px; font-size:10.8px; color:var(--text-main); line-height:1.45;">
+            9-Tsubo House federated BIM model: 893 elements capped at 56,538 tris (under 60k mobile/AR budget) driving 12 automated CAD construction sheets.
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px;">
+          <button class="btn" id="btn-insp-zoom">🔍 Zoom To</button>
+          <button class="btn" id="btn-insp-iso-class">🏛️ Iso Class</button>
+          <button class="btn" id="btn-insp-iso-csi">👷 Iso Trade</button>
+          <button class="btn" id="btn-insp-iso-storey">📑 Iso Storey</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <section class="boq-drawer" id="boq-drawer">
+    <div class="boq-bar">
+      <div class="boq-bar-left">
+        <span class="boq-title">📊 LIVE BIM QUANTITY TAKE-OFF (BOQ)</span>
+        <input type="text" class="boq-search" id="boq-search" placeholder="Search 893 elements (Fixture, Column, Tatami, Sash, Kitty...)" />
+        <span style="font-family:var(--font-mono); font-size:10.5px; color:var(--text-muted);" id="boq-count-label">893 rows</span>
+      </div>
+      <div style="display:flex; gap:5px;">
+        <button class="mini-btn" id="btn-boq-collapse">▼ Min</button>
+        <button class="mini-btn" id="btn-boq-normal">▬ Std</button>
+        <button class="mini-btn" id="btn-boq-expand">▲ Max</button>
+      </div>
+    </div>
+    <div class="boq-table-wrap">
+      <table class="boq-table">
+        <thead>
+          <tr>
+            <th data-sort="name">Element Name</th>
+            <th data-sort="ifcClass">IFC4 Class</th>
+            <th data-sort="buildingId">Building</th>
+            <th data-sort="storeyId">Storey</th>
+            <th data-sort="csiCode">CSI Code</th>
+            <th data-sort="csiTitle">Trade Package</th>
+            <th data-sort="assemblyCode">Assembly</th>
+            <th data-sort="material">Material</th>
+            <th data-sort="areaM2">Area (m²)</th>
+            <th data-sort="volumeM3">Vol (m³)</th>
+            <th data-sort="triangles">Tris</th>
+          </tr>
+        </thead>
+        <tbody id="boq-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="sheet-modal-backdrop" id="sheet-modal">
+    <div class="sheet-modal">
+      <div class="sheet-modal-hdr">
+        <div style="font-family:var(--font-mono); font-size:12.5px; color:var(--accent); font-weight:700;" id="modal-sheet-title">A-101</div>
+        <div style="display:flex; gap:8px;">
+          <a class="btn btn-gold" id="modal-open-binder" href="./drawings/index.html">Open in Full Binder ↗</a>
+          <button class="btn" id="btn-close-sheet-modal">✕ Close</button>
+        </div>
+      </div>
+      <div class="sheet-modal-body"><img id="modal-sheet-img" src="" alt="2D Sheet Preview" /></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+    const SHEETS = [
+      { id: 'A-000', title: 'Cover Sheet & Index', file: 'A-000_Cover_Index.svg' },
+      { id: 'A-100', title: 'Site & Context Plan (1:100)', file: 'A-100_Site_Context_Plan.svg' },
+      { id: 'A-101', title: 'First Floor Plan (1:50)', file: 'A-101_First_Floor_Plan.svg' },
+      { id: 'A-102', title: 'Second Floor Loft Plan (1:50)', file: 'A-102_Second_Floor_Loft_Plan.svg' },
+      { id: 'A-103', title: 'Roof & Timber Framing (1:50)', file: 'A-103_Roof_Structural_Framing_Plan.svg' },
+      { id: 'A-104', title: 'Reflected Ceiling & Lighting (1:50)', file: 'A-104_Reflected_Ceiling_Lighting_Plan.svg' },
+      { id: 'A-201', title: 'Exterior Elevations (1:50)', file: 'A-201_Exterior_Elevations.svg' },
+      { id: 'A-301', title: 'Building Sections A-A & B-B (1:50)', file: 'A-301_Building_Sections.svg' },
+      { id: 'A-401', title: 'Enlarged Kitchen/Bath/Tatami (1:25)', file: 'A-401_Enlarged_Interior_Plans_Elevations.svg' },
+      { id: 'A-501', title: 'Wall Section & Envelope Details', file: 'A-501_Wall_Section_Envelope_Details.svg' },
+      { id: 'A-502', title: 'Glazing, Stair & Guardrail Details', file: 'A-502_Glazing_Stair_Guardrail_Details.svg' },
+      { id: 'A-601', title: 'Schedules & BIM QTO', file: 'A-601_Schedules_BIM_QTO.svg' }
+    ];
+
+    const BUILDING_NAMES = {
+      'BLDG-01': 'BLDG-01 · 9-Tsubo Main Residence',
+      'SITE-01': 'SITE-01 · Parcel, Engawa & Apron',
+      'CTX-01':  'CTX-01 · Urban Context & Kitty'
+    };
+    const STOREY_NAMES = {
+      'L00': 'L00 · Site & RC Plinth (EL 0.00m)',
+      'L01': 'L01 · 1F Living/Kitchen/Tatami (+0.36m)',
+      'L02': 'L02 · 2F Loft & Bedroom (+2.52m)',
+      'L03': 'L03 · Roof & Ridge Structure (+4.31m)'
+    };
+    const PALETTE = [
+      '#38bdf8', '#f59e0b', '#10b981', '#a855f7', '#ef4444', '#ec4899',
+      '#14b8a6', '#eab308', '#6366f1', '#f97316', '#22c55e', '#06b6d4',
+      '#84cc16', '#e879f9', '#fb7185', '#60a5fa', '#fbbf24', '#34d399'
+    ];
+
+    const container = document.getElementById('bim-canvas-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0c1322);
+
+    const w0 = container.clientWidth || 800;
+    const h0 = container.clientHeight || 600;
+    const perspCam = new THREE.PerspectiveCamera(48, w0 / h0, 0.05, 250);
+    perspCam.position.set(-8.5, 6.2, 9.2);
+
+    let orthoSize = 7.5;
+    const orthoCam = new THREE.OrthographicCamera(-orthoSize * (w0 / h0), orthoSize * (w0 / h0), orthoSize, -orthoSize, -80, 200);
+    let activeCam = perspCam;
+    let isOrtho = false;
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(w0, h0);
+    renderer.localClippingEnabled = true;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.88; // Calibrated: zero whiteout!
+    container.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(activeCam, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.target.set(0, 2.2, 0);
+    controls.update();
+
+    // Calibrated architectural BIM lighting (no blowout!)
+    scene.add(new THREE.HemisphereLight(0xeef5ff, 0x64748b, 0.65));
+    const dir1 = new THREE.DirectionalLight(0xfff6e8, 1.15);
+    dir1.position.set(-14, 22, 16);
+    scene.add(dir1);
+    const dir2 = new THREE.DirectionalLight(0xbfdbfe, 0.35);
+    dir2.position.set(16, 12, -14);
+    scene.add(dir2);
+
+    // Subtle ground grid
+    const grid = new THREE.GridHelper(36, 36, 0x263c5e, 0x15243b);
+    grid.position.y = -0.02;
+    scene.add(grid);
+
+    // 6-Plane Section Box Clipping Planes
+    const clipPlanes = [
+      new THREE.Plane(new THREE.Vector3( 0, -1,  0),  9),  // ymax
+      new THREE.Plane(new THREE.Vector3( 0,  1,  0),  1),  // ymin
+      new THREE.Plane(new THREE.Vector3( 1,  0,  0), 18),  // xmin
+      new THREE.Plane(new THREE.Vector3(-1,  0,  0), 18),  // xmax
+      new THREE.Plane(new THREE.Vector3( 0,  0,  1), 18),  // zmin
+      new THREE.Plane(new THREE.Vector3( 0,  0, -1), 18)   // zmax
+    ];
+
+    let bimData = null;
+    let elements = [];
+    let allMeshes = [];
+    let colorMode = 'pbr';
+    let xrayMode = false;
+    let selectedElement = null;
+    let selectionBoxHelper = null;
+    let isolatedNames = null;
+    const manuallyHiddenNames = new Set();
+    const visibleBuildings = new Set(['BLDG-01', 'SITE-01', 'CTX-01']);
+    const visibleStoreys = new Set(['L00', 'L01', 'L02', 'L03']);
+    const visibleIfcClasses = new Set();
+    const visibleCsiCodes = new Set();
+
+    const colorMaps = { ifc: {}, csi: {}, storey: { L00: '#64748b', L01: '#38bdf8', L02: '#f59e0b', L03: '#a855f7' }, discipline: { A: '#38bdf8', S: '#ef4444', E: '#f59e0b', P: '#14b8a6', C: '#94a3b8', L: '#22c55e' } };
+    const matCache = new Map();
+    const ghostMat = new THREE.MeshStandardMaterial({ color: 0x334155, transparent: true, opacity: 0.14, depthWrite: false, clippingPlanes: clipPlanes, side: THREE.DoubleSide });
+    const wireMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, clippingPlanes: clipPlanes });
+    const selMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0x92400e, emissiveIntensity: 0.45, roughness: 0.35, clippingPlanes: clipPlanes, side: THREE.DoubleSide });
+
+    const measureGroup = new THREE.Group();
+    scene.add(measureGroup);
+    let measureActive = false;
+    let measurePtA = null;
+
+    function getFedMat(hex) {
+      if (!matCache.has(hex)) {
+        matCache.set(hex, new THREE.MeshStandardMaterial({
+          color: new THREE.Color(hex), roughness: 0.52, metalness: 0.08, clippingPlanes: clipPlanes, side: THREE.DoubleSide
+        }));
+      }
+      return matCache.get(hex);
+    }
+
+    function mToFtIn(m) {
+      const totalIn = Math.abs(m) * 39.3701;
+      let ft = Math.floor(totalIn / 12);
+      let inch = Math.round(totalIn - ft * 12);
+      if (inch === 12) { ft++; inch = 0; }
+      return `${ft}'-${inch}"`;
+    }
+
+    async function initBIM() {
+      const [metaResp, gltf] = await Promise.all([
+        fetch('./9_tsubo_bim_metadata.json?v=1.0').then((r) => r.json()),
+        new Promise((res, rej) => new GLTFLoader().load('./9_tsubo_house.glb?v=0.5', res, undefined, rej))
+      ]);
+
+      bimData = metaResp;
+      elements = bimData.elements;
+
+      // Build color palettes
+      const ifcSet = [...new Set(elements.map((e) => e.ifcClass))].sort();
+      const csiSet = [...new Set(elements.map((e) => e.csiCode))].sort();
+      ifcSet.forEach((c, i) => { colorMaps.ifc[c] = PALETTE[i % PALETTE.length]; visibleIfcClasses.add(c); });
+      csiSet.forEach((c, i) => { colorMaps.csi[c] = PALETTE[i % PALETTE.length]; visibleCsiCodes.add(c); });
+
+      const byName = new Map();
+      elements.forEach((el) => { el.meshes = []; byName.set(el.name, el); });
+
+      gltf.scene.traverse((child) => {
+        if (!child.isMesh) return;
+        const applyClip = (m) => {
+          if (!m) return m;
+          const cl = m.clone();
+          cl.clippingPlanes = clipPlanes;
+          cl.side = THREE.DoubleSide;
+          return cl;
+        };
+        child.material = Array.isArray(child.material) ? child.material.map(applyClip) : applyClip(child.material);
+        child.userData.origMat = child.material;
+
+        const cleanName = child.name.replace(/_\d+$/, '');
+        const rec = byName.get(child.name) || byName.get(cleanName);
+        if (rec) {
+          rec.meshes.push(child);
+          child.userData.bim = rec;
+        }
+        allMeshes.push(child);
+      });
+
+      scene.add(gltf.scene);
+      buildExplorerUI(ifcSet, csiSet);
+      applyVisibilityFilters();
+      document.getElementById('loading-overlay').classList.add('hidden');
+    }
+
+    function buildExplorerUI(ifcSet, csiSet) {
+      const makeFilterRow = (label, count, color, checked, onToggle, onIso) => {
+        const row = document.createElement('div');
+        row.className = 'filter-row';
+        row.innerHTML = `
+          <label class="filter-left">
+            <input type="checkbox" ${checked ? 'checked' : ''} />
+            <span class="swatch" style="background:${color};"></span>
+            <span class="filter-name" title="${label}">${label}</span>
+          </label>
+          <div class="filter-right">
+            <span class="count-pill">${count}</span>
+            <button class="mini-btn">Iso</button>
+          </div>
+        `;
+        row.querySelector('input').addEventListener('change', (e) => onToggle(e.target.checked));
+        row.querySelector('.mini-btn').addEventListener('click', (e) => { e.stopPropagation(); onIso(); });
+        return row;
+      };
+
+      const bList = document.getElementById('building-filter-list');
+      ['BLDG-01', 'SITE-01', 'CTX-01'].forEach((bid, idx) => {
+        const cnt = elements.filter((e) => e.buildingId === bid).length;
+        bList.appendChild(makeFilterRow(BUILDING_NAMES[bid], cnt, PALETTE[idx], true,
+          (chk) => { chk ? visibleBuildings.add(bid) : visibleBuildings.delete(bid); isolatedNames = null; applyVisibilityFilters(); },
+          () => { isolatedNames = new Set(elements.filter((e) => e.buildingId === bid).map((e) => e.name)); applyVisibilityFilters(); }
+        ));
+      });
+
+      const sList = document.getElementById('storey-filter-list');
+      ['L00', 'L01', 'L02', 'L03'].forEach((sid) => {
+        const cnt = elements.filter((e) => e.storeyId === sid).length;
+        sList.appendChild(makeFilterRow(STOREY_NAMES[sid], cnt, colorMaps.storey[sid], true,
+          (chk) => { chk ? visibleStoreys.add(sid) : visibleStoreys.delete(sid); isolatedNames = null; applyVisibilityFilters(); },
+          () => { isolatedNames = new Set(elements.filter((e) => e.storeyId === sid).map((e) => e.name)); applyVisibilityFilters(); }
+        ));
+      });
+
+      const iList = document.getElementById('ifc-class-list');
+      ifcSet.forEach((cls) => {
+        const cnt = elements.filter((e) => e.ifcClass === cls).length;
+        iList.appendChild(makeFilterRow(cls, cnt, colorMaps.ifc[cls], true,
+          (chk) => { chk ? visibleIfcClasses.add(cls) : visibleIfcClasses.delete(cls); isolatedNames = null; applyVisibilityFilters(); },
+          () => { isolatedNames = new Set(elements.filter((e) => e.ifcClass === cls).map((e) => e.name)); applyVisibilityFilters(); }
+        ));
+      });
+
+      const cList = document.getElementById('csi-filter-list');
+      csiSet.forEach((code) => {
+        const subset = elements.filter((e) => e.csiCode === code);
+        const title = subset[0] ? subset[0].csiTitle : code;
+        cList.appendChild(makeFilterRow(`${code} · ${title}`, subset.length, colorMaps.csi[code], true,
+          (chk) => { chk ? visibleCsiCodes.add(code) : visibleCsiCodes.delete(code); isolatedNames = null; applyVisibilityFilters(); },
+          () => { isolatedNames = new Set(subset.map((e) => e.name)); applyVisibilityFilters(); }
+        ));
+      });
+
+      const shList = document.getElementById('linked-sheets-list');
+      SHEETS.forEach((s) => {
+        const row = document.createElement('div');
+        row.className = 'filter-row';
+        row.style.cursor = 'pointer';
+        row.innerHTML = `<div class="filter-left"><span style="color:var(--accent);font-family:var(--font-mono);font-weight:700;font-size:10.5px;">${s.id}</span><span class="filter-name">${s.title}</span></div><button class="mini-btn">View</button>`;
+        row.addEventListener('click', () => openSheetModal(s));
+        shList.appendChild(row);
+      });
+    }
+
+    function applyVisibilityFilters() {
+      const visible = [];
+      let sumArea = 0, sumTris = 0;
+
+      elements.forEach((el) => {
+        const pass = isolatedNames
+          ? isolatedNames.has(el.name) && !manuallyHiddenNames.has(el.name)
+          : visibleBuildings.has(el.buildingId) &&
+            visibleStoreys.has(el.storeyId) &&
+            visibleIfcClasses.has(el.ifcClass) &&
+            visibleCsiCodes.has(el.csiCode) &&
+            !manuallyHiddenNames.has(el.name);
+        el.meshes.forEach((m) => { m.visible = pass; });
+        if (pass) {
+          visible.push(el);
+          sumArea += el.areaM2;
+          sumTris += el.triangles;
+        }
+      });
+
+      document.getElementById('kpi-elements').textContent = `${visible.length} / ${elements.length}`;
+      document.getElementById('kpi-tris').textContent = sumTris.toLocaleString();
+      document.getElementById('kpi-area').textContent = `${sumArea.toFixed(1)} m²`;
+      applyFederationColors();
+      renderBoqTable(visible);
+    }
+
+    function applyFederationColors() {
+      const legendEl = document.getElementById('legend-overlay');
+      const legendGrid = document.getElementById('legend-grid');
+      const legendTitle = document.getElementById('legend-title');
+
+      elements.forEach((el) => {
+        const isSel = selectedElement && selectedElement.name === el.name;
+        el.meshes.forEach((m) => {
+          if (isSel) { m.material = selMat; return; }
+          if (xrayMode && selectedElement) { m.material = ghostMat; return; }
+          if (colorMode === 'pbr') m.material = m.userData.origMat;
+          else if (colorMode === 'wireframe') m.material = wireMat;
+          else if (colorMode === 'ifc') m.material = getFedMat(colorMaps.ifc[el.ifcClass] || '#94a3b8');
+          else if (colorMode === 'csi') m.material = getFedMat(colorMaps.csi[el.csiCode] || '#94a3b8');
+          else if (colorMode === 'storey') m.material = getFedMat(colorMaps.storey[el.storeyId] || '#94a3b8');
+          else if (colorMode === 'discipline') m.material = getFedMat(colorMaps.discipline[el.discipline] || '#94a3b8');
+        });
+      });
+
+      if (colorMode === 'pbr' || colorMode === 'wireframe') {
+        legendEl.style.display = 'none';
+      } else {
+        legendEl.style.display = 'block';
+        legendTitle.textContent = `Color By ${colorMode.toUpperCase()}`;
+        const mapObj = colorMaps[colorMode] || {};
+        legendGrid.innerHTML = Object.entries(mapObj).slice(0, 14).map(([k, col]) =>
+          `<div class="legend-item"><span class="swatch" style="background:${col};"></span><span>${k}</span></div>`
+        ).join('');
+      }
+    }
+
+    function selectElement(el, flyTo = false) {
+      selectedElement = el;
+      if (selectionBoxHelper) { scene.remove(selectionBoxHelper); selectionBoxHelper = null; }
+      if (!el) {
+        document.getElementById('insp-class-badge').textContent = 'No Selection';
+        applyFederationColors();
+        return;
+      }
+
+      document.getElementById('insp-class-badge').textContent = el.ifcClass;
+      document.getElementById('prop-name').textContent = el.name;
+      document.getElementById('prop-guid').textContent = el.globalId;
+      document.getElementById('prop-bldg').textContent = BUILDING_NAMES[el.buildingId] || el.buildingId;
+      document.getElementById('prop-storey').textContent = STOREY_NAMES[el.storeyId] || el.storeyId;
+      document.getElementById('prop-disc').textContent = `${el.discipline} — ${el.disciplineName}`;
+      document.getElementById('prop-ifc').textContent = `${el.ifcClass} (${el.predefinedType})`;
+      document.getElementById('prop-csi').textContent = `${el.csiCode} · ${el.csiTitle}`;
+      document.getElementById('prop-mat').textContent = el.material;
+      const [dx, dy, dz] = el.dimensions;
+      document.getElementById('prop-dims').textContent = `${(dx*1000).toFixed(0)} × ${(dy*1000).toFixed(0)} × ${(dz*1000).toFixed(0)} mm`;
+      document.getElementById('prop-elev').textContent = `EL +${el.bboxMin[2].toFixed(3)}m .. +${el.bboxMax[2].toFixed(3)}m`;
+      document.getElementById('prop-qto').textContent = `${el.areaM2.toFixed(2)} m² | ${el.volumeM3.toFixed(3)} m³`;
+      document.getElementById('prop-topo').textContent = `${el.vertices} verts / ${el.triangles} tris`;
+      document.getElementById('prop-notes').textContent = el.specNotes;
+
+      // Render LOD-400 Parametric Construction Assembly Card!
+      const asmBody = document.getElementById('asm-body');
+      const asmBadge = document.getElementById('asm-code-badge');
+      const asm = el.assemblyCode && bimData.assemblies ? bimData.assemblies[el.assemblyCode] : null;
+      if (asm) {
+        asmBadge.textContent = `${asm.code} (${asm.totalThicknessMm}mm)`;
+        const detailSheet = (asm.code === 'GLZ-01' || asm.code === 'STR-01') ? 'A-502' : (asm.code === 'LGT-01' ? 'A-104' : 'A-501');
+        asmBody.innerHTML = `
+          <div style="color:#f8fafc; font-weight:700; margin-bottom:4px;">${asm.title}</div>
+          <div style="font-family:var(--font-mono); font-size:9.5px; color:var(--accent); margin-bottom:6px;">U-Value: ${asm.uValue} · ${asm.fireRating}</div>
+          ${asm.layers.map((l) => `<div class="asm-layer-row"><span>${l.seq}. ${l.material}</span><span class="asm-layer-thk">${l.thicknessMm}mm</span></div>`).join('')}
+          <div style="margin-top:6px;"><a class="mini-btn" href="./drawings/index.html#${detailSheet}" style="text-decoration:none; color:var(--accent-gold); border-color:var(--accent-gold);">📐 Open LOD-400 Detail Sheet ${detailSheet} ↗</a></div>
+        `;
+      } else {
+        asmBadge.textContent = 'LOD-300';
+        asmBody.textContent = 'Direct 3D modeled component (no laminated envelope assembly assigned).';
+      }
+
+      if (el.meshes.length > 0) {
+        selectionBoxHelper = new THREE.BoxHelper(el.meshes[0], 0xf59e0b);
+        scene.add(selectionBoxHelper);
+        if (flyTo) zoomToElement(el);
+      }
+      applyFederationColors();
+      document.querySelectorAll('#boq-tbody tr').forEach((tr) => tr.classList.toggle('selected', tr.dataset.name === el.name));
+    }
+
+    function zoomToElement(el) {
+      if (!el || !el.meshes.length) return;
+      const box = new THREE.Box3();
+      el.meshes.forEach((m) => box.expandByObject(m));
+      const c = box.getCenter(new THREE.Vector3());
+      const sz = box.getSize(new THREE.Vector3());
+      const d = Math.max(sz.x, sz.y, sz.z, 1.8) * 2.1;
+      controls.target.copy(c);
+      activeCam.position.copy(c).add(new THREE.Vector3(-0.7, 0.55, 0.85).normalize().multiplyScalar(d));
+      controls.update();
+    }
+
+    // Raycast Click Selection & 3D Laser Tape Measure
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    let downPos = { x: 0, y: 0 };
+    renderer.domElement.addEventListener('pointerdown', (e) => { downPos = { x: e.clientX, y: e.clientY }; });
+    renderer.domElement.addEventListener('pointerup', (e) => {
+      if (Math.hypot(e.clientX - downPos.x, e.clientY - downPos.y) > 5) return;
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(mouse, activeCam);
+      const hits = raycaster.intersectObjects(allMeshes.filter((m) => m.visible), false);
+      const valid = hits.find((h) => clipPlanes.every((p) => p.distanceToPoint(h.point) >= -0.02));
+      if (measureActive && valid) { handleMeasureClick(valid.point); return; }
+      selectElement(valid && valid.object.userData.bim ? valid.object.userData.bim : null, false);
+    });
+
+    function handleMeasureClick(pt) {
+      const mkr = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 12), new THREE.MeshBasicMaterial({ color: 0xf59e0b, depthTest: false }));
+      mkr.position.copy(pt);
+      measureGroup.add(mkr);
+      const statusEl = document.getElementById('measure-status-text');
+      if (!measurePtA) {
+        measurePtA = pt.clone();
+        statusEl.innerHTML = `Point A locked (EL +${pt.y.toFixed(2)}m) — click Point B...`;
+      } else {
+        const dM = measurePtA.distanceTo(pt);
+        const ken = (dM / 1.82).toFixed(2);
+        const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([measurePtA, pt]), new THREE.LineBasicMaterial({ color: 0xf59e0b, depthTest: false }));
+        measureGroup.add(line);
+        const summary = `${(dM * 1000).toFixed(0)}mm (${mToFtIn(dM)} · ${ken} ken) | ΔEL ${(pt.y - measurePtA.y).toFixed(2)}m`;
+        statusEl.innerHTML = `<strong>${summary}</strong>`;
+        const row = document.createElement('div');
+        row.style.cssText = 'background:var(--bg-dark); border:1px solid var(--border); padding:4px 7px; border-radius:4px; font-family:var(--font-mono); font-size:10px; color:var(--accent-gold);';
+        row.textContent = `📏 ${summary}`;
+        document.getElementById('measure-history-list').prepend(row);
+        measurePtA = null;
+      }
+    }
+
+    function toggleMeasureMode() {
+      measureActive = !measureActive; measurePtA = null;
+      document.getElementById('btn-measure-tool').classList.toggle('active', measureActive);
+      document.getElementById('btn-toggle-measure-side').classList.toggle('active', measureActive);
+      document.getElementById('measure-banner').classList.toggle('active', measureActive);
+    }
+
+    // BOQ Table
+    let sortKey = 'name', sortAsc = true;
+    function renderBoqTable(visible) {
+      const q = document.getElementById('boq-search').value.trim().toLowerCase();
+      let rows = q ? visible.filter((e) => (e.name + e.ifcClass + e.csiCode + e.csiTitle + e.material + (e.assemblyCode || '')).toLowerCase().includes(q)) : [...visible];
+      rows.sort((a, b) => {
+        const va = a[sortKey] ?? '', vb = b[sortKey] ?? '';
+        if (typeof va === 'number') return sortAsc ? va - vb : vb - va;
+        return sortAsc ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va));
+      });
+      document.getElementById('boq-count-label').textContent = `${rows.length} rows`;
+      const tbody = document.getElementById('boq-tbody');
+      const frag = document.createDocumentFragment();
+      rows.forEach((el) => {
+        const tr = document.createElement('tr');
+        tr.dataset.name = el.name;
+        if (selectedElement && selectedElement.name === el.name) tr.classList.add('selected');
+        tr.innerHTML = `<td style="color:#f8fafc;font-weight:600;">${el.name}</td><td style="color:var(--accent);">${el.ifcClass}</td><td>${el.buildingId}</td><td>${el.storeyId}</td><td>${el.csiCode}</td><td>${el.csiTitle}</td><td style="color:var(--accent-gold);">${el.assemblyCode || '—'}</td><td>${el.material}</td><td>${el.areaM2.toFixed(2)}</td><td>${el.volumeM3.toFixed(3)}</td><td>${el.triangles}</td>`;
+        tr.addEventListener('click', () => selectElement(el, true));
+        frag.appendChild(tr);
+      });
+      tbody.innerHTML = ''; tbody.appendChild(frag);
+    }
+
+    // Wire UI Events
+    document.querySelectorAll('.tab-btn').forEach((b) => b.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach((x) => x.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach((x) => x.classList.remove('active'));
+      b.classList.add('active'); document.getElementById(b.dataset.tab).classList.add('active');
+    }));
+    document.querySelectorAll('#color-mode-chips .chip-btn').forEach((b) => b.addEventListener('click', () => {
+      document.querySelectorAll('#color-mode-chips .chip-btn').forEach((x) => x.classList.remove('active'));
+      b.classList.add('active'); colorMode = b.dataset.colormode; applyFederationColors();
+    }));
+
+    function resetAll() {
+      isolatedNames = null; manuallyHiddenNames.clear();
+      ['BLDG-01', 'SITE-01', 'CTX-01'].forEach((b) => visibleBuildings.add(b));
+      ['L00', 'L01', 'L02', 'L03'].forEach((s) => visibleStoreys.add(s));
+      elements.forEach((e) => { visibleIfcClasses.add(e.ifcClass); visibleCsiCodes.add(e.csiCode); });
+      document.querySelectorAll('.left-explorer input[type="checkbox"]').forEach((c) => { c.checked = true; });
+      applyVisibilityFilters();
+    }
+    ['preset-all', 'btn-reset-all', 'btn-all-ifc-on', 'btn-all-csi-on'].forEach((id) => document.getElementById(id).addEventListener('click', resetAll));
+    document.getElementById('preset-house').addEventListener('click', () => { resetAll(); isolatedNames = new Set(elements.filter((e) => e.buildingId !== 'CTX-01').map((e) => e.name)); applyVisibilityFilters(); });
+    document.getElementById('preset-no-roof').addEventListener('click', () => { resetAll(); isolatedNames = new Set(elements.filter((e) => e.buildingId !== 'CTX-01' && e.parentGroup !== 'Roof_Group').map((e) => e.name)); applyVisibilityFilters(); });
+    document.getElementById('preset-struct').addEventListener('click', () => { const s = new Set(['IfcColumn','IfcBeam','IfcFooting','IfcSlab','IfcStairFlight']); isolatedNames = new Set(elements.filter((e) => e.buildingId !== 'CTX-01' && s.has(e.ifcClass)).map((e) => e.name)); applyVisibilityFilters(); });
+    document.getElementById('preset-envelope').addEventListener('click', () => { const s = new Set(['IfcWall','IfcRoof','IfcWindow','IfcDoor']); isolatedNames = new Set(elements.filter((e) => e.buildingId !== 'CTX-01' && s.has(e.ifcClass)).map((e) => e.name)); applyVisibilityFilters(); });
+    document.getElementById('preset-fixtures').addEventListener('click', () => { isolatedNames = new Set(elements.filter((e) => e.ifcClass === 'IfcLightFixture').map((e) => e.name)); applyVisibilityFilters(); });
+
+    // Section Box
+    function syncClip() {
+      const vals = ['ymax','ymin','xmin','xmax','zmin','zmax'].map((k) => parseFloat(document.getElementById('clip-' + k).value));
+      clipPlanes[0].constant = vals[0]; clipPlanes[1].constant = -vals[1];
+      clipPlanes[2].constant = -vals[2]; clipPlanes[3].constant = vals[3];
+      clipPlanes[4].constant = -vals[4]; clipPlanes[5].constant = vals[5];
+      ['ymax','ymin','xmin','xmax','zmin','zmax'].forEach((k, i) => {
+        document.getElementById('val-' + k).textContent = `${vals[i] >= 0 ? '+' : ''}${vals[i].toFixed(2)}m`;
+      });
+    }
+    ['ymax','ymin','xmin','xmax','zmin','zmax'].forEach((k) => document.getElementById('clip-' + k).addEventListener('input', syncClip));
+    function setCut(ymx, ymn, xmn, xmx, zmn, zmx) {
+      [ymx, ymn, xmn, xmx, zmn, zmx].forEach((v, i) => { document.getElementById('clip-' + ['ymax','ymin','xmin','xmax','zmin','zmax'][i]).value = v; });
+      syncClip();
+    }
+    document.getElementById('btn-reset-section').addEventListener('click', () => setCut(9, -1, -18, 18, -18, 18));
+    document.querySelectorAll('[data-cut]').forEach((b) => b.addEventListener('click', () => {
+      const c = b.dataset.cut;
+      if (c === 'none') setCut(9, -1, -18, 18, -18, 18);
+      else if (c === 'plan-1f') setCut(1.25, -1, -6, 6, -6, 6);
+      else if (c === 'plan-2f') setCut(3.55, -1, -6, 6, -6, 6);
+      else if (c === 'sec-aa') setCut(9, -1, -6, 6, -6, 0.50);
+      else if (c === 'sec-bb') setCut(9, -1, -0.40, 6, -6, 6);
+      else if (c === 'house-box') setCut(6.2, -0.5, -5.6, 3.5, -3.5, 4.8);
+    }));
+
+    // Cameras & Views
+    function toggleOrtho() {
+      isOrtho = !isOrtho;
+      const prev = activeCam; activeCam = isOrtho ? orthoCam : perspCam;
+      activeCam.position.copy(prev.position); activeCam.quaternion.copy(prev.quaternion);
+      controls.object = activeCam; controls.update();
+      document.getElementById('btn-cam-ortho').classList.toggle('active', isOrtho);
+    }
+    document.getElementById('btn-cam-ortho').addEventListener('click', toggleOrtho);
+    document.querySelectorAll('[data-view]').forEach((b) => b.addEventListener('click', () => {
+      const v = b.dataset.view; controls.target.set(0, 2.2, 0);
+      if (v === 'TOP') activeCam.position.set(0, 16, 0.01);
+      else if (v === 'SOUTH') activeCam.position.set(0, 2.4, 12);
+      else if (v === 'NORTH') activeCam.position.set(0, 2.4, -12);
+      else if (v === 'WEST') activeCam.position.set(-12, 2.4, 0);
+      else if (v === 'EAST') activeCam.position.set(12, 2.4, 0);
+      else activeCam.position.set(-8.5, 6.2, 9.2);
+      controls.update();
+    }));
+
+    const STATIONS = {
+      EXT_3Q: { p: [-7.8, 2.0, 8.5], t: [0, 2.2, 0] },
+      ENGAWA: { p: [-2.4, 1.6, 6.2], t: [0, 1.8, 2.6] },
+      LIVING: { p: [-2.1, 2.0, 2.1], t: [1.2, 1.6, 0.8] },
+      TATAMI: { p: [-0.65, 1.4, 1.8], t: [-0.65, 1.2, -1.8] },
+      BATH:   { p: [1.5, 1.45, -0.45], t: [1.6, 1.3, -1.8] },
+      LOFT:   { p: [-1.25, 3.35, 0.55], t: [1.4, 3.0, -0.5] },
+      KITTY:  { p: [-0.26, 3.40, -0.45], t: [-0.9, 3.6, -4.5] }
+    };
+    document.getElementById('station-jump-select').addEventListener('change', (e) => {
+      const st = STATIONS[e.target.value]; if (!st) return;
+      activeCam.position.set(...st.p); controls.target.set(...st.t); controls.update();
+    });
+
+    document.getElementById('btn-measure-tool').addEventListener('click', toggleMeasureMode);
+    document.getElementById('btn-toggle-measure-side').addEventListener('click', toggleMeasureMode);
+    document.getElementById('btn-clear-measures').addEventListener('click', () => { measureGroup.clear(); measurePtA = null; document.getElementById('measure-history-list').innerHTML = ''; });
+    document.getElementById('btn-isolate-sel').addEventListener('click', () => { if (!selectedElement) return; isolatedNames = new Set([selectedElement.name]); applyVisibilityFilters(); });
+    document.getElementById('btn-hide-sel').addEventListener('click', () => { if (!selectedElement) return; manuallyHiddenNames.add(selectedElement.name); applyVisibilityFilters(); });
+    document.getElementById('btn-xray-toggle').addEventListener('click', () => { xrayMode = !xrayMode; document.getElementById('btn-xray-toggle').classList.toggle('active', xrayMode); applyFederationColors(); });
+    document.getElementById('btn-insp-zoom').addEventListener('click', () => zoomToElement(selectedElement));
+    document.getElementById('btn-insp-iso-class').addEventListener('click', () => { if (!selectedElement) return; isolatedNames = new Set(elements.filter((e) => e.ifcClass === selectedElement.ifcClass).map((e) => e.name)); applyVisibilityFilters(); });
+    document.getElementById('btn-insp-iso-csi').addEventListener('click', () => { if (!selectedElement) return; isolatedNames = new Set(elements.filter((e) => e.csiCode === selectedElement.csiCode).map((e) => e.name)); applyVisibilityFilters(); });
+    document.getElementById('btn-insp-iso-storey').addEventListener('click', () => { if (!selectedElement) return; isolatedNames = new Set(elements.filter((e) => e.storeyId === selectedElement.storeyId).map((e) => e.name)); applyVisibilityFilters(); });
+
+    document.getElementById('boq-search').addEventListener('input', applyVisibilityFilters);
+    document.querySelectorAll('.boq-table thead th').forEach((th) => th.addEventListener('click', () => {
+      const k = th.dataset.sort; if (sortKey === k) sortAsc = !sortAsc; else { sortKey = k; sortAsc = true; } applyVisibilityFilters();
+    }));
+    const boqDrawer = document.getElementById('boq-drawer');
+    document.getElementById('btn-boq-collapse').addEventListener('click', () => { boqDrawer.className = 'boq-drawer collapsed'; setTimeout(onResize, 200); });
+    document.getElementById('btn-boq-normal').addEventListener('click', () => { boqDrawer.className = 'boq-drawer'; setTimeout(onResize, 200); });
+    document.getElementById('btn-boq-expand').addEventListener('click', () => { boqDrawer.className = 'boq-drawer expanded'; setTimeout(onResize, 200); });
+
+    const sheetModal = document.getElementById('sheet-modal');
+    function openSheetModal(s) {
+      document.getElementById('modal-sheet-title').textContent = `${s.id} — ${s.title}`;
+      document.getElementById('modal-sheet-img').src = `./drawings/${s.file}?v=1.0`;
+      document.getElementById('modal-open-binder').href = `./drawings/index.html#${s.id}`;
+      sheetModal.classList.add('open');
+    }
+    document.getElementById('btn-close-sheet-modal').addEventListener('click', () => sheetModal.classList.remove('open'));
+    sheetModal.addEventListener('click', (e) => { if (e.target === sheetModal) sheetModal.classList.remove('open'); });
+
+    // CSV BOQ & IFC4 STEP Exports
+    document.getElementById('btn-export-csv').addEventListener('click', () => {
+      const hdr = 'Name,GlobalId,IfcClass,Building,Storey,CSI_Code,CSI_Title,Assembly,Material,Area_m2,Volume_m3,Triangles';
+      const rows = [hdr, ...elements.map((e) => `"${e.name}","${e.globalId}","${e.ifcClass}","${e.buildingId}","${e.storeyId}","${e.csiCode}","${e.csiTitle}","${e.assemblyCode || ''}","${e.material}",${e.areaM2},${e.volumeM3},${e.triangles}`)];
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([rows.join('\n')], { type: 'text/csv' }));
+      a.download = '9TS-KOI-ZZ-ZZ-SH-A-0601_9Tsubo_BOQ.csv'; a.click();
+    });
+    document.getElementById('btn-export-ifc').addEventListener('click', () => {
+      const lines = [
+        'ISO-10303-21;', 'HEADER;',
+        "FILE_DESCRIPTION(('ViewDefinition [CoordinationView_V2.0]'),'2;1');",
+        "FILE_NAME('9TS-KOI-ZZ-ZZ-M3-A-0001_9TsuboHouse.ifc','2026-11-22T00:00:00',('Architect'),('Makoto Koizumi / Koizumi Studio'),'Blender 5.2 LTS BIM Pipeline','IFC4 ADD2 TC1','ISO 19650 S4');",
+        "FILE_SCHEMA(('IFC4'));", 'ENDSEC;', 'DATA;',
+        "#1=IFCPROJECT('0NineTsuboProj00000001',$,'9-Tsubo House (Sumire Aoi House, 1999)',$,$,$,$,$,#2);",
+        "#2=IFCUNITASSIGNMENT((#3,#4,#5));",
+        "#3=IFCSIUNIT(*,.LENGTHUNIT.,$,.METRE.);", "#4=IFCSIUNIT(*,.AREAUNIT.,$,.SQUARE_METRE.);", "#5=IFCSIUNIT(*,.VOLUMEUNIT.,$,.CUBIC_METRE.);",
+        "#10=IFCSITE('0NineTsuboSite00000001',$,'33.0m x 32.3m Urban Parcel',$,$,$,$,$,.ELEMENT.,$,$,0.,$,$);",
+        "#20=IFCBUILDING('0NineTsuboBldg00000001',$,'BLDG-01 9-Tsubo Main Residence (3x3 Ken)',$,$,$,$,$,.ELEMENT.,$,$,$);"
+      ];
+      let id = 100;
+      elements.forEach((e) => {
+        lines.push(`#${id}=${e.ifcClass.toUpperCase()}('${e.globalId}',$,'${e.name}','${e.csiCode} ${e.csiTitle} | ${e.assemblyCode || 'LOD300'} | ${e.material}','${e.predefinedType}',$,$,'${e.isoContainer}',.${e.predefinedType}.);`);
+        id++;
+      });
+      lines.push('ENDSEC;', 'END-ISO-10303-21;');
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'application/x-step' }));
+      a.download = '9TS-KOI-ZZ-ZZ-M3-A-0001_9TsuboHouse_IFC4.ifc'; a.click();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+      const k = e.key.toLowerCase();
+      if (k === 'o') toggleOrtho();
+      else if (k === 'm') toggleMeasureMode();
+      else if (k === 'i' && selectedElement) { isolatedNames = new Set([selectedElement.name]); applyVisibilityFilters(); }
+      else if (k === 'h' && selectedElement) { manuallyHiddenNames.add(selectedElement.name); applyVisibilityFilters(); }
+      else if (k === 'x') { xrayMode = !xrayMode; document.getElementById('btn-xray-toggle').classList.toggle('active', xrayMode); applyFederationColors(); }
+      else if (k === 'r') resetAll();
+    });
+
+    function onResize() {
+      const w = container.clientWidth, h = container.clientHeight;
+      if (!w || !h) return;
+      const asp = w / h;
+      perspCam.aspect = asp; perspCam.updateProjectionMatrix();
+      orthoCam.left = -orthoSize * asp; orthoCam.right = orthoSize * asp;
+      orthoCam.top = orthoSize; orthoCam.bottom = -orthoSize; orthoCam.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    }
+    window.addEventListener('resize', onResize);
+    function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, activeCam); }
+
+    initBIM();
+    animate();
+  </script>
+</body>
+</html>

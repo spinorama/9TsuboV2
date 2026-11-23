@@ -1,48 +1,53 @@
-# 9TsuboV2 — 4-Mode WebXR, Apple USDZ & Architectural Digital Twin
+# 9TsuboV2 — WebXR, Apple USDZ, ISO 19650 BIM & 12-Sheet Model-Derived Architectural Drawing Set
 
-- **Live 4-Mode WebXR Experience:** [https://spinorama.github.io/9TsuboV2/](https://spinorama.github.io/9TsuboV2/)
-- **Apple iOS (USDZ) & Android AR Launcher:** [https://spinorama.github.io/9TsuboV2/ar.html](https://spinorama.github.io/9TsuboV2/ar.html)
-- **Changelog:** [CHANGELOG.md](./CHANGELOG.md) (current version: **`v0.5.0`**)
-
-Interactive 3D / WebVR / WebAR / Apple AR Quick Look architectural walkthrough of the **9-Tsubo House (*Sumire Aoi House*, 1999 by Makoto Koizumi / Koizumi Studio)** — built with Blender 5.2 LTS, Three.js (`r170`), WebXR, and Google `<model-viewer>` for **Desktop**, **Apple iPhone / iPad / Vision Pro (Native USDZ)**, **Android Chrome (Pixel 10 Pro WebXR & ARCore)**, and **Meta Quest (Quest 3 & Quest Pro)**.
+Complete architectural digital twin of the **9-Tsubo House (*Sumire Aoi House*, 1999 by Makoto Koizumi / Koizumi Studio — after Makoto Masuzawa's 1952 Minimum House)** featuring a calibrated **4-Mode WebXR Experience**, **Native Apple iOS USDZ & Android AR**, an **ISO 19650 / IFC4 BIM Coordination Viewer**, and a **12-Sheet Model-Derived Construction Drawing Set (`A-000`–`A-601`)** automatically sliced and projected from Blender (`v1.0.0`).
 
 ---
 
-## Mobile / AR Performance Budget (`v0.5.0`)
-| Asset | Scope | Triangles | File Size | Target Platform |
+## 🚀 Live Interactive Deliverables
+
+| Deliverable | Live URL / Path | Key Capabilities |
+| :--- | :--- | :--- |
+| **1. 4-Mode WebXR Experience** | [**`index.html`**](https://spinorama.github.io/9TsuboV2/) | Desktop 3D (`WASD`+mouse), Mobile 1-finger orbit/pinch, Quest VR teleport, Android 1:1 & Tabletop WebXR, Apple iOS Quick Look USDZ auto-launch, `💡 Light` (`[F]`), Hidden-Line (`[L]`), `DIN 1451 / LCARS` (`[T]`) |
+| **2. ISO 19650 / IFC4 BIM Viewer** | [**`bim.html`**](https://spinorama.github.io/9TsuboV2/bim.html) | `893` IFC4 elements (`9_tsubo_bim_metadata.json`) · CSI MasterFormat 2020 trade filters · 6-Plane Section Box · Laser Tape Measure (`mm` / `ft-in` / `ken`) · **LOD-400 Multi-Layer Assembly Inspector** · Live `.IFC` & `.CSV` BOQ export |
+| **3. 12-Sheet Construction Drawing Binder** | [**`drawings/index.html`**](https://spinorama.github.io/9TsuboV2/drawings/index.html) | Interactive pan/zoom/print-to-PDF binder for **12 Vector SVG Architectural Sheets (`A-000`–`A-601`)** automatically derived from `9_tsubo_house.blend` via `bmesh` slicing & orthographic projection |
+| **4. Dedicated Apple & Android AR Launcher** | [**`ar.html`**](https://spinorama.github.io/9TsuboV2/ar.html) | Cross-platform `<model-viewer>` AR page with `1:50` Tabletop & `1:1` Walk-In toggle, native Apple `.usdz` Quick Look links & Android ARCore Scene Viewer fallback |
+| **5. Automated BIM-to-CAD Scripts** | [`scripts/`](./scripts/) | Reproducible Blender 5.2 LTS Python pipeline ([`extract_bim_metadata.py`](./scripts/extract_bim_metadata.py), [`cad_engine.py`](./scripts/cad_engine.py), [`generate_sheets_part1.py`](./scripts/generate_sheets_part1.py), [`generate_sheets_part2.py`](./scripts/generate_sheets_part2.py)) |
+
+---
+
+## ⚡ Hybrid Mobile/AR Performance Budget (`LOD-300 3D → LOD-400 2D`)
+
+Following the **BIMCraft** automated model-to-drawing philosophy, 3D geometry stays strictly capped for instant mobile & AR performance (`≤ 60,000` triangles total), while structural framing, flashing, rebar, cavity insulation, and joinery assemblies are driven parametrically from the BIM model into crisp 2D LOD-400 construction drawings:
+
+| Asset | Scope | Triangles | File Size | Platform |
 | :--- | :--- | ---: | ---: | :--- |
-| [`9_tsubo_house.glb`](./9_tsubo_house.glb) | Full House + Roof + Fixtures + Neighborhood Context | `56,538 tris` | `2.33 MB` | Desktop 3D, Quest VR, Android WebXR |
-| [`assets/9_tsubo_house_1to1.usdz`](./assets/9_tsubo_house_1to1.usdz) | House + Roof + 36 Modeled Light Fixtures (`1:1` Scale) | `10,130 tris` | `278 KB` | Apple iOS / iPadOS / visionOS Quick Look (`1:1` Walk) |
-| [`assets/9_tsubo_house_tabletop.usdz`](./assets/9_tsubo_house_tabletop.usdz) | Full Site + Context (`1:50` Tabletop `0.66m × 0.65m`) | `56,538 tris` | `2.11 MB` | Apple iOS / iPadOS / visionOS Quick Look (Tabletop) |
-| [`assets/9_tsubo_house_1to1.glb`](./assets/9_tsubo_house_1to1.glb) | House + Roof + Fixtures (`1:1` Scale) | `10,130 tris` | `792 KB` | Android `<model-viewer>` / Scene Viewer (`1:1`) |
-| [`assets/9_tsubo_house_tabletop.glb`](./assets/9_tsubo_house_tabletop.glb) | Full Site + Context (`1:50` Tabletop) | `56,538 tris` | `2.32 MB` | Android `<model-viewer>` / Scene Viewer (Tabletop) |
-
-> Strictly capped under `60,000` triangles total (`~10k` house mesh) for instantaneous mobile loading and 60fps AR tracking.
+| [`9_tsubo_house.glb`](./9_tsubo_house.glb) | Full House + Roof + 36 Modeled Fixtures + Neighborhood Context | `56,538 tris` | `2.33 MB` | Desktop 3D, Quest VR, Android WebXR, BIM Viewer |
+| [`assets/9_tsubo_house_1to1.usdz`](./assets/9_tsubo_house_1to1.usdz) | House + Roof + Fixtures (`1:1` True Walk-In Scale) | `10,130 tris` | `278 KB` | Apple iPhone / iPad / Vision Pro Quick Look (`1:1`) |
+| [`assets/9_tsubo_house_tabletop.usdz`](./assets/9_tsubo_house_tabletop.usdz) | Full Site + Context (`1:50` Architectural Tabletop `0.66m × 0.65m`) | `56,538 tris` | `2.11 MB` | Apple iPhone / iPad / Vision Pro Quick Look (Tabletop) |
+| [`assets/9_tsubo_house_1to1.glb`](./assets/9_tsubo_house_1to1.glb) | House + Roof + Fixtures (`1:1` Scale) | `10,130 tris` | `792 KB` | Android `<model-viewer>` / ARCore Scene Viewer |
+| [`assets/9_tsubo_house_tabletop.glb`](./assets/9_tsubo_house_tabletop.glb) | Full Site + Context (`1:50` Tabletop) | `56,538 tris` | `2.32 MB` | Android `<model-viewer>` / ARCore Scene Viewer |
 
 ---
 
-## 4 Viewing Modes + Apple USDZ Support (`index.html` & `ar.html`)
+## 📐 12-Sheet Model-Derived Construction Drawing Set ([`drawings/`](./drawings/index.html))
 
-1. **Mode 1 — Browser 3D View (`🖥️ 1 · 3D View`)**
-   - **Phone / Mobile Touch:** True **1-finger 360° orbit**, **2-finger pinch-to-zoom**, and **2-finger pan** around each viewpoint's focal pivot.
-   - **Desktop Mouse & Keyboard:** Left-drag to look (`360°`), Right/Middle-drag or `Shift`+drag to pan, Scroll wheel to zoom, **`WASD` / Arrows** to walk, **`E`/`Space`** & **`Q`/`C`** up/down, **`Shift`** sprint.
-   - **Calibrated Lighting & Modeled Fixtures (`💡 Light` / `[F]`):** Cycles between **Daylight (`0.88`)**, **Warm Evening (`0.84`)**, and **Soft AR (`0.76`)** with warm 2700K point lights anchored directly inside the 36 modeled Koizumi architectural fixtures (pendants, track rails, tatami hinoki drum, cove LED, wall sconces, wet-rated bath downlights).
-   - **Quick Toggles:** `🏠 Roof`, `🌳 Context`, `💡 Light`, `✏️ Lines` (Hidden-Line CAD `[L]`), `📐 Style` (DIN 1451 vs. LCARS `[T]`), `🍎/🤖 AR` (`ar.html`), and `📋 v0.5`.
-
-2. **Mode 2 — Full VR (`🥽 2 · Quest VR`)**
-   - `immersive-vr` (`local-floor`) with floor point-and-teleport laser reticle, thumbstick walk/snap-turn, and floating 3D VR HUD.
-
-3. **Mode 3 — 1:1 Scale AR Walk (`📱 3 · 1:1 AR Walk` — Android WebXR & Apple USDZ Quick Look)**
-   - **Android Chrome:** Native WebXR `immersive-ar` at true `1:1` scale with calibrated soft AR passthrough exposure (no whiteout!).
-   - **Apple iPhone / iPad / Vision Pro:** Launches native Apple AR Quick Look directly via [`assets/9_tsubo_house_1to1.usdz`](./assets/9_tsubo_house_1to1.usdz) (`#allowsContentScaling=0`) for life-size walk-in AR.
-
-4. **Mode 4 — Tabletop AR (`🏡 4 · Tabletop AR` — Android WebXR, Quest Passthrough & Apple USDZ)**
-   - **Android Chrome / Quest:** Displays the full `33m × 32.3m` site auto-scaled to fit your viewport with 2-finger pinch scaling and 1-finger rotation.
-   - **Apple iPhone / iPad / Vision Pro:** Launches native Apple AR Quick Look with [`assets/9_tsubo_house_tabletop.usdz`](./assets/9_tsubo_house_tabletop.usdz) pre-scaled cleanly to `1:50` (`0.66m × 0.65m` architectural tabletop model with pinch zoom).
+1. **[`A-000_Cover_Index.svg`](./drawings/A-000_Cover_Index.svg)** — Cover Sheet, Drawing Index, Model-Projected Axonometric, Project Data & Hybrid LOD-300/400 Pipeline Spec
+2. **[`A-100_Site_Context_Plan.svg`](./drawings/A-100_Site_Context_Plan.svg)** — Site & Neighborhood Context Plan (`1:100`, parcel setbacks, Sakura tree & Tuxedo Kitty sightline)
+3. **[`A-101_First_Floor_Plan.svg`](./drawings/A-101_First_Floor_Plan.svg)** — First Floor Plan (`1:50`, `bmesh` cut @ `EL +1.250m`, `3×3 ken` grid, 3-tier dimensions, room/door/window tags)
+4. **[`A-102_Second_Floor_Loft_Plan.svg`](./drawings/A-102_Second_Floor_Loft_Plan.svg)** — Second Floor Loft & Mezzanine Plan (`1:50`, `bmesh` cut @ `EL +3.550m`, double-height void & `W-02` sliding window)
+5. **[`A-103_Roof_Structural_Framing_Plan.svg`](./drawings/A-103_Roof_Structural_Framing_Plan.svg)** — Roof Drainage Plan & *Zairai-koho* Structural Timber Framing Plan (`1:50`)
+6. **[`A-104_Reflected_Ceiling_Lighting_Plan.svg`](./drawings/A-104_Reflected_Ceiling_Lighting_Plan.svg)** — 1F & 2F Reflected Ceiling & Architectural Lighting Plan (`1:50`, all 36 modeled fixtures `L-01`–`L-09` & luminaire schedule)
+7. **[`A-201_Exterior_Elevations.svg`](./drawings/A-201_Exterior_Elevations.svg)** — Exterior Elevations (`1:50`, South, West, North & East true orthographic 3D projections)
+8. **[`A-301_Building_Sections.svg`](./drawings/A-301_Building_Sections.svg)** — Building Sections A-A (E–W) & B-B (N–S) (`1:50`, `bmesh` cuts + below-grade RC footings + detail callouts)
+9. **[`A-401_Enlarged_Interior_Plans_Elevations.svg`](./drawings/A-401_Enlarged_Interior_Plans_Elevations.svg)** — Enlarged `1:25` Kitchen, 3-Zone Bathroom Suite & Tatami Plans + Interior Elevations
+10. **[`A-501_Wall_Section_Envelope_Details.svg`](./drawings/A-501_Wall_Section_Envelope_Details.svg)** — Typical Full-Height Wall Section (`1:15`) & Foundation Plinth/Engawa Pier, Vented Eave/Gutter & Ridge Beam/Column Cap Details (`1:10`)
+11. **[`A-502_Glazing_Stair_Guardrail_Details.svg`](./drawings/A-502_Glazing_Stair_Guardrail_Details.svg)** — 2-Story Shoji Curtain Wall (`1:8`), `W-02` Sliding Window Flashing (`1:5`), Open-Riser Stair Stringer (`1:10`) & Cable Guardrail (`1:10`) Details
+12. **[`A-601_Schedules_BIM_QTO.svg`](./drawings/A-601_Schedules_BIM_QTO.svg)** — Door, Window/Shoji & Room Finish Schedules + IFC4 Performance Cap Audit & CSI MasterFormat 2020 Quantity Take-Off
 
 ---
 
-## Verification Renders (`v0.5.0` Calibrated Lighting & Modeled Fixtures)
+## 📸 Verification Renders (`v1.0.0` Calibrated Lighting & Modeled Fixtures)
 | Exterior Three-Quarter (`Cam_01`) | Living, Dining & Kitchen Fixtures (`Cam_03`) |
 | :---: | :---: |
 | ![Exterior](./renders/01_exterior_three_quarter.png) | ![Interior Living Kitchen](./renders/02_interior_living_kitchen_fixtures.png) |
