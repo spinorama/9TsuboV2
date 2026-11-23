@@ -2,6 +2,8 @@
 *.blend1
 *.blend2
 *.tmp
+__pycache__/
+*.pyc
 
 # Legacy scratch render folder (contains unrelated local backup blends)
 9_tsubo_house_renders/
