@@ -47,9 +47,30 @@ Following the **BIMCraft** automated model-to-drawing philosophy, 3D geometry st
 
 ---
 
-## 📸 Verification Renders (`v1.0.0` Calibrated Lighting & Modeled Fixtures)
-| Exterior Three-Quarter (`Cam_01`) | Living, Dining & Kitchen Fixtures (`Cam_03`) |
-| :---: | :---: |
-| ![Exterior](./renders/01_exterior_three_quarter.png) | ![Interior Living Kitchen](./renders/02_interior_living_kitchen_fixtures.png) |
-| **2F Loft Lounge & Bed (`Cam_05`)** | **1F Tatami Room Fixtures (`Cam_08`)** |
-| ![Interior Loft](./renders/03_interior_loft_lounge.png) | ![Interior Tatami](./renders/04_interior_tatami_fixtures.png) |
+## 📸 All-Camera Render Gallery — Architectural PBR vs. Japanese Summer Anime
+
+All **12 perspective cameras** rendered at `1280×720` in both **Architectural PBR** (`Cycles GPU / OPTIX`, AgX, calibrated modeled fixtures — [`renders/current/`](./renders/current/)) and **Japanese Summer Anime Style** (`EEVEE` + 3-pass Freestyle ink + Mist/Fog-Glow compositor, sculpted foliage & Sakura, terracotta *kawara* roofs, towering summer cumulus sky — [`renders/anime/`](./renders/anime/)).
+
+### Exterior & Neighborhood Context
+| Camera | Architectural PBR (`Cycles`) | Japanese Summer Anime (`EEVEE + Freestyle`) |
+| :--- | :---: | :---: |
+| **01. Three-Quarter Street** (`Cam_01`) | ![Cam 01 PBR](./renders/current/01_Cam_01_Ext_ThreeQuarter.png) | ![Cam 01 Anime](./renders/anime/01_Cam_01_Ext_ThreeQuarter.png) |
+| **02. Front Low-Angle & Deck** (`Cam_02`) | ![Cam 02 PBR](./renders/current/02_Cam_02_Ext_FrontLowAngle.png) | ![Cam 02 Anime](./renders/anime/02_Cam_02_Ext_FrontLowAngle.png) |
+| **04. South Elevation & Sakura** (`Cam_04`) | ![Cam 04 PBR](./renders/current/04_Cam_04_Ext_FrontElevation.png) | ![Cam 04 Anime](./renders/anime/04_Cam_04_Ext_FrontElevation.png) |
+| **10. Aerial Context Overview** (`Cam_12`) | ![Cam 12 PBR](./renders/current/10_Cam_12_Context_Overview.png) | ![Cam 12 Anime](./renders/anime/10_Cam_12_Context_Overview.png) |
+
+### Interior Architecture & Fixtures
+| Camera | Architectural PBR (`Cycles`) | Japanese Summer Anime (`EEVEE + Freestyle`) |
+| :--- | :---: | :---: |
+| **03. Kitchen, Pendant & Loft** (`Cam_03`) | ![Cam 03 PBR](./renders/current/03_Cam_03_Int_KitchenAndLoft.png) | ![Cam 03 Anime](./renders/anime/03_Cam_03_Int_KitchenAndLoft.png) |
+| **05. 2F Loft Lounge & Bed** (`Cam_05`) | ![Cam 05 PBR](./renders/current/05_Cam_05_Int_LoftLoungeAndBed.png) | ![Cam 05 Anime](./renders/anime/05_Cam_05_Int_LoftLoungeAndBed.png) |
+| **06. High-Angle Dining & Deck** (`Cam_06`) | ![Cam 06 PBR](./renders/current/06_Cam_06_Int_HighAngleDiningKitchen.png) | ![Cam 06 Anime](./renders/anime/06_Cam_06_Int_HighAngleDiningKitchen.png) |
+| **07. Loft to Bed & Stairs** (`Cam_07`) | ![Cam 07 PBR](./renders/current/07_Cam_07_Int_LoftToBedAndStairs.png) | ![Cam 07 Anime](./renders/anime/07_Cam_07_Int_LoftToBedAndStairs.png) |
+| **08. 1F Tatami Room** (`Cam_08`) | ![Cam 08 PBR](./renders/current/08_Cam_08_Int_TatamiRoom.png) | ![Cam 08 Anime](./renders/anime/08_Cam_08_Int_TatamiRoom.png) |
+| **09. Bathroom Suite** (`Cam_09`) | ![Cam 09 PBR](./renders/current/09_Cam_09_Int_Bathroom.png) | ![Cam 09 Anime](./renders/anime/09_Cam_09_Int_Bathroom.png) |
+
+### Neighbor's Tuxedo Kitty Sightlines
+| Camera | Architectural PBR (`Cycles`) | Japanese Summer Anime (`EEVEE + Freestyle`) |
+| :--- | :---: | :---: |
+| **11. Bed Window to Kitty** (`Cam_13`) | ![Cam 13 PBR](./renders/current/11_Cam_13_Int_BedWindow_To_Kitty.png) | ![Cam 13 Anime](./renders/anime/11_Cam_13_Int_BedWindow_To_Kitty.png) |
+| **12. Exterior Kitty Close-Up** (`Cam_14`) | ![Cam 14 PBR](./renders/current/12_Cam_14_Ext_RearWindow_And_Kitty.png) | ![Cam 14 Anime](./renders/anime/12_Cam_14_Ext_RearWindow_And_Kitty.png) |
