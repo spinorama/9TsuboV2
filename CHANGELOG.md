@@ -3,10 +3,29 @@
 All notable versions, Blender refinements, WebXR/AR/USDZ releases, and BIM drawing milestones for the **9-Tsubo House (*Sumire Aoi House*, 1999 by Makoto Koizumi / Koizumi Studio)**.
 
 - **Repository:** [https://github.com/spinorama/9TsuboV2](https://github.com/spinorama/9TsuboV2)
-- **Live 4-Mode WebXR App:** [https://spinorama.github.io/9TsuboV2/](https://spinorama.github.io/9TsuboV2/) ([🌸 Direct Anime Mode Launch](https://spinorama.github.io/9TsuboV2/?anime=1))
+- **Live 4-Mode WebXR App (Anime Default):** [https://spinorama.github.io/9TsuboV2/](https://spinorama.github.io/9TsuboV2/) ([🏛️ PBR Mode](https://spinorama.github.io/9TsuboV2/?pbr=1) · [🏡 Tabletop Diorama](https://spinorama.github.io/9TsuboV2/?tabletop=1))
 - **ISO 19650 / IFC4 BIM Viewer:** [https://spinorama.github.io/9TsuboV2/bim.html](https://spinorama.github.io/9TsuboV2/bim.html)
 - **12-Sheet Construction Drawing Binder:** [https://spinorama.github.io/9TsuboV2/drawings/index.html](https://spinorama.github.io/9TsuboV2/drawings/index.html)
 - **Apple USDZ & Android AR Launcher:** [https://spinorama.github.io/9TsuboV2/ar.html](https://spinorama.github.io/9TsuboV2/ar.html)
+
+---
+
+## [v1.2.0] — 2026-11-23 (Anime Default, Non-AR Tabletop Diorama, Mobile Orbit/Walk Toggle & Overhauled VR/AR Locomotion)
+### Changed & Added
+- **Japanese Summer Anime Default & Clean DIN 1451 UI:**
+  - Japanese Summer Anime Mode (cel-shading, architectural + organic ink outlines, and procedural cumulus sky) is now **ON by default** on initial load (toggle back to Architectural PBR with `🌸 Anime` / `[V]` or `?pbr=1` / `?anime=0`).
+  - Completely removed the legacy LCARS UI option, CSS theme, `[T]` hotkey, and audio chirp; standardized on clean German **DIN 1451** Technical E-Ink Paper styling.
+- **Contextual Non-AR Tabletop Diorama Toggle (`🏡 Tabletop` / Hotkey `[M]` & VR 3D HUD button):**
+  - Keeps the 4-Mode selector strictly 4 views while offering a contextual exhibition-plinth maquette toggle inside **Desktop 3D**, **Mobile 3D**, and **Meta Quest VR** (auto-hidden in AR Modes 3 & 4).
+  - Features a stepped architectural plinth dynamically fitted to either the **Full Site** (`33m × 32m`) or **House Maquette** (`~9m × 8.5m`), turntable **Auto-Spin**, **Cutaway Roof**, **Full Site / House Only** toggle, pitch-clamped exhibition orbit, and waist-high interactive VR miniature manipulation.
+- **Mobile & Desktop Orbit ↔ First-Person Walk Toggle (`🔄 Nav: Orbit` ↔ `🚶 Nav: Walk` / Hotkey `[N]`):**
+  - Mobile/touch users can now switch seamlessly between **360° Orbit** and **First-Person Walk** featuring a tactile bottom-left analog virtual joystick (independent multi-touch ID so you can walk with your left thumb and drag-look with your right thumb simultaneously) plus a bottom-right `▲ UP / ▼ DN / ↺ 30° / ↻ 30°` elevation & turn pad.
+  - Desktop users also gain true Orbit vs. First-Person Walk mouse/wheel switching.
+- **Overhauled Meta Quest VR & Android WebXR AR Interactive Movement:**
+  - **Non-Escapable Quest VR 3D HUD:** Moved from `rig` into world-space with an expanded 2-row × 4-button DIN 1451 command panel, live 3D laser cursor dot & button hover states, **Auto-Follow Guard** (smoothly glides back into view when walking or turning away), and instant summon/re-center via **`Y`/`B`** or **Thumbstick Click**.
+  - **Parabolic Teleport Arc & Step-Following:** Upgraded VR teleport to a 24-segment gravity parabola colliding against all visible opaque meshes (excluding hidden roof/context groups), with headset XZ offset compensation so your physical feet land directly on the reticle, multi-runtime thumbstick auto-detection (`axes[2,3]` vs `axes[0,1]`), smooth deck/stair step-climbing raycast, and head-centered `30°` snap turning.
+  - **1:1 AR Walk (`Mode 3`):** Added on-screen touch virtual joystick, `▲/▼` elevation climbing, head-aligned room anchoring (faces the chosen viewpoint immediately), and viewer-centered turning.
+  - **Tabletop AR (`Mode 4`):** Eliminated accidental WebXR `selectstart` model jumps, added **2-finger spatial pan/lift** alongside 1-finger spin & 2-finger pinch scale, plus explicit `⬆️ Raise` / `⬇️ Lower` / `📍 Place on Surface` controls.
 
 ---
 
