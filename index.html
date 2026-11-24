@@ -103,7 +103,7 @@
       flex-direction: column;
       gap: 6px;
       width: 100%;
-      max-width: 1180px;
+      max-width: 1420px;
       min-width: 0;
       margin: 0 auto;
       pointer-events: none;
@@ -113,13 +113,14 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      flex-wrap: wrap;
+      gap: 6px 10px;
       background: var(--bg-panel);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       border: var(--border-width) solid var(--border-main);
       border-radius: var(--radius-panel);
-      padding: 7px 12px;
+      padding: 6px 11px;
       pointer-events: auto;
       box-shadow: var(--shadow-panel);
       position: relative;
@@ -129,7 +130,8 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      min-width: 0;
+      min-width: 190px;
+      flex-shrink: 0;
     }
 
     .status-dot {
@@ -245,6 +247,41 @@
       border-color: #091526;
     }
 
+    .btn.editorial-btn.toggle-on {
+      background: #1c1917;
+      color: #fafaf9;
+      border-color: #1c1917;
+    }
+
+    .btn.doors-btn.toggle-on {
+      background: #d97706;
+      color: #ffffff;
+      border-color: #050505;
+    }
+
+    /* Interactive Door / Pocket / Shoji Hover Pill */
+    #door-tooltip {
+      position: fixed;
+      z-index: 40;
+      pointer-events: none;
+      display: none;
+      background: rgba(28, 25, 23, 0.94);
+      color: #fafaf9;
+      border: 1.5px solid #f59e0b;
+      padding: 5px 9px;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      box-shadow: 3px 3px 0 rgba(5, 5, 5, 0.45);
+      white-space: nowrap;
+      transform: translate(14px, -50%);
+    }
+    #door-tooltip .tt-action {
+      color: #fbbf24;
+      margin-left: 6px;
+    }
+
     .btn.tabletop-btn.toggle-on {
       background: #fbbf24;
       color: #050505;
@@ -264,8 +301,8 @@
     }
 
     .btn-sm {
-      font-size: 10.5px;
-      padding: 5.5px 7.5px;
+      font-size: 10px;
+      padding: 5px 6.5px;
     }
 
     /* AR & Non-AR Tabletop Contextual Action Bars */
@@ -408,7 +445,7 @@
       flex-direction: column;
       gap: 8px;
       width: 100%;
-      max-width: 1180px;
+      max-width: 1420px;
       min-width: 0;
       margin: 0 auto;
       pointer-events: none;
@@ -701,9 +738,12 @@
   <!-- Loading Screen -->
   <div id="loading-screen">
     <div class="spinner"></div>
-    <div id="loading-text">DIN 1451 CAD · LOADING 9-TSUBO HOUSE (ANIME WEBXR)...</div>
-    <div id="loading-sub">13 CAMERAS · JAPANESE SUMMER ANIME · WEBXR VR + 1:1 AR + TABLETOP</div>
+    <div id="loading-text">DIN 1451 CAD · LOADING 9-TSUBO HOUSE v2.0 (EDITORIAL WEBXR)...</div>
+    <div id="loading-sub">13 CAMERAS · 16 INTERACTIVE POCKET/SLIDING RIGS · SOFT-PBR + WHISPER INK</div>
   </div>
+
+  <!-- Interactive Hover Tooltip for Operable Pocket Doors, Shoji & Fusuma -->
+  <div id="door-tooltip"></div>
 
   <!-- 3D WebGL / WebXR Canvas Container -->
   <div id="canvas-container"></div>
@@ -720,21 +760,23 @@
           <span id="status-dot" class="status-dot"></span>
           <div class="brand-text">
             <div class="brand-title">9-TSUBO HOUSE · KOIZUMI STUDIO (1999)</div>
-            <div id="status-sub" class="brand-sub">JAPANESE SUMMER ANIME DEFAULT · 13 CAMERAS READY</div>
+            <div id="status-sub" class="brand-sub">EDITORIAL HYBRID (SOFT-PBR + WHISPER INK) · CLICK DOORS TO SLIDE</div>
           </div>
         </div>
         <div class="quick-toggles">
-          <button id="btn-toggle-anime" class="btn btn-sm anime-btn toggle-on" title="Toggle Japanese Summer Anime Cel-Shading vs Architectural PBR (Hotkey: V)">🌸 Anime: ON</button>
+          <button id="btn-toggle-anime" class="btn btn-sm editorial-btn toggle-on" title="Cycle Visual Look: Editorial Hybrid / Japanese Anime / Soft-PBR / CAD Paper (Hotkey: V)">✨ Style: Editorial</button>
+          <button id="btn-toggle-doors" class="btn btn-sm doors-btn" title="Cycle All 16 Interactive Pocket Doors, Shoji &amp; Fusuma: Rest / All Open / All Closed (Hotkey: O)">🚪 Doors: Rest</button>
           <button id="btn-toggle-tabletop" class="btn btn-sm tabletop-btn" title="Toggle Non-AR Tabletop Diorama Model in 3D &amp; VR Views (Hotkey: M)">🏡 Tabletop: OFF</button>
           <button id="btn-toggle-nav" class="btn btn-sm nav-btn" title="Switch Navigation: Orbit vs First-Person Walk (Hotkey: N)">🔄 Nav: Orbit</button>
           <button id="btn-toggle-roof" class="btn btn-sm toggle-on" title="Toggle Roof_Group">🏠 Roof: ON</button>
           <button id="btn-toggle-context" class="btn btn-sm toggle-on" title="Toggle Context_Group">🌳 Context: ON</button>
-          <button id="btn-toggle-lighting" class="btn btn-sm toggle-on" title="Cycle PBR Lighting: Daylight / Warm Evening / Soft AR (Hotkey: F)">💡 Light: Day</button>
-          <button id="btn-toggle-lines" class="btn btn-sm" title="Toggle Subtle Hidden-Line CAD Render (Hotkey: L)">✏️ Lines: OFF</button>
+          <button id="btn-toggle-lighting" class="btn btn-sm toggle-on" title="Cycle Lighting Mood: Day / Golden Hour / Evening / Studio Gallery (Hotkey: F)">💡 Light: Day</button>
+          <button id="btn-toggle-lines" class="btn btn-sm toggle-on" title="Toggle Whisper Ink Edges / Hidden-Line CAD Paper (Hotkey: L)">✏️ Ink: ON</button>
           <a class="btn btn-sm" href="./bim.html" title="Open ISO 19650 / IFC4 BIM Coordination Viewer" style="text-decoration:none;">🏗️ BIM</a>
           <a class="btn btn-sm" href="./drawings/index.html" title="Open 12-Sheet Model-Derived Architectural Drawing Binder" style="text-decoration:none;">📐 Drawings</a>
           <a class="btn btn-sm" href="./ar.html" title="Dedicated Apple iOS USDZ Quick Look &amp; Android Scene Viewer AR Page" style="text-decoration:none;">🍎/🤖 AR</a>
-          <button id="btn-changelog" class="btn btn-sm" title="View Version Changelog">📋 v1.2</button>
+          <a class="btn btn-sm" href="./hub.html" title="Open Multi-Model Architectural WebXR Hub" style="text-decoration:none;">🏛️ Hub</a>
+          <button id="btn-changelog" class="btn btn-sm" title="View Version Changelog">📋 v2.0</button>
           <button id="btn-exit-xr" class="btn btn-sm danger" style="display:none;">✕ Exit XR</button>
         </div>
       </div>
@@ -802,7 +844,11 @@
           <button id="btn-close-changelog" class="btn btn-sm">✕ Close</button>
         </div>
         <div class="changelog-entry">
-          <div class="changelog-ver">v1.2.0 · 2026-11-23 (Current — Anime Default, Tabletop Diorama, Mobile Walk &amp; Reliable VR/AR Locomotion)</div>
+          <div class="changelog-ver">v2.0.0 · 2026-11-23 (Current — Pass 2 Pocket Doors, Editorial Hybrid Look &amp; 16 Interactive Rigs)</div>
+          <div class="changelog-desc">• <strong>Architectural Editorial Hybrid Default (<code>✨ Style: Editorial</code> / <code>[V]</code>):</strong> Calibrated Soft-PBR with studio <code>RoomEnvironment</code> IBL, ACES Filmic tone mapping, automatic <strong>Whisper Ink</strong> architectural edge lines (28° crease threshold, warm graphite `#1c1917`), and atmospheric sky moods (Day / Golden Hour / Evening / Studio Gallery). Cycle anytime between Editorial Hybrid, Japanese Summer Anime (<code>?anime=1</code>), Soft-PBR, and CAD Paper.<br>• <strong>Pass 2 Interior Upgrades in <code>9_tsubo_house.glb</code> (59,167 tris):</strong> True recessed hollow-wall sliding pocket doors across all 3 bathroom openings (Entry cedar pocket, 2-leaf telescoping WC pocket, widened 640 mm frameless glass shower pocket with concealed tracks &amp; flush pulls), dual-access East Alcove D (Bathroom 3-shelf cedar towel niche + Tatami lower <em>ji-bukuro</em>), operable West <em>oshiire</em> closet with sliding <em>fusuma</em> &amp; <em>nakadana</em> futon shelf, and 3-panel cascading Tatami South <em>shoji</em> on exposed +160 mm cedar platform track.<br>• <strong>16 Live Interactive Doors &amp; Panels (Desktop, Touch &amp; Quest VR):</strong> Hover any operable pocket door, <em>shoji</em>, <em>fusuma</em>, or front door for a subtle amber Whisper-Ink accent &amp; tooltip; click, tap, or pull VR trigger to glide it smoothly along its exact Blender-verified track bounds (or press <code>[O]</code> / <code>🚪 Doors</code> to cycle Rest / All Open / All Closed).</div>
+        </div>
+        <div class="changelog-entry">
+          <div class="changelog-ver">v1.2.0 · 2026-11-23 (Anime Default, Tabletop Diorama, Mobile Walk &amp; Reliable VR/AR Locomotion)</div>
           <div class="changelog-desc">• <strong>Japanese Summer Anime Default &amp; DIN 1451 UI:</strong> Anime cel-shading, ink outlines &amp; cumulus sky are now ON by default (toggle back to PBR with <code>🌸 Anime</code> / <code>[V]</code> or <code>?pbr=1</code>). Retired legacy LCARS UI option in favor of crisp German DIN 1451 technical styling.<br>• <strong>Non-AR Tabletop Diorama Toggle (<code>🏡 Tabletop</code> / <code>[M]</code>):</strong> Contextual exhibition-plinth maquette mode available in Desktop 3D, Mobile 3D &amp; Quest VR (not a 5th view) with turntable auto-spin, cutaway roof, Full Site vs. House Maquette framing, and VR waist-high tabletop manipulation.<br>• <strong>Mobile &amp; Desktop Orbit ↔ First-Person Walk Toggle (<code>🔄 Nav</code> / <code>[N]</code>):</strong> Switch seamlessly between 360° Orbit and First-Person Walk with dual-thumb analog virtual joystick, simultaneous right-thumb look, and elevation/turn pad.<br>• <strong>Overhauled VR &amp; AR Locomotion:</strong> Quest VR gains a non-escapable auto-following &amp; summonable (<code>Y/B</code>) 2-row 3D HUD with live laser cursor, 24-segment parabolic teleport arc with universal opaque mesh collision &amp; headset-offset compensation, multi-runtime thumbsticks with deck/stair step-following, and head-centered snap turning. 1:1 AR Walk adds touch joystick + floor climb + head-aligned room anchoring; Tabletop AR stops stray <code>selectstart</code> jumps and adds 2-finger spatial pan/lift + Raise/Lower controls.</div>
         </div>
         <div class="changelog-entry">
@@ -854,26 +900,33 @@
   <script type="module">
     import * as THREE from 'three';
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
     import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
 
     // =========================================================================
-    // 0. PROCEDURAL WEB AUDIO SYNTHESIZER (German DIN 1451 Mechanical Click)
+    // 0. PROCEDURAL WEB AUDIO SYNTHESIZER (DIN 1451 Click + Pocket/Shoji Glide)
     // =========================================================================
     let audioCtx = null;
+    function ensureAudioCtx() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return null;
+        audioCtx = new AudioContextClass();
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
     function playUISound() {
       try {
-        if (!audioCtx) {
-          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-          if (!AudioContextClass) return;
-          audioCtx = new AudioContextClass();
-        }
-        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const ctx = ensureAudioCtx();
+        if (!ctx) return;
 
-        const now = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
         osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        gain.connect(ctx.destination);
 
         // Crisp DIN 1451 mechanical triangle-wave click (160Hz -> 40Hz)
         osc.type = 'triangle';
@@ -883,6 +936,50 @@
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.028);
         osc.start(now);
         osc.stop(now + 0.028);
+      } catch (_) {}
+    }
+
+    function playDoorSlideSound(isOpening = true, isHinge = false) {
+      try {
+        const ctx = ensureAudioCtx();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+        if (isHinge) {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(isOpening ? 115 : 145, now);
+          osc.frequency.exponentialRampToValueAtTime(isOpening ? 78 : 62, now + 0.09);
+          gain.gain.setValueAtTime(0.06, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.11);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.12);
+          return;
+        }
+        // Soft architectural wood/aluminum pocket-track glide (bandpass-filtered noise)
+        const dur = 0.24;
+        const bufferSize = Math.floor(ctx.sampleRate * dur);
+        const buf = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1);
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(isOpening ? 520 : 680, now);
+        filter.frequency.exponentialRampToValueAtTime(isOpening ? 740 : 420, now + dur);
+        filter.Q.value = 2.4;
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.045, now + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+        src.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+        src.start(now);
+        src.stop(now + dur);
       } catch (_) {}
     }
 
@@ -951,20 +1048,66 @@
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, IS_MOBILE ? 1.75 : 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.88;
+    renderer.toneMappingExposure = 0.96;
     renderer.shadowMap.enabled = !IS_MOBILE;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.xr.enabled = true;
     container.appendChild(renderer.domElement);
 
+    // Studio-calibrated PMREM Image-Based Lighting (gives glass, chrome, wood & plaster crisp bounce!)
+    const pmremGenerator = new THREE.PMREMGenerator(renderer);
+    const editorialEnvTex = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+    scene.environment = editorialEnvTex;
+    scene.environmentIntensity = 0.42;
+
+    // Atmospheric Architectural Gradient Sky Dome (used in Editorial & Soft-PBR; auto-hidden in AR & Anime)
+    const editorialSkyUniforms = {
+      uZenith:  { value: new THREE.Color(0x9fc2e6) },
+      uHorizon: { value: new THREE.Color(0xf4efe8) },
+      uGround:  { value: new THREE.Color(0xddd6cc) }
+    };
+    const editorialSkyDome = new THREE.Mesh(
+      new THREE.SphereGeometry(180, 32, 20),
+      new THREE.ShaderMaterial({
+        side: THREE.BackSide,
+        depthWrite: false,
+        fog: false,
+        uniforms: editorialSkyUniforms,
+        vertexShader: /* glsl */`
+          varying vec3 vDir;
+          void main() {
+            vDir = normalize(position);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: /* glsl */`
+          uniform vec3 uZenith, uHorizon, uGround;
+          varying vec3 vDir;
+          void main() {
+            float y = vDir.y;
+            vec3 col = y >= 0.0
+              ? mix(uHorizon, uZenith, pow(clamp(y, 0.0, 1.0), 0.58))
+              : mix(uHorizon, uGround, smoothstep(0.0, -0.25, y));
+            gl_FragColor = vec4(col, 1.0);
+            #include <colorspace_fragment>
+          }
+        `
+      })
+    );
+    editorialSkyDome.name = 'Editorial_Atmospheric_SkyDome';
+    editorialSkyDome.frustumCulled = false;
+    editorialSkyDome.renderOrder = -1001;
+    editorialSkyDome.raycast = () => {};
+    scene.add(editorialSkyDome);
+
     // =========================================================================
-    // 3. CALIBRATED ARCHITECTURAL LIGHTING RIG (Fixture-Anchored, No AR Blowout)
+    // 3. CALIBRATED ARCHITECTURAL LIGHTING RIG (Editorial Hybrid + Moods + AR)
     // =========================================================================
-    const hemiLight = new THREE.HemisphereLight(0xeef5ff, 0x9b8b7a, 0.58);
+    const hemiLight = new THREE.HemisphereLight(0xf3f7fc, 0x9c8e7e, 0.52);
     hemiLight.position.set(0, 25, 0);
     scene.add(hemiLight);
 
-    const sunLight = new THREE.DirectionalLight(0xfff5e4, 1.25);
+    const sunLight = new THREE.DirectionalLight(0xfff6e8, 1.38);
     sunLight.position.set(-14, 24, 18);
     if (!IS_MOBILE) {
       sunLight.castShadow = true;
@@ -982,7 +1125,7 @@
     scene.add(sunLight);
     scene.add(sunLight.target);
 
-    const fillLight = new THREE.DirectionalLight(0xdbeafe, 0.24);
+    const fillLight = new THREE.DirectionalLight(0xdbeafe, 0.28);
     fillLight.position.set(16, 12, -14);
     scene.add(fillLight);
 
@@ -995,7 +1138,7 @@
       { id: 'L-02 Kitchen Track',      pos: [ 1.62, 2.12,  1.30], baseInt: 0.55, dist: 4.0, mobile: true  },
       { id: 'L-03 Tatami Shoji Drum',  pos: [-0.69, 2.22, -1.66], baseInt: 0.52, dist: 4.0, mobile: false },
       { id: 'L-01B Living Pendant',    pos: [-1.30, 3.16,  1.15], baseInt: 0.45, dist: 4.6, mobile: false },
-      { id: 'L-07/08 Bath Suite',      pos: [ 1.45, 2.20, -1.45], baseInt: 0.42, dist: 3.4, mobile: false }
+      { id: 'L-07/08 Bath Suite',      pos: [ 1.45, 2.20, -1.45], baseInt: 0.48, dist: 3.6, mobile: false }
     ];
     FIXTURE_LIGHT_SPECS.forEach((spec) => {
       if (IS_MOBILE && !spec.mobile) return;
@@ -1010,45 +1153,105 @@
       {
         id: 'day',
         label: '💡 Light: Day',
-        exposure: 0.88,
-        hemi: 0.58,
-        sun: 1.25,
-        fill: 0.24,
-        fixtureMult: 0.72,
-        skyHex: 0xdbeafe
+        exposure: 0.96,
+        envInt: 0.42,
+        hemi: 0.52,
+        sun: 1.38,
+        sunColor: 0xfff6e8,
+        sunPos: [-14, 24, 18],
+        fill: 0.28,
+        fixtureMult: 0.65,
+        skyHex: 0xe9eef4,
+        zenith: 0x9fc2e6,
+        horizon: 0xf4efe8,
+        ground: 0xdcd5cb
       },
       {
-        id: 'warm',
-        label: '💡 Light: Warm',
-        exposure: 0.84,
-        hemi: 0.26,
-        sun: 0.35,
-        fill: 0.12,
-        fixtureMult: 1.65,
-        skyHex: 0x1e293b
+        id: 'golden',
+        label: '💡 Light: Golden',
+        exposure: 0.94,
+        envInt: 0.34,
+        hemi: 0.38,
+        sun: 1.45,
+        sunColor: 0xffc88a,
+        sunPos: [-22, 9, 14],
+        fill: 0.22,
+        fixtureMult: 1.15,
+        skyHex: 0xead8c8,
+        zenith: 0x6c88b3,
+        horizon: 0xf7cfa6,
+        ground: 0xc9b5a3
       },
       {
-        id: 'ar-soft',
-        label: '💡 Light: Soft',
-        exposure: 0.76,
-        hemi: 0.48,
-        sun: 0.82,
-        fill: 0.16,
-        fixtureMult: 0.55,
-        skyHex: 0xe2e8f0
+        id: 'evening',
+        label: '💡 Light: Dusk',
+        exposure: 0.90,
+        envInt: 0.18,
+        hemi: 0.24,
+        sun: 0.30,
+        sunColor: 0x9bb8e8,
+        sunPos: [14, 14, -18],
+        fill: 0.14,
+        fixtureMult: 1.95,
+        skyHex: 0x1e293b,
+        zenith: 0x0f172a,
+        horizon: 0x334155,
+        ground: 0x182030
+      },
+      {
+        id: 'studio',
+        label: '💡 Light: Studio',
+        exposure: 0.92,
+        envInt: 0.55,
+        hemi: 0.62,
+        sun: 0.95,
+        sunColor: 0xffffff,
+        sunPos: [-12, 22, 16],
+        fill: 0.34,
+        fixtureMult: 0.50,
+        skyHex: 0xf2f0ec,
+        zenith: 0xe6e3dc,
+        horizon: 0xf8f6f2,
+        ground: 0xe8e4dc
       }
     ];
+    const AR_SOFT_PROFILE = {
+      id: 'ar-soft',
+      exposure: 0.84,
+      envInt: 0.40,
+      hemi: 0.50,
+      sun: 0.88,
+      sunColor: 0xfff8ee,
+      sunPos: [-14, 24, 18],
+      fill: 0.20,
+      fixtureMult: 0.55,
+      skyHex: 0xe2e8f0,
+      zenith: 0xdbeafe,
+      horizon: 0xf4f4f0,
+      ground: 0xe5e5e0
+    };
     let currentLightingIdx = 0;
 
     const DEFAULT_SUN_POS = new THREE.Vector3(-14, 24, 18);
     const ANIME_SUN_DIR = new THREE.Vector3(0.76, 0.78, 0.58).normalize();
-    const PBR_REQUESTED = URL_PARAMS.get('anime') === '0' || URL_PARAMS.get('anime') === 'false' || URL_PARAMS.get('pbr') === '1';
-    let animeEnabled = !PBR_REQUESTED; // Japanese Summer Anime is the default experience (v1.2.0)
+    // Visual Look Modes: 'editorial' (default Soft-PBR + Whisper Ink) | 'anime' | 'pbr' | 'cad'
+    const STYLE_ORDER = ['editorial', 'anime', 'pbr', 'cad'];
+    const initialStyle = (() => {
+      if (URL_PARAMS.get('anime') === '1' || URL_PARAMS.get('anime') === 'true') return 'anime';
+      if (URL_PARAMS.get('cad') === '1' || URL_PARAMS.get('lines') === '1') return 'cad';
+      if (URL_PARAMS.get('pbr') === '1' || URL_PARAMS.get('editorial') === '0') return 'pbr';
+      return 'editorial';
+    })();
+    let visualStyle = initialStyle;
+    let animeEnabled = (visualStyle === 'anime');
+    let whisperInkEnabled = (visualStyle === 'editorial');
     let animeBuilt = false;
+    let whisperInkBuilt = false;
     let modelLoaded = false;
 
     function applyLightingProfile(profileIdx, isARPassthrough = false) {
       if (animeEnabled) {
+        scene.environment = null;
         renderer.toneMapping = THREE.NoToneMapping;
         renderer.toneMappingExposure = 1.0;
         hemiLight.intensity = 0.0;
@@ -1061,12 +1264,14 @@
         return;
       }
 
-      const p = isARPassthrough ? LIGHTING_PROFILES[2] : LIGHTING_PROFILES[profileIdx];
+      const p = isARPassthrough ? AR_SOFT_PROFILE : LIGHTING_PROFILES[profileIdx];
+      scene.environment = editorialEnvTex;
+      scene.environmentIntensity = p.envInt;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = p.exposure;
       hemiLight.intensity = p.hemi;
-      sunLight.color.setHex(0xfff5e4);
-      sunLight.position.copy(DEFAULT_SUN_POS);
+      sunLight.color.setHex(p.sunColor || 0xfff5e4);
+      sunLight.position.set(...(p.sunPos || [-14, 24, 18]));
       sunLight.target.position.set(0, 0, 0);
       sunLight.intensity = p.sun;
       fillLight.intensity = p.fill;
@@ -1074,6 +1279,9 @@
         pt.intensity = pt.userData.baseInt * p.fixtureMult;
       });
       skyBgColor.setHex(p.skyHex);
+      editorialSkyUniforms.uZenith.value.setHex(p.zenith);
+      editorialSkyUniforms.uHorizon.value.setHex(p.horizon);
+      editorialSkyUniforms.uGround.value.setHex(p.ground);
       applySceneBackgroundForCurrentState();
     }
 
@@ -1236,9 +1444,11 @@
     const btnToggleContext = document.getElementById('btn-toggle-context');
     const btnToggleLighting = document.getElementById('btn-toggle-lighting');
     const btnToggleAnime = document.getElementById('btn-toggle-anime');
+    const btnToggleDoors = document.getElementById('btn-toggle-doors');
     const btnToggleTabletop = document.getElementById('btn-toggle-tabletop');
     const btnToggleNav = document.getElementById('btn-toggle-nav');
     const btnToggleLines = document.getElementById('btn-toggle-lines');
+    const doorTooltip = document.getElementById('door-tooltip');
     const btnChangelog = document.getElementById('btn-changelog');
     const btnCloseChangelog = document.getElementById('btn-close-changelog');
     const changelogModal = document.getElementById('changelog-modal');
@@ -1248,13 +1458,13 @@
 
     function cycleLightingMode() {
       if (animeEnabled) {
-        setAnimeMode(false);
+        setVisualStyle('editorial');
       }
       currentLightingIdx = (currentLightingIdx + 1) % LIGHTING_PROFILES.length;
       const p = LIGHTING_PROFILES[currentLightingIdx];
       btnToggleLighting.textContent = p.label;
       applyLightingProfile(currentLightingIdx, false);
-      setStatus(`PBR LIGHTING PROFILE: ${p.id.toUpperCase()} (EXPOSURE ${p.exposure.toFixed(2)})`);
+      setStatus(`LIGHTING MOOD: ${p.id.toUpperCase()} (EXPOSURE ${p.exposure.toFixed(2)} · IBL ${p.envInt.toFixed(2)})`);
     }
 
     btnToggleLighting.addEventListener('click', (e) => {
@@ -1290,12 +1500,12 @@
       if (currentMode === 1) {
         if (navMode === 'orbit') {
           controlHintLabel.textContent = IS_TOUCH_DEVICE
-            ? 'ORBIT · 1-FINGER: SPIN · PINCH: ZOOM · 2-FINGER: PAN · TAP NAV FOR WALK'
-            : 'ORBIT · DRAG: ORBIT · RIGHT-DRAG: PAN · SCROLL: ZOOM · [N]: WALK · [M]: TABLETOP';
+            ? 'ORBIT · 1-FINGER: SPIN · TAP DOORS TO SLIDE · PINCH: ZOOM'
+            : 'ORBIT · DRAG: ORBIT · CLICK DOORS/SHOJI: SLIDE · [V]: STYLE · [O]: DOORS · [N]: WALK';
         } else {
           controlHintLabel.textContent = IS_TOUCH_DEVICE
-            ? 'FIRST-PERSON WALK · LEFT STICK: MOVE · DRAG: LOOK · ▲/▼: FLOOR'
-            : 'WALK · DRAG: LOOK · WASD / E-Q: MOVE · [N]: ORBIT · [M]: TABLETOP · [V]: ANIME';
+            ? 'WALK · STICK: MOVE · DRAG: LOOK · TAP DOORS TO SLIDE · ▲/▼: FLOOR'
+            : 'WALK · DRAG: LOOK · WASD: MOVE · CLICK DOORS/SHOJI: SLIDE · [V]: STYLE · [O]: DOORS';
         }
       } else if (currentMode === 3) {
         controlHintLabel.textContent = '1:1 AR WALK · WALK PHYSICALLY OR USE JOYSTICK + ▲/▼ TO CLIMB LOFT';
@@ -1649,6 +1859,7 @@
     };
 
     const INDOOR_WHITE_MESH_NAMES = new Set([
+      'AlcoveD_Tatami_UpperWall',
       'Bath_Wall_Front_Header', 'Bath_Wall_Front_Left', 'Bath_Wall_Front_Right',
       'Bath_Wall_West_AlcoveBack', 'Bath_Wall_West_Vanity',
       'Loft_Rail_Post_Front', 'Loft_Rail_Post_Stair', 'Loft_Rail_Top_Rear', 'Loft_Rail_Top_Right',
@@ -2008,104 +2219,383 @@
       });
     }
 
+    // =========================================================================
+    // 5B-2. ARCHITECTURAL EDITORIAL HYBRID ("WHISPER INK") & STYLE CONTROLLER
+    // =========================================================================
+    const whisperInkArchMat = new THREE.LineBasicMaterial({
+      color: 0x1c1917,
+      transparent: true,
+      opacity: 0.24,
+      depthTest: true,
+      depthWrite: false
+    });
+    const whisperInkCtxMat = new THREE.LineBasicMaterial({
+      color: 0x292524,
+      transparent: true,
+      opacity: 0.11,
+      depthTest: true,
+      depthWrite: false
+    });
+    const interactiveHoverEdgeMat = new THREE.LineBasicMaterial({
+      color: 0xf59e0b,
+      transparent: true,
+      opacity: 0.92,
+      depthTest: true,
+      depthWrite: false
+    });
+
+    function buildWhisperInkEdgesIfNeeded() {
+      if (whisperInkBuilt) return;
+      whisperInkBuilt = true;
+      const skipPattern = /foliage|sakura|petal|leaf|blossom|shrub|bush|tree|kitty|bulb|glow|eyeshine|wire|water|towel_roll|gravel|soil/i;
+
+      worldRoot.traverse((child) => {
+        if (!child.isMesh || child.userData.isEdgeHelper || child.userData.isAnimeHelper) return;
+        if (!child.userData.origMaterial) child.userData.origMaterial = child.material;
+        if (!child.userData.origGeometry) child.userData.origGeometry = child.geometry;
+
+        // Subtle PBR calibration for architectural plaster/wood (no plastic gloss)
+        const baseGeo = child.userData.origGeometry;
+        const name = child.name || '';
+        if (!baseGeo || skipPattern.test(name)) return;
+
+        const isCtx = isDescendantOf(child, contextGroup);
+        const edgesGeo = new THREE.EdgesGeometry(baseGeo, isCtx ? 32 : 28);
+        const lineSeg = new THREE.LineSegments(edgesGeo, isCtx ? whisperInkCtxMat : whisperInkArchMat);
+        lineSeg.userData.isEdgeHelper = true;
+        lineSeg.raycast = () => {};
+        lineSeg.visible = false;
+        child.add(lineSeg);
+        child.userData.whisperInkSegments = lineSeg;
+      });
+    }
+
     function applySceneBackgroundForCurrentState() {
       const isARPresenting = renderer.xr.isPresenting && (currentMode === 3 || currentMode === 4);
       if (isARPresenting) {
         animeSkyDome.visible = false;
+        editorialSkyDome.visible = false;
         scene.background = null;
         scene.fog = null;
         return;
       }
       if (animeEnabled) {
         animeSkyDome.visible = true;
+        editorialSkyDome.visible = false;
         scene.background = animeSkyBgColor;
         scene.fog = new THREE.Fog(0x7be9fa, 26, 95);
         return;
       }
       animeSkyDome.visible = false;
-      const bg = hiddenLineEnabled ? paperSkyColor : skyBgColor;
-      scene.background = bg;
-      scene.fog = new THREE.FogExp2(bg.getHex(), 0.012);
-    }
-
-    function setAnimeMode(enabled) {
-      if (!modelLoaded && enabled) {
-        animeEnabled = true;
+      if (hiddenLineEnabled) {
+        editorialSkyDome.visible = false;
+        scene.background = paperSkyColor;
+        scene.fog = new THREE.FogExp2(paperSkyColor.getHex(), 0.008);
         return;
       }
-      if (enabled && hiddenLineEnabled) {
-        setHiddenLineMode(false);
-      }
-      if (enabled) {
-        buildAnimeMaterialsIfNeeded();
-      }
-      animeEnabled = enabled;
+      editorialSkyDome.visible = true;
+      scene.background = skyBgColor;
+      scene.fog = new THREE.FogExp2(skyBgColor.getHex(), 0.009);
+    }
+
+    function setVisualStyle(style) {
+      const next = STYLE_ORDER.includes(style) ? style : 'editorial';
+      visualStyle = next;
+      animeEnabled = (next === 'anime');
+      hiddenLineEnabled = (next === 'cad');
+      whisperInkEnabled = (next === 'editorial');
+
+      if (!modelLoaded) return;
+
+      if (animeEnabled) buildAnimeMaterialsIfNeeded();
+      if (hiddenLineEnabled) buildHiddenLineMaterialsIfNeeded();
+      if (whisperInkEnabled) buildWhisperInkEdgesIfNeeded();
 
       worldRoot.traverse((child) => {
         if (!child.isMesh || child.userData.isEdgeHelper || child.userData.isAnimeHelper) return;
-        if (child.userData.origMaterial && child.userData.animeMaterial) {
-          child.material = enabled ? child.userData.animeMaterial : child.userData.origMaterial;
+        if (!child.userData.origMaterial) child.userData.origMaterial = child.material;
+        if (!child.userData.origGeometry) child.userData.origGeometry = child.geometry;
+
+        if (animeEnabled && child.userData.animeMaterial) {
+          child.material = child.userData.animeMaterial;
+        } else if (hiddenLineEnabled && child.userData.hlMaterial) {
+          child.material = child.userData.hlMaterial;
+        } else {
+          child.material = child.userData.origMaterial;
         }
-        if (child.userData.origGeometry && child.userData.animeGeometry) {
-          child.geometry = enabled ? child.userData.animeGeometry : child.userData.origGeometry;
+
+        if (child.userData.animeGeometry) {
+          child.geometry = animeEnabled ? child.userData.animeGeometry : child.userData.origGeometry;
         }
-        if (child.userData.animeEdgeSegments) {
-          child.userData.animeEdgeSegments.visible = enabled;
-        }
-        if (child.userData.animeOutlineMesh) {
-          child.userData.animeOutlineMesh.visible = enabled;
-        }
+        if (child.userData.animeEdgeSegments) child.userData.animeEdgeSegments.visible = animeEnabled;
+        if (child.userData.animeOutlineMesh) child.userData.animeOutlineMesh.visible = animeEnabled;
+        if (child.userData.edgeSegments) child.userData.edgeSegments.visible = hiddenLineEnabled;
+        if (child.userData.whisperInkSegments) child.userData.whisperInkSegments.visible = whisperInkEnabled;
       });
 
-      btnToggleAnime.classList.toggle('toggle-on', enabled);
-      btnToggleAnime.textContent = enabled ? '🌸 Anime: ON' : '🌸 Anime: OFF';
+      btnToggleAnime.classList.remove('anime-btn', 'editorial-btn', 'toggle-on');
+      if (next === 'editorial') {
+        btnToggleAnime.classList.add('editorial-btn', 'toggle-on');
+        btnToggleAnime.textContent = '✨ Style: Editorial';
+      } else if (next === 'anime') {
+        btnToggleAnime.classList.add('anime-btn', 'toggle-on');
+        btnToggleAnime.textContent = '🌸 Style: Anime';
+      } else if (next === 'pbr') {
+        btnToggleAnime.classList.add('editorial-btn');
+        btnToggleAnime.textContent = '☀️ Style: Soft-PBR';
+      } else {
+        btnToggleAnime.classList.add('editorial-btn', 'toggle-on');
+        btnToggleAnime.textContent = '✏️ Style: CAD Paper';
+      }
+
+      btnToggleLines.classList.toggle('toggle-on', whisperInkEnabled || hiddenLineEnabled);
+      btnToggleLines.textContent = hiddenLineEnabled
+        ? '✏️ CAD: ON'
+        : (whisperInkEnabled ? '✏️ Ink: ON' : '✏️ Ink: OFF');
 
       const isARPresenting = renderer.xr.isPresenting && (currentMode === 3 || currentMode === 4);
       applyLightingProfile(currentLightingIdx, isARPresenting);
       updateVRHudCanvas();
 
+      const statusMsgs = {
+        editorial: 'EDITORIAL HYBRID ACTIVE · SOFT-PBR + WHISPER INK · CLICK DOORS TO SLIDE',
+        anime:     'JAPANESE SUMMER ANIME MODE · CEL SHADING + INK OUTLINES',
+        pbr:       'PURE SOFT-PBR ARCHITECTURAL MODE · STUDIO IBL + ACES FILMIC',
+        cad:       'MONOCHROME CAD PAPER MODE · HIDDEN-LINE ARCHITECTURAL DRAFTING'
+      };
+      setStatus(statusMsgs[next]);
+    }
+
+    function setAnimeMode(enabled) {
+      setVisualStyle(enabled ? 'anime' : 'editorial');
+    }
+
+    function setHiddenLineMode(enabled) {
       if (enabled) {
-        setStatus('JAPANESE SUMMER ANIME MODE ACTIVE · CEL SHADING + INK OUTLINES');
+        setVisualStyle('cad');
       } else {
-        setStatus('ARCHITECTURAL PBR MODE ACTIVE · DIN 1451 TECHNICAL SPEC');
+        setVisualStyle('editorial');
       }
     }
 
     btnToggleAnime.addEventListener('click', (e) => {
       e.stopPropagation();
       playUISound();
-      setAnimeMode(!animeEnabled);
+      const idx = STYLE_ORDER.indexOf(visualStyle);
+      setVisualStyle(STYLE_ORDER[(idx + 1) % STYLE_ORDER.length]);
     });
-
-    function setHiddenLineMode(enabled) {
-      if (enabled && animeEnabled) {
-        setAnimeMode(false);
-      }
-      buildHiddenLineMaterialsIfNeeded();
-      hiddenLineEnabled = enabled;
-
-      sharedEdgeMaterial.color.setHex(0x27272a);
-
-      worldRoot.traverse((child) => {
-        if (!child.isMesh || child.userData.isEdgeHelper || child.userData.isAnimeHelper) return;
-        if (child.userData.origMaterial && child.userData.hlMaterial) {
-          child.material = enabled ? child.userData.hlMaterial : child.userData.origMaterial;
-        }
-        if (child.userData.edgeSegments) {
-          child.userData.edgeSegments.visible = enabled;
-        }
-      });
-
-      btnToggleLines.classList.toggle('toggle-on', enabled);
-      btnToggleLines.textContent = enabled ? '✏️ Lines: ON' : '✏️ Lines: OFF';
-      applySceneBackgroundForCurrentState();
-    }
 
     btnToggleLines.addEventListener('click', (e) => {
       e.stopPropagation();
       playUISound();
-      setHiddenLineMode(!hiddenLineEnabled);
+      if (visualStyle === 'editorial') setVisualStyle('pbr');
+      else if (visualStyle === 'pbr') setVisualStyle('editorial');
+      else if (visualStyle === 'cad') setVisualStyle('editorial');
+      else setVisualStyle('editorial');
     });
+
+    // =========================================================================
+    // 5B-3. PASS 2 INTERACTIVE POCKET DOORS, SHOJI, FUSUMA & HINGE RIG ENGINE
+    // =========================================================================
+    const interactiveRigs = [];         // { node, name, type, axis, groupId, label, closedVal, openVal, restVal, currentVal, targetVal, meshes, hoverEdges }
+    const interactiveRigGroups = new Map();
+    const interactiveMeshes = [];
+    const interactiveRaycaster = new THREE.Raycaster();
+    const interactivePointerNDC = new THREE.Vector2();
+    let hoveredRig = null;
+    let doorsCycleState = 0; // 0 = Rest, 1 = All Open, 2 = All Closed
+
+    function applyRigValueToTransform(rigEntry, val) {
+      rigEntry.currentVal = val;
+      if (rigEntry.type === 'hinge_door') {
+        rigEntry.node.rotation.y = THREE.MathUtils.degToRad(val);
+      } else if (rigEntry.axis === 'X') {
+        rigEntry.node.position.x = val;
+      } else if (rigEntry.axis === 'Y') {
+        // Blender +Y maps to Three.js -Z under glTF export_yup=True
+        rigEntry.node.position.z = -val;
+      }
+    }
+
+    function isRigConsideredOpen(rigEntry) {
+      const span = Math.abs(rigEntry.openVal - rigEntry.closedVal);
+      if (span < 1e-4) return false;
+      return Math.abs(rigEntry.targetVal - rigEntry.openVal) < Math.abs(rigEntry.targetVal - rigEntry.closedVal);
+    }
+
+    function getRigGroupMembers(rigEntry) {
+      if (rigEntry.groupId && interactiveRigGroups.has(rigEntry.groupId)) {
+        return interactiveRigGroups.get(rigEntry.groupId);
+      }
+      return [rigEntry];
+    }
+
+    function initInteractiveRigs(modelRoot) {
+      interactiveRigs.length = 0;
+      interactiveRigGroups.clear();
+      interactiveMeshes.length = 0;
+
+      modelRoot.traverse((obj) => {
+        const ud = obj.userData || {};
+        if (!ud.parametric_type) return;
+
+        const type = ud.parametric_type;
+        const axis = (ud.slide_axis || 'X').toUpperCase();
+        const curVal = type === 'hinge_door'
+          ? THREE.MathUtils.radToDeg(obj.rotation.y)
+          : (axis === 'Y' ? -obj.position.z : obj.position.x);
+
+        let closedVal = typeof ud.closed_val === 'number' ? ud.closed_val : curVal;
+        let openVal = typeof ud.open_val === 'number' ? ud.open_val : curVal;
+        if (typeof ud.closed_val !== 'number' || typeof ud.open_val !== 'number') {
+          if (type === 'hinge_door') {
+            closedVal = ud.swing_min_deg ?? 0;
+            openVal = ud.swing_max_deg ?? 85;
+          } else if (axis === 'X' && typeof ud.slide_min_x === 'number' && typeof ud.slide_max_x === 'number') {
+            closedVal = ud.slide_min_x;
+            openVal = ud.slide_max_x;
+          } else if (axis === 'Y' && typeof ud.slide_min_y === 'number' && typeof ud.slide_max_y === 'number') {
+            closedVal = ud.slide_min_y;
+            openVal = ud.slide_max_y;
+          }
+        }
+        const restVal = typeof ud.rest_val === 'number' ? ud.rest_val : curVal;
+        const entry = {
+          node: obj,
+          name: obj.name,
+          type,
+          axis,
+          groupId: ud.group_id || null,
+          label: ud.label || obj.name.replace(/_/g, ' '),
+          closedVal,
+          openVal,
+          restVal,
+          currentVal: curVal,
+          targetVal: curVal,
+          meshes: [],
+          hoverEdges: []
+        };
+
+        obj.traverse((child) => {
+          if (!child.isMesh || child.userData.isEdgeHelper || child.userData.isAnimeHelper) return;
+          child.userData.interactiveRig = entry;
+          entry.meshes.push(child);
+          interactiveMeshes.push(child);
+
+          if (child.geometry) {
+            const hGeo = new THREE.EdgesGeometry(child.geometry, 24);
+            const hLines = new THREE.LineSegments(hGeo, interactiveHoverEdgeMat);
+            hLines.userData.isEdgeHelper = true;
+            hLines.raycast = () => {};
+            hLines.visible = false;
+            child.add(hLines);
+            entry.hoverEdges.push(hLines);
+          }
+        });
+
+        if (entry.meshes.length > 0) {
+          interactiveRigs.push(entry);
+          if (entry.groupId) {
+            if (!interactiveRigGroups.has(entry.groupId)) interactiveRigGroups.set(entry.groupId, []);
+            interactiveRigGroups.get(entry.groupId).push(entry);
+          }
+        }
+      });
+
+      if (btnToggleDoors) {
+        btnToggleDoors.style.display = interactiveRigs.length > 0 ? 'inline-flex' : 'none';
+      }
+    }
+
+    function setHoveredRig(nextRig, clientX = null, clientY = null) {
+      if (hoveredRig !== nextRig) {
+        if (hoveredRig) {
+          getRigGroupMembers(hoveredRig).forEach((m) => m.hoverEdges.forEach((e) => { e.visible = false; }));
+        }
+        hoveredRig = nextRig;
+        if (hoveredRig) {
+          getRigGroupMembers(hoveredRig).forEach((m) => m.hoverEdges.forEach((e) => { e.visible = true; }));
+        }
+        canvasEl.style.cursor = hoveredRig ? 'pointer' : '';
+      }
+
+      if (hoveredRig && clientX !== null && clientY !== null && !renderer.xr.isPresenting) {
+        const members = getRigGroupMembers(hoveredRig);
+        const lead = members.find((m) => Math.abs(m.openVal - m.closedVal) > 1e-4) || hoveredRig;
+        const willClose = isRigConsideredOpen(lead);
+        const icon = lead.type === 'hinge_door' ? '🚪' : '↔';
+        doorTooltip.innerHTML = `${icon} ${lead.label}<span class="tt-action">[CLICK TO ${willClose ? 'CLOSE' : 'OPEN'}]</span>`;
+        doorTooltip.style.left = `${Math.min(window.innerWidth - 260, clientX)}px`;
+        doorTooltip.style.top = `${Math.max(24, clientY)}px`;
+        doorTooltip.style.display = 'block';
+      } else {
+        doorTooltip.style.display = 'none';
+      }
+    }
+
+    function toggleRigOrGroup(rigEntry) {
+      if (!rigEntry) return;
+      const members = getRigGroupMembers(rigEntry);
+      const lead = members.find((m) => Math.abs(m.openVal - m.closedVal) > 1e-4) || rigEntry;
+      const opening = !isRigConsideredOpen(lead);
+      members.forEach((m) => {
+        m.targetVal = opening ? m.openVal : m.closedVal;
+      });
+      playDoorSlideSound(opening, lead.type === 'hinge_door');
+      setStatus(`${opening ? 'OPENED' : 'CLOSED'}: ${lead.label.toUpperCase()}`);
+    }
+
+    function cycleAllDoorsMode() {
+      if (interactiveRigs.length === 0) return;
+      doorsCycleState = (doorsCycleState + 1) % 3; // 1: All Open, 2: All Closed, 0: Rest Pose
+      interactiveRigs.forEach((r) => {
+        if (doorsCycleState === 1) r.targetVal = r.openVal;
+        else if (doorsCycleState === 2) r.targetVal = r.closedVal;
+        else r.targetVal = r.restVal;
+      });
+      const labels = ['🚪 Doors: Rest', '🚪 Doors: Open', '🚪 Doors: Closed'];
+      btnToggleDoors.textContent = labels[doorsCycleState];
+      btnToggleDoors.classList.toggle('toggle-on', doorsCycleState !== 0);
+      playDoorSlideSound(doorsCycleState === 1, false);
+      setStatus(`ALL 16 INTERACTIVE RIGS → ${doorsCycleState === 1 ? 'ALL OPEN' : (doorsCycleState === 2 ? 'ALL CLOSED' : 'ARCHITECTURAL REST POSE')}`);
+    }
+
+    if (btnToggleDoors) {
+      btnToggleDoors.addEventListener('click', (e) => {
+        e.stopPropagation();
+        cycleAllDoorsMode();
+      });
+    }
+
+    function updateInteractiveRigs(dt) {
+      if (interactiveRigs.length === 0) return;
+      const smooth = 1 - Math.exp(-8.5 * dt);
+      for (const r of interactiveRigs) {
+        const diff = r.targetVal - r.currentVal;
+        if (Math.abs(diff) > 0.0005) {
+          applyRigValueToTransform(r, r.currentVal + diff * smooth);
+        } else if (diff !== 0) {
+          applyRigValueToTransform(r, r.targetVal);
+        }
+      }
+    }
+
+    function raycastInteractiveDoorAtClientXY(clientX, clientY) {
+      if (interactiveMeshes.length === 0 || renderer.xr.isPresenting) return null;
+      const rect = canvasEl.getBoundingClientRect();
+      interactivePointerNDC.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+      interactivePointerNDC.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+      interactiveRaycaster.setFromCamera(interactivePointerNDC, camera);
+      interactiveRaycaster.near = 0.05;
+      interactiveRaycaster.far = 28;
+      const hits = interactiveRaycaster.intersectObjects(interactiveMeshes, false);
+      for (const h of hits) {
+        if (isObjectActuallyVisible(h.object) && h.object.userData.interactiveRig) {
+          return h.object.userData.interactiveRig;
+        }
+      }
+      return null;
+    }
 
     // =========================================================================
     // 5C. ORBIT <-> FIRST-PERSON WALK TOGGLE & NON-AR TABLETOP DIORAMA ENGINE
@@ -2520,7 +3010,7 @@
       if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
       if (e.code === 'KeyL') {
         playUISound();
-        setHiddenLineMode(!hiddenLineEnabled);
+        setVisualStyle(visualStyle === 'cad' ? 'editorial' : 'cad');
         return;
       }
       if (e.code === 'KeyF') {
@@ -2530,7 +3020,12 @@
       }
       if (e.code === 'KeyV') {
         playUISound();
-        setAnimeMode(!animeEnabled);
+        const idx = STYLE_ORDER.indexOf(visualStyle);
+        setVisualStyle(STYLE_ORDER[(idx + 1) % STYLE_ORDER.length]);
+        return;
+      }
+      if (e.code === 'KeyO') {
+        cycleAllDoorsMode();
         return;
       }
       if (e.code === 'KeyN' && currentMode === 1) {
@@ -2616,11 +3111,16 @@
     }
 
     // Desktop Mouse Drag (Walk: Left=Look, Right=Pan | Orbit/Tabletop: Left=Orbit, Right=Pan)
+    // + Hover/Click Interactive Pocket Doors, Shoji, Fusuma & Front Door
     const canvasEl = renderer.domElement;
     let isMouseDown = false;
     let mouseButton = 0;
     let prevMouseX = 0;
     let prevMouseY = 0;
+    let mouseDownX = 0;
+    let mouseDownY = 0;
+    let mouseDownTime = 0;
+    let hoverCheckTick = 0;
 
     canvasEl.addEventListener('contextmenu', (e) => e.preventDefault());
 
@@ -2630,11 +3130,31 @@
       mouseButton = e.button;
       prevMouseX = e.clientX;
       prevMouseY = e.clientY;
+      mouseDownX = e.clientX;
+      mouseDownY = e.clientY;
+      mouseDownTime = performance.now();
       camTransition.active = false;
     });
 
+    canvasEl.addEventListener('mouseleave', () => {
+      setHoveredRig(null);
+    });
+
     window.addEventListener('mousemove', (e) => {
-      if (!isMouseDown || renderer.xr.isPresenting) return;
+      if (renderer.xr.isPresenting) return;
+      if (!isMouseDown) {
+        if (e.target === canvasEl) {
+          hoverCheckTick = (hoverCheckTick + 1) % 2;
+          if (hoverCheckTick === 0 || hoveredRig) {
+            const hitRig = raycastInteractiveDoorAtClientXY(e.clientX, e.clientY);
+            setHoveredRig(hitRig, e.clientX, e.clientY);
+          }
+        } else if (hoveredRig) {
+          setHoveredRig(null);
+        }
+        return;
+      }
+      if (hoveredRig) setHoveredRig(null);
       const dx = e.clientX - prevMouseX;
       const dy = e.clientY - prevMouseY;
       prevMouseX = e.clientX;
@@ -2672,7 +3192,18 @@
       }
     });
 
-    window.addEventListener('mouseup', () => {
+    window.addEventListener('mouseup', (e) => {
+      if (isMouseDown && mouseButton === 0 && !renderer.xr.isPresenting && e.target === canvasEl) {
+        const moved = Math.hypot(e.clientX - mouseDownX, e.clientY - mouseDownY);
+        const elapsed = performance.now() - mouseDownTime;
+        if (moved < 6 && elapsed < 340) {
+          const hitRig = raycastInteractiveDoorAtClientXY(e.clientX, e.clientY);
+          if (hitRig) {
+            toggleRigOrGroup(hitRig);
+            setHoveredRig(hitRig, e.clientX, e.clientY);
+          }
+        }
+      }
       isMouseDown = false;
     });
 
@@ -3022,6 +3553,19 @@
           e.target === arTouchSurface
         ) {
           placeDollhouseAtReticleOrFront(false);
+        } else if (
+          currentMode === 1 &&
+          !renderer.xr.isPresenting &&
+          touchMode === 'single' &&
+          touchMovedDist < 10 &&
+          performance.now() - touchStartTime < 280 &&
+          performance.now() - lastPinchTimestamp > 350 &&
+          e.changedTouches.length > 0 &&
+          e.target === canvasEl
+        ) {
+          const t = e.changedTouches[0];
+          const hitRig = raycastInteractiveDoorAtClientXY(t.clientX, t.clientY);
+          if (hitRig) toggleRigOrGroup(hitRig);
         }
         touchMode = null;
       } else if (st.length === 1) {
@@ -3107,7 +3651,7 @@
 
     const loader = new GLTFLoader();
     loader.load(
-      './9_tsubo_house.glb?v=1.2.1',
+      './9_tsubo_house.glb?v=2.0.0',
       (gltf) => {
         const model = gltf.scene;
         worldRoot.add(model);
@@ -3115,12 +3659,15 @@
         roofGroup = model.getObjectByName('Roof_Group');
         contextGroup = model.getObjectByName('Context_Group');
 
+        // Initialize all 16 Pass 2 interactive pocket doors, sliding shoji, fusuma & front door
+        initInteractiveRigs(model);
+
         const houseBox = new THREE.Box3();
         const tmpMeshBox = new THREE.Box3();
         const nonCollisionPattern = /glass|pane|wire|bulb|glow|eyeshine|petal|blossom|leaf/i;
 
         model.traverse((child) => {
-          if (child.isMesh) {
+          if (child.isMesh && !child.userData.isEdgeHelper && !child.userData.isAnimeHelper) {
             if (!IS_MOBILE) {
               child.castShadow = true;
               child.receiveShadow = true;
@@ -3131,7 +3678,7 @@
 
             const n = child.name.toLowerCase();
             const isTransparentMat = child.material && !Array.isArray(child.material) && child.material.transparent && child.material.opacity < 0.5;
-            if (!isTransparentMat && !nonCollisionPattern.test(n)) {
+            if (!isTransparentMat && !nonCollisionPattern.test(n) && !child.userData.interactiveRig) {
               vrCollisionMeshes.push(child);
             }
 
@@ -3191,8 +3738,8 @@
         const initialRoom = parseInt(URL_PARAMS.get('room') || '0', 10);
         goToRoom(Number.isFinite(initialRoom) ? initialRoom : 0, false);
 
-        // Apply Japanese Summer Anime by default unless ?anime=0 or ?pbr=1 was passed
-        setAnimeMode(animeEnabled);
+        // Apply Architectural Editorial Hybrid by default (or ?anime=1 / ?pbr=1 / ?cad=1)
+        setVisualStyle(visualStyle);
 
         if (URL_PARAMS.get('tabletop') === '1' || URL_PARAMS.get('tabletop') === 'true') {
           if (URL_PARAMS.get('site') === '0') setContextVisibility(false);
@@ -3441,7 +3988,11 @@
         next:     { label: 'NEXT ROOM ▶',                         bg: '#18181b', fg: '#ffffff' },
         follow:   { label: vrHudFollow ? '📍 HUD: FOLLOW' : '📌 HUD: PINNED', bg: vrHudFollow ? '#0ea5e9' : '#f4f4f5', fg: vrHudFollow ? '#ffffff' : '#050505' },
         roof:     { label: roofVisible ? '🏠 ROOF: ON' : '🏠 ROOF: OFF',     bg: roofVisible ? '#18181b' : '#f4f4f5', fg: roofVisible ? '#ffffff' : '#050505' },
-        anime:    { label: animeEnabled ? '🌸 ANIME: ON' : '🌸 ANIME: OFF',  bg: animeEnabled ? '#20d8ff' : '#f4f4f5', fg: '#091526' },
+        anime:    {
+          label: visualStyle === 'editorial' ? '✨ EDITORIAL' : (visualStyle === 'anime' ? '🌸 ANIME' : (visualStyle === 'pbr' ? '☀️ SOFT-PBR' : '✏️ CAD PAPER')),
+          bg: visualStyle === 'anime' ? '#20d8ff' : (visualStyle === 'editorial' ? '#1c1917' : '#f4f4f5'),
+          fg: visualStyle === 'editorial' ? '#fafaf9' : '#091526'
+        },
         tabletop: { label: nonARTabletopEnabled ? '🏡 TABLETOP: ON' : '🏡 TABLETOP', bg: nonARTabletopEnabled ? '#fbbf24' : '#f4f4f5', fg: '#050505' },
         context:  { label: contextVisible ? '🌳 SITE: ON' : '🌳 SITE: OFF',  bg: contextVisible ? '#18181b' : '#f4f4f5', fg: contextVisible ? '#ffffff' : '#050505' },
         hide:     { label: '✕ HIDE (Y/B)',                        bg: '#dc2626', fg: '#ffffff' }
@@ -3485,9 +4036,11 @@
         case 'roof':
           setRoofVisibility(!roofVisible);
           break;
-        case 'anime':
-          setAnimeMode(!animeEnabled);
+        case 'anime': {
+          const idx = STYLE_ORDER.indexOf(visualStyle);
+          setVisualStyle(STYLE_ORDER[(idx + 1) % STYLE_ORDER.length]);
           break;
+        }
         case 'tabletop':
           setNonARTabletopMode(!nonARTabletopEnabled, false);
           break;
@@ -3575,6 +4128,17 @@
               return;
             }
             return; // Clicked HUD panel background, don't accidentally teleport behind it
+          }
+        }
+
+        // Check Pass 2 interactive pocket doors, shoji, fusuma & front door before floor teleport
+        if (interactiveMeshes.length > 0) {
+          const doorHits = vrRaycaster.intersectObjects(interactiveMeshes, false);
+          for (const h of doorHits) {
+            if (isObjectActuallyVisible(h.object) && h.object.userData.interactiveRig) {
+              toggleRigOrGroup(h.object.userData.interactiveRig);
+              return;
+            }
           }
         }
 
@@ -3791,8 +4355,9 @@
         positionVRHudInFrontOfUser(true);
       }
 
-      // 1. Check live HUD laser hover & cursor dot across both controllers
+      // 1. Check live HUD & Interactive Door laser hover across both controllers
       let nextHoverBtnId = null;
+      let nextVrHoveredRig = null;
       let anyAimingAtHud = false;
       let hudCursorPlaced = false;
       const hudAimingControllers = new Set();
@@ -3806,6 +4371,7 @@
         vrRaycaster.far = 8;
 
         let laserLen = 4.2;
+        let hitInteractiveDoor = false;
         if (vrHudMesh.visible) {
           const hudHits = vrRaycaster.intersectObject(vrHudMesh, false);
           if (hudHits.length > 0) {
@@ -3822,14 +4388,27 @@
             if (btn) nextHoverBtnId = btn.id;
           }
         }
+        if (!hudAimingControllers.has(ctrl) && interactiveMeshes.length > 0) {
+          const doorHits = vrRaycaster.intersectObjects(interactiveMeshes, false);
+          for (const h of doorHits) {
+            if (isObjectActuallyVisible(h.object) && h.object.userData.interactiveRig) {
+              hitInteractiveDoor = true;
+              nextVrHoveredRig = h.object.userData.interactiveRig;
+              laserLen = h.distance;
+              break;
+            }
+          }
+        }
         if (laser) {
           const posAttr = laser.geometry.attributes.position;
           posAttr.setXYZ(1, 0, 0, -laserLen);
           posAttr.needsUpdate = true;
-          laser.visible = !nonARTabletopEnabled || anyAimingAtHud;
+          laser.material.color.setHex(hitInteractiveDoor ? 0xf59e0b : 0x20d8ff);
+          laser.visible = !nonARTabletopEnabled || anyAimingAtHud || hitInteractiveDoor;
         }
       }
 
+      setHoveredRig(nextVrHoveredRig, null, null);
       if (!hudCursorPlaced) vrHudCursorDot.visible = false;
       if (nextHoverBtnId !== vrHudHoverBtnId) {
         vrHudHoverBtnId = nextHoverBtnId;
@@ -4502,6 +5081,14 @@
         updateDesktopMovement(dt);
       }
 
+      updateInteractiveRigs(dt);
+
+      const activeSkyCam = renderer.xr.isPresenting ? renderer.xr.getCamera() : camera;
+      if (editorialSkyDome.visible) {
+        activeSkyCam.getWorldPosition(_animeTmpCamPos);
+        editorialSkyDome.position.copy(_animeTmpCamPos);
+      }
+
       if (animeEnabled) {
         worldRoot.updateMatrixWorld();
         animeWorldRootInvUniform.value.copy(worldRoot.matrixWorld).invert();
@@ -4509,8 +5096,7 @@
         syncAnimeSunTransform();
         if (animeSkyDome.visible) {
           animeSkyUniforms.uTime.value = (timestamp || performance.now()) * 0.001;
-          const activeCam = renderer.xr.isPresenting ? renderer.xr.getCamera() : camera;
-          activeCam.getWorldPosition(_animeTmpCamPos);
+          activeSkyCam.getWorldPosition(_animeTmpCamPos);
           animeSkyDome.position.copy(_animeTmpCamPos);
         }
       }

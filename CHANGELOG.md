@@ -3,10 +3,27 @@
 All notable versions, Blender refinements, WebXR/AR/USDZ releases, and BIM drawing milestones for the **9-Tsubo House (*Sumire Aoi House*, 1999 by Makoto Koizumi / Koizumi Studio)**.
 
 - **Repository:** [https://github.com/spinorama/9TsuboV2](https://github.com/spinorama/9TsuboV2)
-- **Live 4-Mode WebXR App (Anime Default):** [https://spinorama.github.io/9TsuboV2/](https://spinorama.github.io/9TsuboV2/) ([🏛️ PBR Mode](https://spinorama.github.io/9TsuboV2/?pbr=1) · [🏡 Tabletop Diorama](https://spinorama.github.io/9TsuboV2/?tabletop=1))
+- **Live 4-Mode WebXR App (Editorial Hybrid Default):** [https://spinorama.github.io/9TsuboV2/](https://spinorama.github.io/9TsuboV2/) ([🌸 Anime Mode](https://spinorama.github.io/9TsuboV2/?anime=1) · [🏡 Tabletop Diorama](https://spinorama.github.io/9TsuboV2/?tabletop=1))
+- **Multi-Model Architectural WebXR Hub:** [https://spinorama.github.io/9TsuboV2/hub.html](https://spinorama.github.io/9TsuboV2/hub.html)
 - **ISO 19650 / IFC4 BIM Viewer:** [https://spinorama.github.io/9TsuboV2/bim.html](https://spinorama.github.io/9TsuboV2/bim.html)
 - **12-Sheet Construction Drawing Binder:** [https://spinorama.github.io/9TsuboV2/drawings/index.html](https://spinorama.github.io/9TsuboV2/drawings/index.html)
 - **Apple USDZ & Android AR Launcher:** [https://spinorama.github.io/9TsuboV2/ar.html](https://spinorama.github.io/9TsuboV2/ar.html)
+
+---
+
+## [v2.0.0] — 2026-11-23 (Pass 2 Pocket Doors, Editorial Hybrid Look, 16 Interactive Rigs & Multi-Model WebXR Hub)
+### Changed & Added
+- **Pass 2 Architectural Interior Upgrades in `9_tsubo_house.glb` (`59,167 / 60,000` tris):**
+  - **True Recessed Sliding Pocket Doors in Bathroom Core:** Hollowed `Bath_Wall_Front_Left` (Entry cedar pocket door), `98 mm` `WC_Wall_FrontPier` (2-leaf telescoping WC pocket door), and `Shower_Wall_RightWall` (widened `640 mm` frameless glass shower pocket door) with concealed tracks, slotted jambs, flush/edge pulls, and zero exposed rails.
+  - **Split Dual-Access East Storage Alcove D:** Bathroom upper recessed 3-shelf cedar towel niche (rolled towels & rattan baskets) + Tatami lower twin-sliding *ji-bukuro* cabinet under a flush white upper wall.
+  - **Operable West *Oshiire* Closet F:** Hollow plywood-lined closet with mid-height *nakadana* futon shelf, stacked futons, woven chest, and twin sliding *fusuma* panels with recessed circular *hikite* pulls.
+  - **Tatami South 3-Panel Cascading Shoji:** Triple recessed cedar *shikii*/*kamoi* track atop the exposed `+160 mm` cedar step with 3 cascading *washi* + *kumiko* lattice panels.
+- **Architectural Editorial Hybrid Default (`index.html`):**
+  - Calibrated Soft-PBR (`RoomEnvironment` PMREM studio IBL + ACES Filmic tone mapping), auto-generated **Whisper Ink** architectural edge lines, atmospheric sky moods (Day / Golden / Dusk / Studio), and instant cycling (`[V]`) across Editorial Hybrid, Japanese Summer Anime (`?anime=1`), Soft-PBR, and CAD Paper.
+- **16 Live Interactive Door, Pocket, Fusuma & Shoji Rigs (Desktop, Touch & Quest VR):**
+  - Exported glTF `extras` for all 16 parametric rigs (including coupled WC telescoping pocket & 3-panel Tatami shoji groups) + 9 room waypoints. Hover for amber Whisper-Ink outline & tooltip; click, tap, or pull VR trigger to glide smoothly (`[O]` / `🚪 Doors` cycles Rest / All Open / All Closed).
+- **Multi-Model Architectural WebXR Hub (`hub.html` + `hub_models.json`):**
+  - Unified Architectural Editorial Hybrid WebXR portfolio hub loading `9-Tsubo House`, `Massaro House`, `American Midwestern Modern House`, `Victorian House`, `F1 COTA Austin`, and `F1 Tabletop Track` (plus local `.glb`/`.gltf` drag-and-drop) with live `Z-Cut` horizontal section plane, 4 universal styles (Editorial / Soft-PBR / Paper CAD / Blueprint), 4 lighting moods, tabletop maquette mode, and Quest VR / WebXR AR.
 
 ---
 

@@ -1,0 +1,2521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Architectural Editorial WebXR Hub — Multi-Model Interactive Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: rgba(250, 249, 246, 0.94);
+      --paper-solid: #faf9f6;
+      --ink: #181715;
+      --ink-muted: #5c5852;
+      --line: #1c1917;
+      --btn-bg: #f1efe9;
+      --btn-hover: #e5e1d8;
+      --accent: #b45309;
+      --accent-bright: #f59e0b;
+      --shadow: 4px 4px 0px rgba(24, 23, 21, 0.85);
+      --font-ui: 'Instrument Sans', 'Bahnschrift', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #e9eef4;
+      font-family: var(--font-ui);
+      color: var(--ink);
+      touch-action: none;
+    }
+
+    #canvas-container {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+
+    #door-tooltip {
+      position: fixed;
+      z-index: 50;
+      pointer-events: none;
+      display: none;
+      background: rgba(24, 23, 21, 0.95);
+      color: #faf9f6;
+      border: 1.5px solid var(--accent-bright);
+      padding: 5px 10px;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.45);
+      white-space: nowrap;
+      transform: translate(14px, -50%);
+    }
+    #door-tooltip .tt-act {
+      color: #fbbf24;
+      margin-left: 7px;
+    }
+
+    #drop-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(24, 23, 21, 0.72);
+      backdrop-filter: blur(6px);
+      color: #faf9f6;
+      pointer-events: none;
+    }
+    #drop-overlay.visible { display: flex; }
+    .drop-box {
+      border: 2px dashed #fbbf24;
+      background: rgba(24, 23, 21, 0.9);
+      padding: 32px 44px;
+      text-align: center;
+      font-family: var(--font-mono);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .drop-box h2 { font-size: 18px; margin-bottom: 8px; color: #fbbf24; }
+    .drop-box p { font-size: 12px; color: #d6d3d1; }
+
+    #ui-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      width: 100%;
+      height: 100dvh;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding:
+        max(10px, env(safe-area-inset-top))
+        max(10px, env(safe-area-inset-right))
+        max(10px, env(safe-area-inset-bottom))
+        max(10px, env(safe-area-inset-left));
+    }
+
+    #ar-touch-surface {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      touch-action: none;
+    }
+    #ar-touch-surface.active { pointer-events: auto; }
+
+    .top-bar-wrap {
+      position: relative;
+      z-index: 4;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      width: 100%;
+      max-width: 1380px;
+      margin: 0 auto;
+      pointer-events: none;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: var(--paper);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1.5px solid var(--line);
+      padding: 7px 11px;
+      box-shadow: var(--shadow);
+      pointer-events: auto;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      background: #f59e0b;
+      border: 1px solid var(--line);
+      flex-shrink: 0;
+    }
+    .status-dot.ready { background: #16a34a; }
+
+    .brand-copy { min-width: 0; }
+    .brand-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .brand-sub {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--ink-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .controls-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      appearance: none;
+      border: 1.5px solid var(--line);
+      background: var(--btn-bg);
+      color: var(--ink);
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      padding: 6px 8.5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      white-space: nowrap;
+      transition: background 0.12s ease, color 0.12s ease, transform 0.08s ease;
+      text-decoration: none;
+    }
+    .btn:hover { background: var(--btn-hover); }
+    .btn:active { transform: scale(0.97); }
+    .btn.active, .btn.on {
+      background: var(--ink);
+      color: var(--paper-solid);
+    }
+    .btn.accent-on {
+      background: var(--accent);
+      border-color: var(--line);
+      color: #ffffff;
+    }
+    .btn.amber-on {
+      background: #fbbf24;
+      color: var(--ink);
+    }
+    .btn.danger {
+      background: #dc2626;
+      border-color: #dc2626;
+      color: #ffffff;
+    }
+
+    .mode-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      background: var(--paper);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1.5px solid var(--line);
+      padding: 5px;
+      box-shadow: var(--shadow);
+      pointer-events: auto;
+    }
+    .mode-strip .btn {
+      font-size: 11px;
+      padding: 7px 8px;
+    }
+
+    #ar-bar {
+      display: none;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: var(--paper-solid);
+      border: 1.5px solid var(--line);
+      padding: 6px 10px;
+      box-shadow: var(--shadow);
+      pointer-events: auto;
+    }
+    #ar-bar.visible { display: flex; }
+    .ar-label {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-right: 4px;
+    }
+
+    /* Middle Area: Collapsible Model Portfolio Drawer */
+    .mid-workspace {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      align-items: stretch;
+      justify-content: flex-start;
+      width: 100%;
+      max-width: 1380px;
+      margin: 8px auto;
+      pointer-events: none;
+      position: relative;
+      z-index: 3;
+    }
+
+    #catalog-drawer {
+      width: 320px;
+      max-width: calc(100vw - 24px);
+      max-height: 100%;
+      background: var(--paper);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1.5px solid var(--line);
+      box-shadow: var(--shadow);
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+    #catalog-drawer.collapsed {
+      display: none;
+    }
+
+    .drawer-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 11px;
+      border-bottom: 1.5px solid var(--line);
+      background: var(--ink);
+      color: var(--paper-solid);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .drawer-tools {
+      display: flex;
+      gap: 6px;
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(28, 25, 23, 0.2);
+      background: rgba(241, 239, 233, 0.7);
+    }
+    #model-search {
+      flex: 1;
+      min-width: 0;
+      border: 1.5px solid var(--line);
+      background: #ffffff;
+      padding: 5px 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink);
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    #model-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      touch-action: pan-y;
+    }
+
+    .model-card {
+      border: 1.5px solid var(--line);
+      background: #ffffff;
+      padding: 9px 10px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: background 0.12s ease, transform 0.08s ease;
+    }
+    .model-card:hover { background: #f6f4ee; }
+    .model-card.active {
+      background: #1c1917;
+      color: #faf9f6;
+      border-color: #1c1917;
+    }
+    .mc-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 6px;
+    }
+    .mc-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .mc-size {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      opacity: 0.72;
+      flex-shrink: 0;
+    }
+    .mc-sub {
+      font-size: 10.5px;
+      opacity: 0.78;
+    }
+    .mc-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 2px;
+    }
+    .mc-badge {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 5px;
+      border: 1px solid currentColor;
+      opacity: 0.85;
+    }
+    .model-card.active .mc-badge {
+      border-color: #fbbf24;
+      color: #fbbf24;
+      opacity: 1;
+    }
+
+    .drawer-foot {
+      padding: 8px 10px;
+      border-top: 1.5px solid var(--line);
+      background: rgba(241, 239, 233, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      color: var(--ink-muted);
+    }
+
+    /* Bottom Dock: Section Cut + Animation Bar + Viewpoints Strip */
+    .bottom-dock {
+      position: relative;
+      z-index: 4;
+      width: 100%;
+      max-width: 1380px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      pointer-events: none;
+    }
+
+    .analysis-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--paper);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1.5px solid var(--line);
+      padding: 6px 11px;
+      box-shadow: var(--shadow);
+      pointer-events: auto;
+    }
+
+    .slider-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .slider-group input[type="range"] {
+      width: 140px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    #anim-group { display: none; }
+    #anim-group.visible { display: flex; }
+
+    .model-meta-pill {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--ink-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .view-bar {
+      background: var(--paper);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1.5px solid var(--line);
+      padding: 7px 10px;
+      box-shadow: var(--shadow);
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .view-bar-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    #viewpoint-strip {
+      display: flex;
+      gap: 5px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    #viewpoint-strip::-webkit-scrollbar { display: none; }
+
+    .vp-pill {
+      appearance: none;
+      border: 1.5px solid var(--line);
+      background: var(--btn-bg);
+      color: var(--ink);
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 6px 10px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .vp-pill:hover { background: var(--btn-hover); }
+    .vp-pill.active {
+      background: var(--ink);
+      color: var(--paper-solid);
+    }
+
+    /* Loading Overlay */
+    #loader-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: rgba(250, 249, 246, 0.92);
+      backdrop-filter: blur(6px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: opacity 0.18s ease, visibility 0.18s ease;
+    }
+    #loader-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .loader-box {
+      width: 36px;
+      height: 36px;
+      border: 3px solid #d6d3d1;
+      border-top-color: var(--ink);
+      animation: spin 0.75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loader-title {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    #loader-sub {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--ink-muted);
+    }
+
+    @media (max-width: 820px) {
+      .brand-copy { display: none; }
+      .controls-row {
+        flex: 1;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .controls-row::-webkit-scrollbar { display: none; }
+      .mode-strip { grid-template-columns: repeat(2, 1fr); }
+      .hint-desktop { display: none; }
+      #catalog-drawer { width: 290px; }
+    }
+  </style>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="loader-overlay">
+    <div class="loader-box"></div>
+    <div id="loader-title">ARCHITECTURAL EDITORIAL WEBXR HUB</div>
+    <div id="loader-sub">INITIALIZING STUDIO IBL · WHISPER INK · MULTI-MODEL ENGINE...</div>
+  </div>
+
+  <div id="drop-overlay">
+    <div class="drop-box">
+      <h2>DROP .GLB / .GLTF MODEL</h2>
+      <p>Automatically grounds, calibrates Soft-PBR + Whisper Ink, &amp; enables WebXR VR/AR + Section Cut</p>
+    </div>
+  </div>
+
+  <div id="door-tooltip"></div>
+  <div id="canvas-container"></div>
+
+  <div id="ui-overlay">
+    <div id="ar-touch-surface"></div>
+
+    <div class="top-bar-wrap">
+      <div class="header-row">
+        <div class="brand">
+          <span id="status-dot" class="status-dot"></span>
+          <div class="brand-copy">
+            <div id="active-model-title" class="brand-title">ARCHITECTURAL EDITORIAL WEBXR HUB</div>
+            <div id="status-sub" class="brand-sub">SOFT-PBR + WHISPER INK · MULTI-MODEL PORTFOLIO</div>
+          </div>
+        </div>
+
+        <div class="controls-row">
+          <button id="btn-drawer" class="btn active" title="Toggle Model Portfolio Drawer (Hotkey: G)">🏛️ Models</button>
+          <button id="btn-style" class="btn active" title="Cycle Visual Look: Editorial / Soft-PBR / Paper CAD / Blueprint (Hotkey: V)">✨ Editorial</button>
+          <button id="btn-mood" class="btn" title="Cycle Lighting Mood: Day / Golden / Evening / Studio (Hotkey: F)">☀️ Day</button>
+          <button id="btn-doors" class="btn accent-on" style="display:none;" title="Cycle Interactive Doors / Pocket Doors / Shoji (Hotkey: O)">🚪 Doors: Rest</button>
+          <button id="btn-tabletop" class="btn" title="Toggle Tabletop Maquette Diorama (Hotkey: M)">🏡 Maquette</button>
+          <button id="btn-nav" class="btn" title="Switch Orbit vs First-Person Walk (Hotkey: N)">🔄 Orbit</button>
+          <button id="btn-roof" class="btn on" style="display:none;" title="Toggle Roof Layer">🏠 Roof</button>
+          <button id="btn-context" class="btn on" style="display:none;" title="Toggle Site Context">🌳 Site</button>
+          <a id="btn-standalone" class="btn" href="./index.html" style="display:none;" title="Open Dedicated Project Experience">↗ Full App</a>
+          <button id="btn-exit-xr" class="btn danger" style="display:none;">✕ Exit XR</button>
+        </div>
+      </div>
+
+      <div class="mode-strip">
+        <button id="btn-mode-1" class="btn active">🖥️ 1 · 3D Studio</button>
+        <button id="btn-mode-2" class="btn">🥽 2 · Quest VR</button>
+        <button id="btn-mode-3" class="btn">📱 3 · 1:1 AR Walk</button>
+        <button id="btn-mode-4" class="btn">🏡 4 · Tabletop AR</button>
+      </div>
+
+      <div id="ar-bar">
+        <span id="ar-label" class="ar-label">AR READY · PINCH TO SCALE</span>
+        <button id="btn-ar-place" class="btn active">📍 Place</button>
+        <button id="btn-ar-up" class="btn">⬆️ Raise</button>
+        <button id="btn-ar-down" class="btn">⬇️ Lower</button>
+        <button id="btn-ar-rot" class="btn">🔄 Rotate 45°</button>
+      </div>
+    </div>
+
+    <div class="mid-workspace">
+      <aside id="catalog-drawer">
+        <div class="drawer-head">
+          <span>MODEL PORTFOLIO</span>
+          <button id="btn-close-drawer" class="btn" style="padding:2px 6px;font-size:10px;">✕</button>
+        </div>
+        <div class="drawer-tools">
+          <input id="model-search" type="text" placeholder="Filter models..." autocomplete="off" />
+          <label class="btn" style="cursor:pointer;" title="Load any local .glb or .gltf file">
+            + GLB
+            <input id="file-glb-input" type="file" accept=".glb,.gltf" style="display:none;" />
+          </label>
+        </div>
+        <div id="model-list"></div>
+        <div class="drawer-foot">
+          <span>DRAG &amp; DROP ANY .GLB</span>
+          <span id="catalog-count">0 MODELS</span>
+        </div>
+      </aside>
+    </div>
+
+    <div class="bottom-dock">
+      <div class="analysis-bar">
+        <div class="slider-group">
+          <span>✂️ Z-Cut</span>
+          <input id="cut-slider" type="range" min="5" max="100" value="100" />
+          <span id="cut-readout">OFF</span>
+        </div>
+
+        <div id="anim-group" class="slider-group">
+          <button id="btn-anim-play" class="btn active">⏸ Pause</button>
+          <input id="anim-slider" type="range" min="0" max="1000" value="0" />
+          <span id="anim-readout">0.0s</span>
+        </div>
+
+        <div class="model-meta-pill">
+          <span id="meta-dims">DIMS: —</span>
+          <span>·</span>
+          <span id="meta-tris">MESHES: —</span>
+          <span id="meta-rigs"></span>
+          <button id="btn-spin" class="btn" style="padding:3px 7px;font-size:9.5px;">🔄 Spin: OFF</button>
+        </div>
+      </div>
+
+      <div class="view-bar">
+        <div class="view-bar-head">
+          <span id="active-vp-label">📷 VIEWPOINT: 01 · HERO 3/4</span>
+          <span class="hint-desktop">DRAG: ORBIT/LOOK · SCROLL: ZOOM · CLICK DOORS: SLIDE · [V]: STYLE · [F]: MOOD · [M]: MAQUETTE · [G]: MODELS</span>
+        </div>
+        <div id="viewpoint-strip"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+    import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
+
+    // =========================================================================
+    // 0. AUDIO CUES (Subtle DIN Click & Architectural Pocket/Shoji Glide)
+    // =========================================================================
+    let audioCtx = null;
+    function getAudio() {
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        audioCtx = new AC();
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+    function playClick() {
+      try {
+        const ctx = getAudio(); if (!ctx) return;
+        const t = ctx.currentTime;
+        const osc = ctx.createOscillator(), g = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(165, t);
+        osc.frequency.exponentialRampToValueAtTime(42, t + 0.024);
+        g.gain.setValueAtTime(0.06, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.026);
+        osc.connect(g); g.connect(ctx.destination);
+        osc.start(t); osc.stop(t + 0.027);
+      } catch (_) {}
+    }
+    function playSlideSFX(opening = true, isHinge = false) {
+      try {
+        const ctx = getAudio(); if (!ctx) return;
+        const t = ctx.currentTime;
+        if (isHinge) {
+          const osc = ctx.createOscillator(), g = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(opening ? 115 : 145, t);
+          osc.frequency.exponentialRampToValueAtTime(opening ? 76 : 60, t + 0.09);
+          g.gain.setValueAtTime(0.055, t);
+          g.gain.exponentialRampToValueAtTime(0.001, t + 0.11);
+          osc.connect(g); g.connect(ctx.destination);
+          osc.start(t); osc.stop(t + 0.12);
+          return;
+        }
+        const dur = 0.22;
+        const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * dur), ctx.sampleRate);
+        const d = buf.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+        const src = ctx.createBufferSource(); src.buffer = buf;
+        const flt = ctx.createBiquadFilter(); flt.type = 'bandpass'; flt.Q.value = 2.4;
+        flt.frequency.setValueAtTime(opening ? 520 : 680, t);
+        flt.frequency.exponentialRampToValueAtTime(opening ? 740 : 420, t + dur);
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.001, t);
+        g.gain.linearRampToValueAtTime(0.04, t + 0.05);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+        src.connect(flt); flt.connect(g); g.connect(ctx.destination);
+        src.start(t); src.stop(t + dur);
+      } catch (_) {}
+    }
+
+    const IS_MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+    const URL_PARAMS = new URLSearchParams(window.location.search);
+
+    // =========================================================================
+    // 1. CORE SCENE, RENDERER, PMREM STUDIO IBL & EDITORIAL SKY DOME
+    // =========================================================================
+    const container = document.getElementById('canvas-container');
+    const scene = new THREE.Scene();
+
+    const camera = new THREE.PerspectiveCamera(56, window.innerWidth / window.innerHeight, 0.05, 600);
+    camera.rotation.order = 'YXZ';
+
+    const rig = new THREE.Group();
+    rig.add(camera);
+    scene.add(rig);
+
+    const worldRoot = new THREE.Group();
+    worldRoot.name = 'World_Root';
+    scene.add(worldRoot);
+
+    const modelHolder = new THREE.Group();
+    modelHolder.name = 'Active_Model_Holder';
+    worldRoot.add(modelHolder);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, IS_MOBILE ? 1.75 : 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.96;
+    renderer.shadowMap.enabled = !IS_MOBILE;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.localClippingEnabled = true;
+    renderer.xr.enabled = true;
+    container.appendChild(renderer.domElement);
+    const canvasEl = renderer.domElement;
+
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    const studioEnvTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    scene.environment = studioEnvTex;
+    scene.environmentIntensity = 0.44;
+
+    // Horizontal Section Cut Clipping Plane (works universally on ANY model!)
+    const sectionPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 9999);
+    let sectionCutActive = false;
+
+    // Atmospheric Architectural Sky Dome
+    const skyUniforms = {
+      uZenith:  { value: new THREE.Color(0x9ec0e2) },
+      uHorizon: { value: new THREE.Color(0xf4efe8) },
+      uGround:  { value: new THREE.Color(0xdcd6cc) }
+    };
+    const skyDome = new THREE.Mesh(
+      new THREE.SphereGeometry(420, 32, 20),
+      new THREE.ShaderMaterial({
+        side: THREE.BackSide,
+        depthWrite: false,
+        fog: false,
+        uniforms: skyUniforms,
+        vertexShader: `varying vec3 vD; void main(){ vD = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+        fragmentShader: `
+          uniform vec3 uZenith, uHorizon, uGround;
+          varying vec3 vD;
+          void main(){
+            float y = vD.y;
+            vec3 c = y >= 0.0
+              ? mix(uHorizon, uZenith, pow(clamp(y, 0.0, 1.0), 0.58))
+              : mix(uHorizon, uGround, smoothstep(0.0, -0.22, y));
+            gl_FragColor = vec4(c, 1.0);
+            #include <colorspace_fragment>
+          }
+        `
+      })
+    );
+    skyDome.frustumCulled = false;
+    skyDome.renderOrder = -1000;
+    skyDome.raycast = () => {};
+    scene.add(skyDome);
+
+    // Calibrated Architectural Lighting Rig
+    const hemiLight = new THREE.HemisphereLight(0xf3f7fc, 0x9b8e80, 0.52);
+    scene.add(hemiLight);
+
+    const sunLight = new THREE.DirectionalLight(0xfff6e8, 1.42);
+    sunLight.position.set(-18, 28, 22);
+    if (!IS_MOBILE) {
+      sunLight.castShadow = true;
+      sunLight.shadow.mapSize.set(2048, 2048);
+      sunLight.shadow.bias = -0.0004;
+      sunLight.shadow.normalBias = 0.025;
+    }
+    scene.add(sunLight);
+    scene.add(sunLight.target);
+
+    const fillLight = new THREE.DirectionalLight(0xdbeafe, 0.28);
+    fillLight.position.set(20, 14, -18);
+    scene.add(fillLight);
+
+    const MOODS = [
+      { id: 'day',     label: '☀️ Day',     exp: 0.96, env: 0.44, hemi: 0.52, sun: 1.42, sunCol: 0xfff6e8, sunDir: [-0.45, 0.72, 0.52], fill: 0.28, bg: 0xe9eef4, zen: 0x9ec0e2, hor: 0xf4efe8, grd: 0xdcd6cc },
+      { id: 'golden',  label: '🌅 Golden',  exp: 0.95, env: 0.35, hemi: 0.38, sun: 1.55, sunCol: 0xffc684, sunDir: [-0.78, 0.30, 0.55], fill: 0.22, bg: 0xead8c8, zen: 0x6783ae, hor: 0xf7cfa6, grd: 0xc8b4a0 },
+      { id: 'evening', label: '🌙 Evening', exp: 0.90, env: 0.22, hemi: 0.26, sun: 0.42, sunCol: 0x9bb8e8, sunDir: [0.45, 0.48, -0.75], fill: 0.16, bg: 0x1e293b, zen: 0x0f172a, hor: 0x334155, grd: 0x172030 },
+      { id: 'studio',  label: '🏛️ Studio',  exp: 0.93, env: 0.58, hemi: 0.64, sun: 0.96, sunCol: 0xffffff, sunDir: [-0.40, 0.78, 0.48], fill: 0.36, bg: 0xf3f1ec, zen: 0xe6e3dc, hor: 0xf9f7f3, grd: 0xe9e5de }
+    ];
+    let moodIdx = 0;
+
+    // 4 Universal Visual Looks
+    const STYLES = [
+      { id: 'editorial', label: '✨ Editorial', cls: 'active' },
+      { id: 'pbr',       label: '☀️ Soft-PBR',  cls: '' },
+      { id: 'cad',       label: '✏️ Paper CAD', cls: 'active' },
+      { id: 'blueprint', label: '📐 Blueprint', cls: 'active' }
+    ];
+    let styleIdx = 0; // Editorial Hybrid default
+
+    // Shared Edge & Style Materials (Zero per-mesh cloning — blazing fast even on 3,400+ mesh models!)
+    const whisperArchMat = new THREE.LineBasicMaterial({ color: 0x1c1917, transparent: true, opacity: 0.24, depthTest: true, depthWrite: false });
+    const whisperCtxMat  = new THREE.LineBasicMaterial({ color: 0x292524, transparent: true, opacity: 0.11, depthTest: true, depthWrite: false });
+    const cadInkMat      = new THREE.LineBasicMaterial({ color: 0x18181b, transparent: true, opacity: 0.56, depthTest: true, depthWrite: false });
+    const blueprintMat   = new THREE.LineBasicMaterial({ color: 0xbae6fd, transparent: true, opacity: 0.72, depthTest: true, depthWrite: false });
+    const hoverEdgeMat   = new THREE.LineBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.95, depthTest: true, depthWrite: false });
+    const cadOpaqueMat   = new THREE.MeshStandardMaterial({ color: 0xf7f5ef, roughness: 0.94, metalness: 0.02, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
+    const cadGlassMat    = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.25, metalness: 0.05, transparent: true, opacity: 0.24, side: THREE.DoubleSide });
+    const bpOpaqueMat    = new THREE.MeshStandardMaterial({ color: 0x132c4f, roughness: 0.92, metalness: 0.04, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
+    const bpGlassMat     = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.25, metalness: 0.05, transparent: true, opacity: 0.18, side: THREE.DoubleSide });
+    const SHARED_STYLE_MATS = new Set([whisperArchMat, whisperCtxMat, cadInkMat, blueprintMat, hoverEdgeMat, cadOpaqueMat, cadGlassMat, bpOpaqueMat, bpGlassMat]);
+
+    // Museum Plinth & Subtle Architectural Ground Grid (Auto-sized per model, hidden in AR)
+    const stageGroup = new THREE.Group();
+    const plinthTopMat = new THREE.MeshStandardMaterial({ color: 0xe6e3dc, roughness: 0.90, metalness: 0.02 });
+    const plinthBaseMat = new THREE.MeshStandardMaterial({ color: 0x8f6642, roughness: 0.76, metalness: 0.04 });
+    const plinthTop = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), plinthTopMat);
+    const plinthBase = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), plinthBaseMat);
+    plinthTop.receiveShadow = !IS_MOBILE;
+    plinthBase.receiveShadow = !IS_MOBILE;
+    stageGroup.add(plinthTop, plinthBase);
+    stageGroup.visible = false;
+    worldRoot.add(stageGroup);
+
+    let groundGrid = new THREE.GridHelper(60, 60, 0x9c968c, 0xcbc6bc);
+    groundGrid.material.transparent = true;
+    groundGrid.material.opacity = 0.32;
+    groundGrid.position.y = -0.008;
+    worldRoot.add(groundGrid);
+
+    // =========================================================================
+    // 2. STATE & MODEL METRICS
+    // =========================================================================
+    let catalog = [];
+    let activeModelIdx = 0;
+    let currentMode = 1; // 1: 3D, 2: Quest VR, 3: 1:1 AR, 4: Tabletop AR
+    let navMode = IS_MOBILE ? 'orbit' : 'orbit';
+    let maquetteMode = false;
+    let autoSpin = false;
+    let roofNode = null;
+    let contextNode = null;
+    let roofVisible = true;
+    let contextVisible = true;
+
+    const modelSize = new THREE.Vector3(10, 6, 10);
+    const modelCenter = new THREE.Vector3(0, 3, 0);
+    const focusSize = new THREE.Vector3(10, 6, 10);
+    const focusCenter = new THREE.Vector3(0, 3, 0);
+    let modelMaxSpan = 10;
+    let focusMaxSpan = 10;
+    let modelMinY = 0;
+    let modelMaxY = 6;
+
+    let mixer = null;
+    let animActions = [];
+    let animDuration = 0;
+    let animPlaying = true;
+    let animScrubbing = false;
+
+    const walkableMeshes = [];
+    let viewpoints = [];
+    let activeVpIdx = 0;
+
+    // Camera / Orbit state
+    let yaw = -0.72;
+    let pitch = -0.32;
+    let orbitRadius = 14;
+    const orbitTarget = new THREE.Vector3(0, 2, 0);
+    const camTrans = { active: false, t0: 0, dur: 520, p0: new THREE.Vector3(), p1: new THREE.Vector3(), y0: 0, y1: 0, pi0: 0, pi1: 0, r1: 14, tgt1: new THREE.Vector3() };
+
+    function fwdFromAngles(y, p) {
+      return new THREE.Vector3(-Math.sin(y) * Math.cos(p), Math.sin(p), -Math.cos(y) * Math.cos(p)).normalize();
+    }
+    function applyOrbitToRig() {
+      const f = fwdFromAngles(yaw, pitch);
+      rig.position.copy(orbitTarget).addScaledVector(f, -orbitRadius);
+      camera.rotation.set(pitch, yaw, 0);
+    }
+    function syncOrbitFromRig(r) {
+      if (typeof r === 'number') orbitRadius = r;
+      orbitTarget.copy(rig.position).addScaledVector(fwdFromAngles(yaw, pitch), orbitRadius);
+    }
+    function shortAngle(a, b) {
+      let d = (b - a) % (Math.PI * 2);
+      if (d > Math.PI) d -= Math.PI * 2;
+      if (d < -Math.PI) d += Math.PI * 2;
+      return d;
+    }
+
+    // =========================================================================
+    // 3. UI REFS
+    // =========================================================================
+    const loaderOverlay = document.getElementById('loader-overlay');
+    const loaderTitle = document.getElementById('loader-title');
+    const loaderSub = document.getElementById('loader-sub');
+    const statusDot = document.getElementById('status-dot');
+    const activeModelTitle = document.getElementById('active-model-title');
+    const statusSub = document.getElementById('status-sub');
+    const doorTooltip = document.getElementById('door-tooltip');
+    const dropOverlay = document.getElementById('drop-overlay');
+    const arTouchSurface = document.getElementById('ar-touch-surface');
+    const arBar = document.getElementById('ar-bar');
+    const arLabel = document.getElementById('ar-label');
+    const drawerEl = document.getElementById('catalog-drawer');
+    const modelListEl = document.getElementById('model-list');
+    const modelSearchEl = document.getElementById('model-search');
+    const catalogCountEl = document.getElementById('catalog-count');
+    const vpStripEl = document.getElementById('viewpoint-strip');
+    const activeVpLabel = document.getElementById('active-vp-label');
+    const cutSlider = document.getElementById('cut-slider');
+    const cutReadout = document.getElementById('cut-readout');
+    const animGroup = document.getElementById('anim-group');
+    const btnAnimPlay = document.getElementById('btn-anim-play');
+    const animSlider = document.getElementById('anim-slider');
+    const animReadout = document.getElementById('anim-readout');
+    const metaDims = document.getElementById('meta-dims');
+    const metaTris = document.getElementById('meta-tris');
+    const metaRigs = document.getElementById('meta-rigs');
+    const btnDrawer = document.getElementById('btn-drawer');
+    const btnStyle = document.getElementById('btn-style');
+    const btnMood = document.getElementById('btn-mood');
+    const btnDoors = document.getElementById('btn-doors');
+    const btnTabletop = document.getElementById('btn-tabletop');
+    const btnNav = document.getElementById('btn-nav');
+    const btnRoof = document.getElementById('btn-roof');
+    const btnContext = document.getElementById('btn-context');
+    const btnStandalone = document.getElementById('btn-standalone');
+    const btnExitXR = document.getElementById('btn-exit-xr');
+    const btnSpin = document.getElementById('btn-spin');
+
+    // =========================================================================
+    // 4. UNIVERSAL VISUAL STYLE & LIGHTING ENGINE (SOFT-PBR + WHISPER INK)
+    // =========================================================================
+    function isDescendant(obj, anc) {
+      for (let p = obj; p; p = p.parent) if (p === anc) return true;
+      return false;
+    }
+
+    function applyEnvironmentAndMood() {
+      const isAR = renderer.xr.isPresenting && (currentMode === 3 || currentMode === 4);
+      const style = STYLES[styleIdx].id;
+      const m = MOODS[moodIdx];
+
+      const sunDist = Math.max(24, modelMaxSpan * 1.8);
+      sunLight.position.set(m.sunDir[0] * sunDist, m.sunDir[1] * sunDist, m.sunDir[2] * sunDist);
+      sunLight.target.position.set(focusCenter.x, 0, focusCenter.z);
+      if (!IS_MOBILE) {
+        const d = Math.max(12, modelMaxSpan * 0.72);
+        sunLight.shadow.camera.left = -d;
+        sunLight.shadow.camera.right = d;
+        sunLight.shadow.camera.top = d;
+        sunLight.shadow.camera.bottom = -d;
+        sunLight.shadow.camera.near = 1;
+        sunLight.shadow.camera.far = sunDist * 2.8;
+        sunLight.shadow.camera.updateProjectionMatrix();
+      }
+
+      if (isAR) {
+        skyDome.visible = false;
+        stageGroup.visible = false;
+        groundGrid.visible = false;
+        scene.background = null;
+        scene.fog = null;
+        renderer.toneMappingExposure = 0.86;
+        scene.environmentIntensity = 0.40;
+        hemiLight.intensity = 0.50;
+        sunLight.intensity = 0.90;
+        sunLight.color.setHex(0xfff8ee);
+        fillLight.intensity = 0.20;
+        return;
+      }
+
+      groundGrid.visible = !maquetteMode && style !== 'blueprint';
+      stageGroup.visible = maquetteMode;
+
+      if (style === 'blueprint') {
+        skyDome.visible = false;
+        scene.background = new THREE.Color(0x0c1e38);
+        scene.fog = new THREE.FogExp2(0x0c1e38, 0.005);
+        scene.environmentIntensity = 0.14;
+        renderer.toneMappingExposure = 0.92;
+        hemiLight.intensity = 0.55;
+        sunLight.intensity = 0.65;
+        sunLight.color.setHex(0x93c5fd);
+        fillLight.intensity = 0.25;
+      } else if (style === 'cad') {
+        skyDome.visible = false;
+        scene.background = new THREE.Color(0xf4f3ef);
+        scene.fog = new THREE.FogExp2(0xf4f3ef, 0.005);
+        scene.environmentIntensity = 0.30;
+        renderer.toneMappingExposure = 0.94;
+        hemiLight.intensity = 0.66;
+        sunLight.intensity = 0.92;
+        sunLight.color.setHex(0xffffff);
+        fillLight.intensity = 0.30;
+      } else {
+        skyDome.visible = true;
+        scene.background = new THREE.Color(m.bg);
+        scene.fog = new THREE.FogExp2(m.bg, Math.min(0.008, 0.12 / Math.max(15, modelMaxSpan)));
+        skyUniforms.uZenith.value.setHex(m.zen);
+        skyUniforms.uHorizon.value.setHex(m.hor);
+        skyUniforms.uGround.value.setHex(m.grd);
+        scene.environmentIntensity = m.env;
+        renderer.toneMappingExposure = m.exp;
+        hemiLight.intensity = m.hemi;
+        sunLight.intensity = m.sun;
+        sunLight.color.setHex(m.sunCol);
+        fillLight.intensity = m.fill;
+      }
+      btnMood.textContent = m.label;
+    }
+
+    function applyClippingToMat(mat) {
+      if (!mat) return;
+      if (Array.isArray(mat)) { mat.forEach(applyClippingToMat); return; }
+      mat.clippingPlanes = sectionCutActive ? [sectionPlane] : [];
+      mat.clipShadows = sectionCutActive;
+      mat.needsUpdate = true;
+    }
+
+    function applyVisualStyle(idx) {
+      styleIdx = ((idx % STYLES.length) + STYLES.length) % STYLES.length;
+      const st = STYLES[styleIdx];
+      btnStyle.textContent = st.label;
+      btnStyle.classList.toggle('active', st.id !== 'pbr');
+
+      const showEdges = (st.id === 'editorial' || st.id === 'cad' || st.id === 'blueprint');
+      modelHolder.traverse((child) => {
+        if (!child.isMesh || child.userData.isHelper) return;
+        const orig = child.userData.origMat;
+        if (!orig) return;
+
+        if (st.id === 'cad' && child.userData.cadMat) child.material = child.userData.cadMat;
+        else if (st.id === 'blueprint' && child.userData.bpMat) child.material = child.userData.bpMat;
+        else child.material = orig;
+        applyClippingToMat(child.material);
+
+        const edge = child.userData.edgeSeg;
+        if (edge) {
+          edge.visible = showEdges;
+          if (st.id === 'editorial') edge.material = child.userData.isContextMesh ? whisperCtxMat : whisperArchMat;
+          else if (st.id === 'cad') edge.material = cadInkMat;
+          else if (st.id === 'blueprint') edge.material = blueprintMat;
+        }
+      });
+
+      applyEnvironmentAndMood();
+      updateVRHudCanvas();
+      statusSub.textContent = `${st.label.replace(/^[^\w]+/, '').toUpperCase()} · ${MOODS[moodIdx].id.toUpperCase()} MOOD${interactiveRigs.length ? ` · ${interactiveRigs.length} INTERACTIVE RIGS` : ''}`;
+    }
+
+    // =========================================================================
+    // 5. GLTF EXTRAS INTERACTIVE RIG ENGINE (Pocket Doors, Shoji, Fusuma, Hinge)
+    // =========================================================================
+    const interactiveRigs = [];
+    const rigGroups = new Map();
+    const interactiveMeshes = [];
+    const raycaster = new THREE.Raycaster();
+    const pointerNDC = new THREE.Vector2();
+    let hoveredRig = null;
+    let doorsCycleState = 0;
+
+    function applyRigVal(r, val) {
+      r.currentVal = val;
+      if (r.type === 'hinge_door') r.node.rotation.y = THREE.MathUtils.degToRad(val);
+      else if (r.axis === 'X') r.node.position.x = val;
+      else if (r.axis === 'Y') r.node.position.z = -val;
+    }
+    function isRigOpen(r) {
+      const span = Math.abs(r.openVal - r.closedVal);
+      if (span < 1e-4) return false;
+      return Math.abs(r.targetVal - r.openVal) < Math.abs(r.targetVal - r.closedVal);
+    }
+    function getGroup(r) {
+      return (r.groupId && rigGroups.has(r.groupId)) ? rigGroups.get(r.groupId) : [r];
+    }
+
+    function buildInteractiveRigs(root) {
+      interactiveRigs.length = 0;
+      rigGroups.clear();
+      interactiveMeshes.length = 0;
+      hoveredRig = null;
+      doorsCycleState = 0;
+
+      root.traverse((obj) => {
+        const ud = obj.userData || {};
+        if (!ud.parametric_type) return;
+        const type = ud.parametric_type;
+        const axis = (ud.slide_axis || 'X').toUpperCase();
+        const cur = type === 'hinge_door'
+          ? THREE.MathUtils.radToDeg(obj.rotation.y)
+          : (axis === 'Y' ? -obj.position.z : obj.position.x);
+
+        let closedVal = typeof ud.closed_val === 'number' ? ud.closed_val : cur;
+        let openVal = typeof ud.open_val === 'number' ? ud.open_val : cur;
+        if (typeof ud.closed_val !== 'number' || typeof ud.open_val !== 'number') {
+          if (type === 'hinge_door') { closedVal = ud.swing_min_deg ?? 0; openVal = ud.swing_max_deg ?? 85; }
+          else if (axis === 'X' && typeof ud.slide_min_x === 'number') { closedVal = ud.slide_min_x; openVal = ud.slide_max_x; }
+          else if (axis === 'Y' && typeof ud.slide_min_y === 'number') { closedVal = ud.slide_min_y; openVal = ud.slide_max_y; }
+        }
+        const entry = {
+          node: obj, name: obj.name, type, axis,
+          groupId: ud.group_id || null,
+          label: ud.label || obj.name.replace(/_/g, ' '),
+          closedVal, openVal,
+          restVal: typeof ud.rest_val === 'number' ? ud.rest_val : cur,
+          currentVal: cur, targetVal: cur,
+          meshes: [], hoverEdges: []
+        };
+        obj.traverse((c) => {
+          if (!c.isMesh || c.userData.isHelper) return;
+          c.userData.interactiveRig = entry;
+          entry.meshes.push(c);
+          interactiveMeshes.push(c);
+          if (c.geometry) {
+            const hl = new THREE.LineSegments(new THREE.EdgesGeometry(c.geometry, 24), hoverEdgeMat);
+            hl.userData.isHelper = true;
+            hl.raycast = () => {};
+            hl.visible = false;
+            c.add(hl);
+            entry.hoverEdges.push(hl);
+          }
+        });
+        if (entry.meshes.length > 0) {
+          interactiveRigs.push(entry);
+          if (entry.groupId) {
+            if (!rigGroups.has(entry.groupId)) rigGroups.set(entry.groupId, []);
+            rigGroups.get(entry.groupId).push(entry);
+          }
+        }
+      });
+
+      btnDoors.style.display = interactiveRigs.length > 0 ? 'inline-flex' : 'none';
+      btnDoors.textContent = '🚪 Doors: Rest';
+      metaRigs.textContent = interactiveRigs.length > 0 ? `· ${interactiveRigs.length} INTERACTIVE DOORS` : '';
+    }
+
+    function setHoveredRig(next, cx = null, cy = null) {
+      if (hoveredRig !== next) {
+        if (hoveredRig) getGroup(hoveredRig).forEach((m) => m.hoverEdges.forEach((e) => { e.visible = false; }));
+        hoveredRig = next;
+        if (hoveredRig) getGroup(hoveredRig).forEach((m) => m.hoverEdges.forEach((e) => { e.visible = true; }));
+        canvasEl.style.cursor = hoveredRig ? 'pointer' : '';
+      }
+      if (hoveredRig && cx !== null && cy !== null && !renderer.xr.isPresenting) {
+        const grp = getGroup(hoveredRig);
+        const lead = grp.find((m) => Math.abs(m.openVal - m.closedVal) > 1e-4) || hoveredRig;
+        const willClose = isRigOpen(lead);
+        doorTooltip.innerHTML = `${lead.type === 'hinge_door' ? '🚪' : '↔'} ${lead.label}<span class="tt-act">[CLICK TO ${willClose ? 'CLOSE' : 'OPEN'}]</span>`;
+        doorTooltip.style.left = `${Math.min(window.innerWidth - 260, cx)}px`;
+        doorTooltip.style.top = `${Math.max(24, cy)}px`;
+        doorTooltip.style.display = 'block';
+      } else {
+        doorTooltip.style.display = 'none';
+      }
+    }
+
+    function toggleRig(r) {
+      if (!r) return;
+      const grp = getGroup(r);
+      const lead = grp.find((m) => Math.abs(m.openVal - m.closedVal) > 1e-4) || r;
+      const opening = !isRigOpen(lead);
+      grp.forEach((m) => { m.targetVal = opening ? m.openVal : m.closedVal; });
+      playSlideSFX(opening, lead.type === 'hinge_door');
+      statusSub.textContent = `${opening ? 'OPENED' : 'CLOSED'}: ${lead.label.toUpperCase()}`;
+    }
+
+    function cycleAllDoors() {
+      if (interactiveRigs.length === 0) return;
+      doorsCycleState = (doorsCycleState + 1) % 3;
+      interactiveRigs.forEach((r) => {
+        r.targetVal = doorsCycleState === 1 ? r.openVal : (doorsCycleState === 2 ? r.closedVal : r.restVal);
+      });
+      btnDoors.textContent = ['🚪 Doors: Rest', '🚪 Doors: Open', '🚪 Doors: Closed'][doorsCycleState];
+      playSlideSFX(doorsCycleState === 1, false);
+    }
+
+    function updateRigs(dt) {
+      const s = 1 - Math.exp(-8.5 * dt);
+      for (const r of interactiveRigs) {
+        const diff = r.targetVal - r.currentVal;
+        if (Math.abs(diff) > 0.0005) applyRigVal(r, r.currentVal + diff * s);
+        else if (diff !== 0) applyRigVal(r, r.targetVal);
+      }
+    }
+
+    function isVisibleDeep(o) {
+      for (let p = o; p; p = p.parent) if (!p.visible) return false;
+      return true;
+    }
+
+    function raycastDoorAtClient(cx, cy) {
+      if (interactiveMeshes.length === 0 || renderer.xr.isPresenting) return null;
+      const rect = canvasEl.getBoundingClientRect();
+      pointerNDC.x = ((cx - rect.left) / rect.width) * 2 - 1;
+      pointerNDC.y = -((cy - rect.top) / rect.height) * 2 + 1;
+      raycaster.setFromCamera(pointerNDC, camera);
+      raycaster.near = 0.05; raycaster.far = 36;
+      const hits = raycaster.intersectObjects(interactiveMeshes, false);
+      for (const h of hits) {
+        if (isVisibleDeep(h.object) && h.object.userData.interactiveRig) return h.object.userData.interactiveRig;
+      }
+      return null;
+    }
+
+    // =========================================================================
+    // 6. MODEL LOADER, DISPOSAL, AUTO-GROUNDING, WHISPER INK & VIEWPOINTS
+    // =========================================================================
+    const gltfLoader = new GLTFLoader();
+    let loadSerial = 0;
+
+    function disposeCurrentModel() {
+      if (mixer) { mixer.stopAllAction(); mixer = null; }
+      animActions = [];
+      animDuration = 0;
+      animGroup.classList.remove('visible');
+      setHoveredRig(null);
+      interactiveRigs.length = 0;
+      rigGroups.clear();
+      interactiveMeshes.length = 0;
+      walkableMeshes.length = 0;
+      roofNode = null;
+      contextNode = null;
+
+      const geos = new Set();
+      const mats = new Set();
+      modelHolder.traverse((obj) => {
+        if (obj.geometry) geos.add(obj.geometry);
+        if (obj.material) (Array.isArray(obj.material) ? obj.material : [obj.material]).forEach((m) => mats.add(m));
+        if (obj.userData.origMat) (Array.isArray(obj.userData.origMat) ? obj.userData.origMat : [obj.userData.origMat]).forEach((m) => mats.add(m));
+      });
+      geos.forEach((g) => g.dispose());
+      mats.forEach((m) => {
+        if (m && !SHARED_STYLE_MATS.has(m) && typeof m.dispose === 'function') m.dispose();
+      });
+      while (modelHolder.children.length > 0) modelHolder.remove(modelHolder.children[0]);
+    }
+
+    function updatePlinthBounds() {
+      const sz = (contextNode && !contextVisible) ? focusSize : modelSize;
+      const ctr = (contextNode && !contextVisible) ? focusCenter : modelCenter;
+      const span = Math.max(sz.x, sz.z, 4);
+      const margin = Math.max(0.8, span * 0.08);
+      const w = sz.x + margin * 2;
+      const d = sz.z + margin * 2;
+      const h1 = Math.max(0.14, span * 0.015);
+      const h2 = Math.max(0.28, span * 0.032);
+      const ov = Math.max(0.18, span * 0.02);
+
+      plinthTop.scale.set(w, h1, d);
+      plinthTop.position.set(ctr.x, -0.02 - h1 * 0.5, ctr.z);
+      plinthBase.scale.set(w + ov * 2, h2, d + ov * 2);
+      plinthBase.position.set(ctr.x, -0.02 - h1 - h2 * 0.5, ctr.z);
+    }
+
+    function buildViewpointsForModel(entry, gltf, model) {
+      viewpoints = [];
+      const ctr = entry.focusHouseOnly ? focusCenter : modelCenter;
+      const span = entry.focusHouseOnly ? focusMaxSpan : modelMaxSpan;
+      const h = entry.focusHouseOnly ? focusSize.y : modelSize.y;
+      const heroR = Math.max(4.5, span * 1.18);
+
+      const addOrbitVP = (name, yRad, pRad, dist, target = new THREE.Vector3(ctr.x, Math.max(1.2, h * 0.36), ctr.z)) => {
+        const f = fwdFromAngles(yRad, pRad);
+        const eye = target.clone().addScaledVector(f, -dist);
+        viewpoints.push({ name, eye, yaw: yRad, pitch: pRad, orbitDist: dist, target });
+      };
+
+      addOrbitVP('01 · Hero 3/4', -0.72, -0.24, heroR);
+      addOrbitVP('02 · Front Elev', 0.0, -0.06, Math.max(5.0, span * 1.28), new THREE.Vector3(ctr.x, h * 0.42, ctr.z));
+      addOrbitVP('03 · Rear 3/4', 2.42, -0.26, heroR);
+      addOrbitVP('04 · Aerial Plan', -0.68, -0.92, Math.max(8.0, modelMaxSpan * 1.25), new THREE.Vector3(modelCenter.x, 0.5, modelCenter.z));
+
+      // Special curated interior shots for 9-Tsubo House Pass 2 (jump right to Pocket Doors & Shoji!)
+      if (entry.id === '9-tsubo-house') {
+        viewpoints.push(
+          { name: '05 · Bathroom Pocket Doors', eye: new THREE.Vector3(1.52, 1.45, -0.45), yaw: -0.1237, pitch: -0.2114, orbitDist: 1.8, target: null },
+          { name: '06 · Tatami & Shoji',        eye: new THREE.Vector3(-0.65, 1.38, 2.05), yaw: 0.0,     pitch: -0.0141, orbitDist: 2.4, target: null },
+          { name: '07 · Living & Kitchen',      eye: new THREE.Vector3(-2.15, 2.05, 2.10), yaw: -1.2530, pitch: -0.0250, orbitDist: 2.8, target: null },
+          { name: '08 · 2F Loft Lounge',        eye: new THREE.Vector3(1.55, 3.25, 1.35),  yaw: 0.7266,  pitch: -0.1914, orbitDist: 2.8, target: null }
+        );
+      }
+
+      // Auto-import any WP_* waypoints with room_label
+      const wps = [];
+      model.traverse((o) => {
+        if (o.userData && o.userData.room_label) wps.push(o);
+      });
+      if (entry.id !== '9-tsubo-house' && wps.length > 0) {
+        wps.slice(0, 10).forEach((wp, i) => {
+          const p = new THREE.Vector3();
+          wp.getWorldPosition(p);
+          viewpoints.push({
+            name: `WP ${i + 1} · ${wp.userData.room_label}`,
+            eye: new THREE.Vector3(p.x, p.y + 1.55, p.z),
+            yaw: 0, pitch: -0.04, orbitDist: 2.5, target: null
+          });
+        });
+      }
+
+      // Auto-import embedded glTF cameras (e.g. Miss Robichaux's Academy 19 cameras!)
+      if (gltf.cameras && gltf.cameras.length > 0) {
+        const tmpPos = new THREE.Vector3();
+        const tmpQuat = new THREE.Quaternion();
+        const tmpEuler = new THREE.Euler(0, 0, 0, 'YXZ');
+        gltf.cameras.slice(0, 12).forEach((camObj, i) => {
+          camObj.updateMatrixWorld(true);
+          camObj.getWorldPosition(tmpPos);
+          camObj.getWorldQuaternion(tmpQuat);
+          tmpEuler.setFromQuaternion(tmpQuat, 'YXZ');
+          const cleanName = (camObj.name || `Camera ${i + 1}`).replace(/^Cam_?\d*_?/i, '').replace(/_/g, ' ').trim();
+          viewpoints.push({
+            name: `Cam ${i + 1} · ${cleanName || 'View'}`,
+            eye: tmpPos.clone(),
+            yaw: tmpEuler.y,
+            pitch: THREE.MathUtils.clamp(tmpEuler.x, -1.45, 1.45),
+            orbitDist: Math.max(2.2, span * 0.28),
+            target: null
+          });
+        });
+      }
+
+      vpStripEl.innerHTML = '';
+      viewpoints.forEach((vp, i) => {
+        const b = document.createElement('button');
+        b.className = 'vp-pill' + (i === 0 ? ' active' : '');
+        b.textContent = vp.name;
+        b.addEventListener('click', (e) => { e.stopPropagation(); playClick(); goToViewpoint(i, true); });
+        vpStripEl.appendChild(b);
+      });
+    }
+
+    function goToViewpoint(idx, animate = true) {
+      if (viewpoints.length === 0) return;
+      activeVpIdx = ((idx % viewpoints.length) + viewpoints.length) % viewpoints.length;
+      const vp = viewpoints[activeVpIdx];
+      activeVpLabel.textContent = `📷 VIEWPOINT: ${vp.name.toUpperCase()}`;
+      vpStripEl.querySelectorAll('.vp-pill').forEach((el, i) => {
+        el.classList.toggle('active', i === activeVpIdx);
+        if (i === activeVpIdx) el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      });
+      updateVRHudCanvas();
+
+      if (renderer.xr.isPresenting && currentMode === 2) {
+        if (!maquetteMode) {
+          rig.position.set(vp.eye.x, Math.max(0, vp.eye.y - 1.55), vp.eye.z);
+          rig.rotation.set(0, vp.yaw, 0);
+          placeVRHud(true);
+        }
+        return;
+      }
+
+      const tgt = vp.target ? vp.target.clone() : vp.eye.clone().addScaledVector(fwdFromAngles(vp.yaw, vp.pitch), vp.orbitDist);
+      if (!animate) {
+        camTrans.active = false;
+        rig.position.copy(vp.eye);
+        yaw = vp.yaw; pitch = vp.pitch; orbitRadius = vp.orbitDist; orbitTarget.copy(tgt);
+        camera.rotation.set(pitch, yaw, 0);
+        return;
+      }
+      camTrans.active = true;
+      camTrans.t0 = performance.now();
+      camTrans.dur = 520;
+      camTrans.p0.copy(rig.position);
+      camTrans.p1.copy(vp.eye);
+      camTrans.y0 = yaw;
+      camTrans.y1 = yaw + shortAngle(yaw, vp.yaw);
+      camTrans.pi0 = pitch;
+      camTrans.pi1 = vp.pitch;
+      camTrans.r1 = vp.orbitDist;
+      camTrans.tgt1.copy(tgt);
+    }
+
+    function loadModelEntry(index) {
+      if (!catalog[index]) return;
+      activeModelIdx = index;
+      const entry = catalog[index];
+      const serial = ++loadSerial;
+
+      // Update active card UI
+      renderCatalogList(modelSearchEl.value);
+      activeModelTitle.textContent = entry.title.toUpperCase();
+      loaderTitle.textContent = `LOADING ${entry.title.toUpperCase()}...`;
+      loaderSub.textContent = `${entry.subtitle || 'LOCAL GLB'} · PREPARING SOFT-PBR + WHISPER INK`;
+      loaderOverlay.classList.remove('hidden');
+      statusDot.classList.remove('ready');
+
+      const isLocalHost = (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+      const resolvedUrl = (isLocalHost && entry.localUrl) ? entry.localUrl : entry.url;
+      const resolvedStandalone = (isLocalHost && entry.localStandaloneUrl) ? entry.localStandaloneUrl : entry.standaloneUrl;
+      btnStandalone.style.display = resolvedStandalone ? 'inline-flex' : 'none';
+      if (resolvedStandalone) btnStandalone.href = resolvedStandalone;
+
+      disposeCurrentModel();
+
+      // Reset Section Cut cleanly
+      cutSlider.value = 100;
+      sectionCutActive = false;
+      cutReadout.textContent = 'OFF';
+
+      gltfLoader.load(
+        resolvedUrl,
+        (gltf) => {
+          if (serial !== loadSerial) return;
+          const model = gltf.scene;
+          modelHolder.add(model);
+
+          // Ground model cleanly at Y = 0 and center X/Z ONLY if far off-origin
+          model.updateMatrixWorld(true);
+          const rawBox = new THREE.Box3().setFromObject(model);
+          if (!rawBox.isEmpty()) {
+            const rawMinY = rawBox.min.y;
+            if (Math.abs(rawMinY) > 0.02) {
+              model.position.y -= rawMinY;
+            }
+            const rawCtr = new THREE.Vector3();
+            rawBox.getCenter(rawCtr);
+            if (Math.hypot(rawCtr.x, rawCtr.z) > 25) {
+              model.position.x -= rawCtr.x;
+              model.position.z -= rawCtr.z;
+            }
+          }
+          model.updateMatrixWorld(true);
+
+          // Normalize embedded glTF KHR_lights_punctual (Blender exports raw Watt intensities that blow out PBR!)
+          model.traverse((o) => {
+            if (!o.isLight) return;
+            if (o.isDirectionalLight || o.isHemisphereLight || o.isSpotLight) {
+              o.intensity = 0; // Unified Editorial Mood rig handles sky & sun consistently across all models
+              o.visible = false;
+            } else if (o.isPointLight) {
+              // Preserve subtle warm interior fixture ambiance without overexposing white plaster
+              o.intensity = Math.min(o.intensity * 0.015, 1.4);
+              o.distance = Math.min(o.distance || 8, 8);
+              o.decay = 2.0;
+            }
+          });
+
+          // Detect Roof & Context groups automatically
+          roofNode = model.getObjectByName('Roof_Group') || null;
+          contextNode = model.getObjectByName('Context_Group') || null;
+          roofVisible = true;
+          contextVisible = true;
+          btnRoof.style.display = roofNode ? 'inline-flex' : 'none';
+          btnRoof.classList.add('on');
+          btnContext.style.display = contextNode ? 'inline-flex' : 'none';
+          btnContext.classList.add('on');
+
+          // Initialize glTF extras interactive rigs (16 rigs on 9-Tsubo House!)
+          buildInteractiveRigs(model);
+
+          // Traverse all meshes: assign shared CAD/Blueprint styles + smart Whisper Ink edges + metrics
+          const skipInkPattern = /foliage|sakura|petal|leaf|blossom|shrub|bush|tree|kitty|bulb|glow|eyeshine|wire|water|towel_roll|gravel|soil|fans_group|rock|stone|boulder|terrain|landscape/i;
+          const houseBox = new THREE.Box3();
+          const tmpBox = new THREE.Box3();
+          const edgeGeoCache = new Map();
+          let meshCount = 0;
+          let edgeCount = 0;
+
+          model.traverse((c) => {
+            if (!c.isMesh || c.userData.isHelper) return;
+            meshCount++;
+            if (!IS_MOBILE) { c.castShadow = true; c.receiveShadow = true; }
+            const arr = c.material ? (Array.isArray(c.material) ? c.material : [c.material]) : [];
+            let isGlass = /glass|pane|window/i.test(c.name || '');
+            arr.forEach((m) => {
+              if (!m) return;
+              m.side = THREE.DoubleSide;
+              // Replace heavy double-pass transmission with crisp reflective WebXR-safe glass (keeps 90fps in VR!)
+              if (typeof m.transmission === 'number' && m.transmission > 0) {
+                m.transmission = 0;
+                m.transparent = true;
+                m.opacity = Math.min(m.opacity < 1 ? m.opacity : 0.45, 0.52);
+                m.roughness = Math.min(m.roughness ?? 0.1, 0.12);
+                m.depthWrite = false;
+                isGlass = true;
+              } else if (m.transparent && m.opacity < 0.85) {
+                isGlass = true;
+              }
+            });
+
+            c.userData.origMat = c.material;
+            c.userData.isContextMesh = contextNode ? isDescendant(c, contextNode) : false;
+            c.userData.cadMat = isGlass ? cadGlassMat : cadOpaqueMat;
+            c.userData.bpMat  = isGlass ? bpGlassMat  : bpOpaqueMat;
+
+            // Auto-generate Whisper Ink EdgesGeometry (cached by geometry.uuid for instanced structures!)
+            const triEst = c.geometry && c.geometry.index ? c.geometry.index.count / 3 : (c.geometry?.attributes?.position?.count || 0) / 3;
+            if (edgeCount < 1400 && c.geometry && !skipInkPattern.test(c.name || '') && triEst > 0 && triEst < 8000) {
+              const cacheKey = `${c.geometry.uuid}_${c.userData.isContextMesh ? 32 : 28}`;
+              let eGeo = edgeGeoCache.get(cacheKey);
+              if (!eGeo) {
+                eGeo = new THREE.EdgesGeometry(c.geometry, c.userData.isContextMesh ? 32 : 28);
+                edgeGeoCache.set(cacheKey, eGeo);
+              }
+              const seg = new THREE.LineSegments(eGeo, c.userData.isContextMesh ? whisperCtxMat : whisperArchMat);
+              seg.userData.isHelper = true;
+              seg.raycast = () => {};
+              c.add(seg);
+              c.userData.edgeSeg = seg;
+              edgeCount++;
+            }
+
+            // Walkable floor detection for VR teleport
+            const ln = (c.name || '').toLowerCase();
+            if (/floor|slab|plinth|tatami|deck|stair|tread|loft|ground|road|asphalt|paver|site|path|track|curb|terrace|porch/i.test(ln)) {
+              walkableMeshes.push(c);
+            }
+
+            if (!c.userData.isContextMesh) {
+              tmpBox.setFromObject(c);
+              if (!tmpBox.isEmpty()) houseBox.union(tmpBox);
+            }
+          });
+
+          if (walkableMeshes.length === 0) {
+            model.traverse((c) => { if (c.isMesh && !c.userData.isHelper) walkableMeshes.push(c); });
+          }
+
+          // Setup glTF animations with O(1) node-name binding (avoids O(N^2) PropertyBinding DFS on 595-clip towers!)
+          if (gltf.animations && gltf.animations.length > 0) {
+            mixer = new THREE.AnimationMixer(model);
+            animDuration = 0;
+            const nodeMap = new Map();
+            model.traverse((o) => { if (o.name && !o.userData.isHelper && !nodeMap.has(o.name)) nodeMap.set(o.name, o); });
+            let totalTracks = 0;
+            gltf.animations.forEach((clip) => {
+              if (clip.duration > animDuration) animDuration = clip.duration;
+              totalTracks += clip.tracks ? clip.tracks.length : 0;
+              let rootTarget = model;
+              if (clip.tracks && clip.tracks.length > 0) {
+                const firstNodeName = clip.tracks[0].name.split('.')[0];
+                const allSame = clip.tracks.every((tr) => tr.name.split('.')[0] === firstNodeName);
+                if (allSame && nodeMap.has(firstNodeName)) {
+                  rootTarget = nodeMap.get(firstNodeName);
+                }
+              }
+              const act = mixer.clipAction(clip, rootTarget);
+              act.play();
+              animActions.push(act);
+            });
+            const isHeavyBuildAnim = totalTracks > 60;
+            if (isHeavyBuildAnim && animDuration > 0) {
+              mixer.setTime(animDuration * 0.96);
+              model.updateMatrixWorld(true);
+              animPlaying = false;
+              btnAnimPlay.textContent = '▶ Play';
+              btnAnimPlay.classList.remove('active');
+              animSlider.value = 960;
+              animReadout.textContent = `${(animDuration * 0.96).toFixed(1)}s`;
+            } else {
+              animPlaying = true;
+              btnAnimPlay.textContent = '⏸ Pause';
+              btnAnimPlay.classList.add('active');
+            }
+            animGroup.classList.add('visible');
+          }
+
+          // Compute exact bounding boxes (after animation pose if applicable)
+          const fullBox = new THREE.Box3().setFromObject(model);
+          if (!fullBox.isEmpty()) {
+            fullBox.getSize(modelSize);
+            fullBox.getCenter(modelCenter);
+            modelMaxSpan = Math.max(modelSize.x, modelSize.z, modelSize.y, 4);
+            modelMinY = fullBox.min.y;
+            modelMaxY = fullBox.max.y;
+          }
+          // Dynamically adapt camera far plane & sky dome radius for skyscrapers / F1 circuits
+          const neededFar = Math.max(600, modelMaxSpan * 10);
+          camera.far = neededFar;
+          camera.updateProjectionMatrix();
+          skyDome.scale.setScalar((neededFar * 0.72) / 420);
+          if (!contextNode) {
+            focusSize.copy(modelSize);
+            focusCenter.copy(modelCenter);
+            focusMaxSpan = modelMaxSpan;
+          } else if (!houseBox.isEmpty()) {
+            houseBox.getSize(focusSize);
+            houseBox.getCenter(focusCenter);
+            focusMaxSpan = Math.max(focusSize.x, focusSize.z, focusSize.y, 4);
+          } else {
+            focusSize.copy(modelSize);
+            focusCenter.copy(modelCenter);
+            focusMaxSpan = modelMaxSpan;
+          }
+
+          // Resize ground grid & plinth cleanly to match model scale
+          worldRoot.remove(groundGrid);
+          const gridSpan = Math.max(24, Math.ceil(modelMaxSpan * 2.2 / 4) * 4);
+          groundGrid = new THREE.GridHelper(gridSpan, Math.min(80, Math.round(gridSpan)), 0x9c968c, 0xcbc6bc);
+          groundGrid.material.transparent = true;
+          groundGrid.material.opacity = 0.28;
+          groundGrid.position.set(modelCenter.x, -0.008, modelCenter.z);
+          worldRoot.add(groundGrid);
+          updatePlinthBounds();
+
+          // Apply default mood for model if specified
+          const mIdx = MOODS.findIndex((m) => m.id === entry.defaultMood);
+          if (mIdx >= 0) moodIdx = mIdx;
+
+          metaDims.textContent = `DIMS: ${focusSize.x.toFixed(1)}×${focusSize.z.toFixed(1)}×${focusSize.y.toFixed(1)}m`;
+          metaTris.textContent = `MESHES: ${meshCount}`;
+
+          buildViewpointsForModel(entry, gltf, model);
+          applyVisualStyle(styleIdx);
+
+          if (maquetteMode) frameMaquette(false);
+          else goToViewpoint(0, false);
+
+          statusDot.classList.add('ready');
+          loaderOverlay.classList.add('hidden');
+        },
+        (xhr) => {
+          if (xhr.total > 0) {
+            const pct = Math.round((xhr.loaded / xhr.total) * 100);
+            loaderSub.textContent = `DOWNLOADING MODEL... ${pct}% (${(xhr.loaded / 1e6).toFixed(1)} / ${(xhr.total / 1e6).toFixed(1)} MB)`;
+          }
+        },
+        (err) => {
+          console.error('Model load failed:', err);
+          loaderTitle.textContent = `FAILED TO LOAD ${entry.title.toUpperCase()}`;
+          loaderSub.textContent = 'Run serve_hub.py from ArchWebXRHub/ or drag & drop a .glb file directly.';
+        }
+      );
+    }
+
+    // =========================================================================
+    // 7. CATALOG DRAWER & DRAG-AND-DROP LOCAL GLB SUPPORT
+    // =========================================================================
+    function renderCatalogList(filterText = '') {
+      const q = filterText.trim().toLowerCase();
+      modelListEl.innerHTML = '';
+      let shown = 0;
+      catalog.forEach((m, idx) => {
+        const hay = `${m.title} ${m.subtitle || ''} ${m.category || ''} ${(m.badges || []).join(' ')}`.toLowerCase();
+        if (q && !hay.includes(q)) return;
+        shown++;
+        const card = document.createElement('div');
+        card.className = 'model-card' + (idx === activeModelIdx ? ' active' : '');
+        card.innerHTML = `
+          <div class="mc-top">
+            <span class="mc-title">${m.title}</span>
+            <span class="mc-size">${m.sizeMB ? m.sizeMB.toFixed(1) + ' MB' : 'LOCAL'}</span>
+          </div>
+          <div class="mc-sub">${m.subtitle || m.category || ''}</div>
+          <div class="mc-badges">${(m.badges || []).map((b) => `<span class="mc-badge">${b}</span>`).join('')}</div>
+        `;
+        card.addEventListener('click', (e) => {
+          e.stopPropagation();
+          playClick();
+          loadModelEntry(idx);
+          if (window.innerWidth <= 820) drawerEl.classList.add('collapsed');
+        });
+        modelListEl.appendChild(card);
+      });
+      catalogCountEl.textContent = `${shown} / ${catalog.length} MODELS`;
+    }
+
+    function addLocalGLBFile(file) {
+      if (!file) return;
+      const blobUrl = URL.createObjectURL(file);
+      const cleanTitle = file.name.replace(/\.(glb|gltf)$/i, '').replace(/[_-]+/g, ' ');
+      const entry = {
+        id: 'local-' + Date.now(),
+        title: cleanTitle,
+        subtitle: `Local Drop · ${(file.size / 1e6).toFixed(2)} MB`,
+        category: 'User Model',
+        url: blobUrl,
+        standaloneUrl: null,
+        sizeMB: file.size / 1e6,
+        badges: ['Local GLB', 'Editorial Hybrid'],
+        defaultMood: 'studio',
+        focusHouseOnly: false
+      };
+      catalog.unshift(entry);
+      loadModelEntry(0);
+    }
+
+    document.getElementById('file-glb-input').addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) addLocalGLBFile(e.target.files[0]);
+      e.target.value = '';
+    });
+
+    window.addEventListener('dragover', (e) => { e.preventDefault(); dropOverlay.classList.add('visible'); });
+    window.addEventListener('dragleave', (e) => { if (e.relatedTarget === null) dropOverlay.classList.remove('visible'); });
+    window.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropOverlay.classList.remove('visible');
+      const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if (file && /\.(glb|gltf)$/i.test(file.name)) addLocalGLBFile(file);
+    });
+
+    // =========================================================================
+    // 8. MAQUETTE DIORAMA, SECTION CUT & UI CONTROLS
+    // =========================================================================
+    function frameMaquette(animate = true) {
+      updatePlinthBounds();
+      const useSite = contextNode && contextVisible;
+      const ctr = useSite ? modelCenter : focusCenter;
+      const span = useSite ? modelMaxSpan : focusMaxSpan;
+      const r = Math.max(7.5, span * 1.48);
+      const target = new THREE.Vector3(ctr.x, Math.max(0.8, (useSite ? modelSize.y : focusSize.y) * 0.28), ctr.z);
+      const ty = -0.68, tp = -0.46;
+      const endPos = target.clone().addScaledVector(fwdFromAngles(ty, tp), -r);
+      if (!animate) {
+        camTrans.active = false;
+        orbitTarget.copy(target); orbitRadius = r; yaw = ty; pitch = tp;
+        applyOrbitToRig();
+        return;
+      }
+      camTrans.active = true; camTrans.t0 = performance.now(); camTrans.dur = 520;
+      camTrans.p0.copy(rig.position); camTrans.p1.copy(endPos);
+      camTrans.y0 = yaw; camTrans.y1 = yaw + shortAngle(yaw, ty);
+      camTrans.pi0 = pitch; camTrans.pi1 = tp;
+      camTrans.r1 = r; camTrans.tgt1.copy(target);
+    }
+
+    function setMaquetteMode(enabled) {
+      maquetteMode = enabled;
+      btnTabletop.classList.toggle('amber-on', enabled);
+      btnTabletop.textContent = enabled ? '🏡 Maquette: ON' : '🏡 Maquette';
+      applyEnvironmentAndMood();
+      if (renderer.xr.isPresenting && currentMode === 2) {
+        if (enabled) placeVRTabletop();
+        else {
+          worldRoot.position.set(0, 0, 0); worldRoot.rotation.set(0, 0, 0); worldRoot.scale.set(1, 1, 1);
+          goToViewpoint(activeVpIdx, false);
+        }
+      } else {
+        if (enabled) frameMaquette(true);
+        else goToViewpoint(activeVpIdx, true);
+      }
+      updateVRHudCanvas();
+    }
+
+    cutSlider.addEventListener('input', () => {
+      const pct = Number(cutSlider.value);
+      if (pct >= 100) {
+        sectionCutActive = false;
+        cutReadout.textContent = 'OFF';
+      } else {
+        sectionCutActive = true;
+        const cutY = modelMinY + (modelMaxY - modelMinY) * (pct / 100);
+        sectionPlane.constant = cutY;
+        cutReadout.textContent = `${cutY.toFixed(1)}m`;
+      }
+      modelHolder.traverse((c) => {
+        if (c.isMesh && !c.userData.isHelper) applyClippingToMat(c.material);
+      });
+    });
+
+    btnAnimPlay.addEventListener('click', (e) => {
+      e.stopPropagation(); playClick();
+      if (!animPlaying && mixer && animDuration > 0 && (mixer.time % animDuration) > animDuration * 0.92) {
+        mixer.setTime(0);
+      }
+      animPlaying = !animPlaying;
+      btnAnimPlay.textContent = animPlaying ? '⏸ Pause' : '▶ Play';
+      btnAnimPlay.classList.toggle('active', animPlaying);
+    });
+    animSlider.addEventListener('input', () => {
+      if (!mixer || animDuration <= 0) return;
+      animScrubbing = true;
+      const t = (Number(animSlider.value) / 1000) * animDuration;
+      mixer.setTime(t);
+      animReadout.textContent = `${t.toFixed(1)}s`;
+    });
+    animSlider.addEventListener('change', () => { animScrubbing = false; });
+
+    btnDrawer.addEventListener('click', (e) => {
+      e.stopPropagation(); playClick();
+      const willOpen = drawerEl.classList.toggle('collapsed') === false;
+      btnDrawer.classList.toggle('active', willOpen);
+    });
+    document.getElementById('btn-close-drawer').addEventListener('click', (e) => {
+      e.stopPropagation(); playClick();
+      drawerEl.classList.add('collapsed');
+      btnDrawer.classList.remove('active');
+    });
+    modelSearchEl.addEventListener('input', () => renderCatalogList(modelSearchEl.value));
+    btnStyle.addEventListener('click', (e) => { e.stopPropagation(); playClick(); applyVisualStyle(styleIdx + 1); });
+    btnMood.addEventListener('click', (e) => { e.stopPropagation(); playClick(); moodIdx = (moodIdx + 1) % MOODS.length; applyEnvironmentAndMood(); });
+    btnDoors.addEventListener('click', (e) => { e.stopPropagation(); cycleAllDoors(); });
+    btnTabletop.addEventListener('click', (e) => { e.stopPropagation(); playClick(); setMaquetteMode(!maquetteMode); });
+    btnNav.addEventListener('click', (e) => {
+      e.stopPropagation(); playClick();
+      navMode = navMode === 'orbit' ? 'walk' : 'orbit';
+      btnNav.textContent = navMode === 'walk' ? '🚶 Walk' : '🔄 Orbit';
+      btnNav.classList.toggle('active', navMode === 'walk');
+      if (navMode === 'orbit') syncOrbitFromRig(THREE.MathUtils.clamp(orbitRadius, 2.0, Math.max(25, modelMaxSpan * 2)));
+    });
+    btnRoof.addEventListener('click', (e) => {
+      e.stopPropagation(); playClick();
+      roofVisible = !roofVisible;
+      if (roofNode) roofNode.visible = roofVisible;
+      btnRoof.classList.toggle('on', roofVisible);
+    });
+    btnContext.addEventListener('click', (e) => {
+      e.stopPropagation(); playClick();
+      contextVisible = !contextVisible;
+      if (contextNode) contextNode.visible = contextVisible;
+      btnContext.classList.toggle('on', contextVisible);
+      updatePlinthBounds();
+      if (maquetteMode) frameMaquette(true);
+    });
+    btnSpin.addEventListener('click', (e) => {
+      e.stopPropagation(); playClick();
+      autoSpin = !autoSpin;
+      btnSpin.textContent = autoSpin ? '🔄 Spin: ON' : '🔄 Spin: OFF';
+      btnSpin.classList.toggle('active', autoSpin);
+    });
+
+    // =========================================================================
+    // 9. DESKTOP & MOBILE NAVIGATION + INTERACTIVE DOOR HOVER & CLICK
+    // =========================================================================
+    const keys = { w: false, s: false, a: false, d: false, e: false, q: false, shift: false };
+    window.addEventListener('keydown', (ev) => {
+      if (ev.target && (ev.target.tagName === 'INPUT' || ev.target.tagName === 'TEXTAREA')) return;
+      if (ev.code === 'KeyV') { playClick(); applyVisualStyle(styleIdx + 1); return; }
+      if (ev.code === 'KeyF') { playClick(); moodIdx = (moodIdx + 1) % MOODS.length; applyEnvironmentAndMood(); return; }
+      if (ev.code === 'KeyO') { cycleAllDoors(); return; }
+      if (ev.code === 'KeyM') { playClick(); setMaquetteMode(!maquetteMode); return; }
+      if (ev.code === 'KeyN') { btnNav.click(); return; }
+      if (ev.code === 'KeyG') { btnDrawer.click(); return; }
+      if (ev.code === 'KeyW' || ev.code === 'ArrowUp') keys.w = true;
+      if (ev.code === 'KeyS' || ev.code === 'ArrowDown') keys.s = true;
+      if (ev.code === 'KeyA' || ev.code === 'ArrowLeft') keys.a = true;
+      if (ev.code === 'KeyD' || ev.code === 'ArrowRight') keys.d = true;
+      if (ev.code === 'KeyE' || ev.code === 'Space') keys.e = true;
+      if (ev.code === 'KeyQ' || ev.code === 'KeyC') keys.q = true;
+      if (ev.code === 'ShiftLeft' || ev.code === 'ShiftRight') keys.shift = true;
+    });
+    window.addEventListener('keyup', (ev) => {
+      if (ev.code === 'KeyW' || ev.code === 'ArrowUp') keys.w = false;
+      if (ev.code === 'KeyS' || ev.code === 'ArrowDown') keys.s = false;
+      if (ev.code === 'KeyA' || ev.code === 'ArrowLeft') keys.a = false;
+      if (ev.code === 'KeyD' || ev.code === 'ArrowRight') keys.d = false;
+      if (ev.code === 'KeyE' || ev.code === 'Space') keys.e = false;
+      if (ev.code === 'KeyQ' || ev.code === 'KeyC') keys.q = false;
+      if (ev.code === 'ShiftLeft' || ev.code === 'ShiftRight') keys.shift = false;
+    });
+
+    let dragDown = false, dragBtn = 0, px = 0, py = 0, downX = 0, downY = 0, downT = 0, hoverMod = 0;
+    canvasEl.addEventListener('contextmenu', (e) => e.preventDefault());
+    canvasEl.addEventListener('mouseleave', () => setHoveredRig(null));
+    canvasEl.addEventListener('mousedown', (e) => {
+      if (renderer.xr.isPresenting) return;
+      dragDown = true; dragBtn = e.button; px = downX = e.clientX; py = downY = e.clientY; downT = performance.now();
+      camTrans.active = false;
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (renderer.xr.isPresenting) return;
+      if (!dragDown) {
+        if (e.target === canvasEl) {
+          hoverMod = (hoverMod + 1) % 2;
+          if (hoverMod === 0 || hoveredRig) setHoveredRig(raycastDoorAtClient(e.clientX, e.clientY), e.clientX, e.clientY);
+        } else if (hoveredRig) setHoveredRig(null);
+        return;
+      }
+      if (hoveredRig) setHoveredRig(null);
+      const dx = e.clientX - px, dy = e.clientY - py;
+      px = e.clientX; py = e.clientY;
+      const useOrbit = maquetteMode || navMode === 'orbit';
+      const eu = new THREE.Euler(pitch, yaw, 0, 'YXZ');
+      const right = new THREE.Vector3(1, 0, 0).applyEuler(eu);
+      const up = new THREE.Vector3(0, 1, 0).applyEuler(eu);
+
+      if (dragBtn === 2 || dragBtn === 1 || e.shiftKey) {
+        const sp = useOrbit ? Math.max(0.004, orbitRadius * 0.0014) : 0.01;
+        if (useOrbit) { orbitTarget.addScaledVector(right, -dx * sp).addScaledVector(up, dy * sp); applyOrbitToRig(); }
+        else { rig.position.addScaledVector(right, -dx * sp).addScaledVector(up, dy * sp); syncOrbitFromRig(); }
+      } else {
+        const sens = useOrbit ? 0.0048 : 0.0032;
+        yaw -= dx * sens;
+        pitch = THREE.MathUtils.clamp(pitch - dy * sens, maquetteMode ? -1.48 : -1.52, maquetteMode ? -0.04 : 1.52);
+        if (useOrbit) applyOrbitToRig();
+        else { camera.rotation.set(pitch, yaw, 0); syncOrbitFromRig(); }
+      }
+    });
+    window.addEventListener('mouseup', (e) => {
+      if (dragDown && dragBtn === 0 && !renderer.xr.isPresenting && e.target === canvasEl) {
+        if (Math.hypot(e.clientX - downX, e.clientY - downY) < 6 && performance.now() - downT < 340) {
+          const hit = raycastDoorAtClient(e.clientX, e.clientY);
+          if (hit) { toggleRig(hit); setHoveredRig(hit, e.clientX, e.clientY); }
+        }
+      }
+      dragDown = false;
+    });
+    canvasEl.addEventListener('wheel', (e) => {
+      if (renderer.xr.isPresenting) return;
+      e.preventDefault(); camTrans.active = false;
+      const useOrbit = maquetteMode || navMode === 'orbit';
+      if (useOrbit) {
+        orbitRadius = THREE.MathUtils.clamp(orbitRadius * Math.exp(e.deltaY * 0.0011), 0.5, Math.max(85, modelMaxSpan * 4));
+        applyOrbitToRig();
+      } else {
+        rig.position.addScaledVector(fwdFromAngles(yaw, pitch), -e.deltaY * 0.0045);
+        syncOrbitFromRig();
+      }
+    }, { passive: false });
+
+    // Multi-touch Orbit/Pinch + AR Tabletop Pinch/Spin + Quick Tap Doors
+    let tMode = null, tpx = 0, tpy = 0, tStart = 0, tMove = 0, prevPinch = 0;
+    let arScale = 0.04, arYaw = 0;
+    const arAnchor = new THREE.Vector3(0, -0.15, -0.95);
+    const arReticle = new THREE.Mesh(
+      new THREE.RingGeometry(0.08, 0.11, 32).rotateX(-Math.PI / 2),
+      new THREE.MeshBasicMaterial({ color: 0xf59e0b, side: THREE.DoubleSide })
+    );
+    arReticle.matrixAutoUpdate = false;
+    arReticle.visible = false;
+    scene.add(arReticle);
+
+    window.addEventListener('touchstart', (e) => {
+      if (e.target && e.target.closest('button, a, input, #catalog-drawer, .view-bar, .analysis-bar, .header-row, .mode-strip')) { tMode = null; return; }
+      if (e.touches.length === 1) {
+        tMode = 'one'; tpx = e.touches[0].clientX; tpy = e.touches[0].clientY; tStart = performance.now(); tMove = 0; camTrans.active = false;
+      } else if (e.touches.length >= 2) {
+        tMode = 'two';
+        prevPinch = Math.hypot(e.touches[1].clientX - e.touches[0].clientX, e.touches[1].clientY - e.touches[0].clientY);
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchmove', (e) => {
+      if (!tMode) return;
+      if (e.touches.length >= 2) {
+        e.preventDefault();
+        const d = Math.hypot(e.touches[1].clientX - e.touches[0].clientX, e.touches[1].clientY - e.touches[0].clientY);
+        if (prevPinch > 8 && d > 8) {
+          if (currentMode === 4 && renderer.xr.isPresenting) {
+            arScale = THREE.MathUtils.clamp(arScale * (d / prevPinch), 0.002, 1.0);
+            applyARTabletopTransform();
+          } else if (!renderer.xr.isPresenting) {
+            orbitRadius = THREE.MathUtils.clamp(orbitRadius * (prevPinch / d), 0.5, Math.max(85, modelMaxSpan * 4));
+            applyOrbitToRig();
+          }
+        }
+        prevPinch = d;
+      } else if (tMode === 'one' && e.touches.length === 1) {
+        const dx = e.touches[0].clientX - tpx, dy = e.touches[0].clientY - tpy;
+        tMove += Math.hypot(dx, dy); tpx = e.touches[0].clientX; tpy = e.touches[0].clientY;
+        if (currentMode === 4 && renderer.xr.isPresenting) {
+          e.preventDefault(); arYaw += dx * 0.007; applyARTabletopTransform();
+        } else if (!renderer.xr.isPresenting) {
+          e.preventDefault();
+          yaw -= dx * 0.0052;
+          pitch = THREE.MathUtils.clamp(pitch - dy * 0.0052, -1.5, 1.5);
+          if (maquetteMode || navMode === 'orbit') applyOrbitToRig();
+          else { camera.rotation.set(pitch, yaw, 0); syncOrbitFromRig(); }
+        }
+      }
+    }, { passive: false });
+
+    window.addEventListener('touchend', (e) => {
+      if (e.touches.length === 0) {
+        if (tMode === 'one' && tMove < 10 && performance.now() - tStart < 280 && e.changedTouches.length > 0) {
+          if (currentMode === 1 && !renderer.xr.isPresenting && e.target === canvasEl) {
+            const hit = raycastDoorAtClient(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+            if (hit) toggleRig(hit);
+          } else if (currentMode === 4 && renderer.xr.isPresenting && arReticle.visible && e.target === arTouchSurface) {
+            placeARTabletopAtReticle();
+          }
+        }
+        tMode = null;
+      }
+    });
+
+    // =========================================================================
+    // 10. QUEST VR (3D MULTI-MODEL COMMAND HUD + TELEPORT + DOOR TRIGGER) & AR
+    // =========================================================================
+    const vrRay = new THREE.Raycaster();
+    const tmpMat = new THREE.Matrix4();
+    const vrReticle = new THREE.Mesh(
+      new THREE.RingGeometry(0.18, 0.25, 28).rotateX(-Math.PI / 2),
+      new THREE.MeshBasicMaterial({ color: 0xf59e0b, side: THREE.DoubleSide })
+    );
+    vrReticle.visible = false;
+    scene.add(vrReticle);
+
+    const VR_ARC_N = 20;
+    const vrArcArr = new Float32Array((VR_ARC_N + 1) * 3);
+    const vrArcGeo = new THREE.BufferGeometry();
+    vrArcGeo.setAttribute('position', new THREE.BufferAttribute(vrArcArr, 3));
+    const vrArcLine = new THREE.Line(vrArcGeo, new THREE.LineBasicMaterial({ color: 0xf59e0b, transparent: true, opacity: 0.9 }));
+    vrArcLine.frustumCulled = false; vrArcLine.visible = false;
+    scene.add(vrArcLine);
+    let vrTpValid = false;
+    const vrTpTarget = new THREE.Vector3();
+
+    // World-space 3D VR Command HUD (Switch Models, Switch Views, Cycle Style, Doors, Maquette)
+    const HUD_W = 800, HUD_H = 420;
+    const hudCvs = document.createElement('canvas'); hudCvs.width = HUD_W; hudCvs.height = HUD_H;
+    const hudCtx = hudCvs.getContext('2d');
+    const hudTex = new THREE.CanvasTexture(hudCvs); hudTex.colorSpace = THREE.SRGBColorSpace;
+    const vrHud = new THREE.Mesh(new THREE.PlaneGeometry(1.04, 0.54), new THREE.MeshBasicMaterial({ map: hudTex, transparent: true, side: THREE.DoubleSide }));
+    vrHud.visible = false;
+    scene.add(vrHud);
+
+    const HUD_BTNS = [
+      { id: 'mprev', x: 22,  y: 218, w: 180, h: 74 },
+      { id: 'mnext', x: 212, y: 218, w: 180, h: 74 },
+      { id: 'vprev', x: 402, y: 218, w: 180, h: 74 },
+      { id: 'vnext', x: 592, y: 218, w: 186, h: 74 },
+      { id: 'style', x: 22,  y: 306, w: 180, h: 74 },
+      { id: 'mood',  x: 212, y: 306, w: 180, h: 74 },
+      { id: 'maq',   x: 402, y: 306, w: 180, h: 74 },
+      { id: 'doors', x: 592, y: 306, w: 186, h: 74 }
+    ];
+    let vrHoverBtn = null;
+
+    function updateVRHudCanvas() {
+      hudCtx.clearRect(0, 0, HUD_W, HUD_H);
+      hudCtx.fillStyle = 'rgba(250, 249, 246, 0.96)';
+      hudCtx.strokeStyle = '#181715'; hudCtx.lineWidth = 6;
+      hudCtx.fillRect(6, 6, HUD_W - 12, HUD_H - 12);
+      hudCtx.strokeRect(6, 6, HUD_W - 12, HUD_H - 12);
+
+      hudCtx.fillStyle = '#181715';
+      hudCtx.fillRect(6, 6, HUD_W - 12, 58);
+      hudCtx.fillStyle = '#faf9f6';
+      hudCtx.font = 'bold 23px sans-serif';
+      hudCtx.fillText('ARCHITECTURAL EDITORIAL WEBXR HUB', 24, 43);
+
+      const m = catalog[activeModelIdx];
+      const vp = viewpoints[activeVpIdx];
+      hudCtx.fillStyle = '#181715';
+      hudCtx.font = 'bold 25px sans-serif';
+      hudCtx.fillText(`MODEL: ${(m ? m.title : 'LOADING').toUpperCase().slice(0, 38)}`, 24, 108);
+      hudCtx.fillStyle = '#5c5852';
+      hudCtx.font = 'bold 19px sans-serif';
+      hudCtx.fillText(`VIEW: ${(vp ? vp.name : 'HERO').toUpperCase()}   |   STYLE: ${STYLES[styleIdx].id.toUpperCase()}`, 24, 146);
+      hudCtx.font = '17px sans-serif';
+      hudCtx.fillText('• Laser + Trigger: Slide Doors / Click HUD / Teleport   • Left Stick: Walk   • Right Stick: Snap Turn', 24, 186);
+
+      const specs = {
+        mprev: { l: '◀ PREV MODEL', bg: '#181715', fg: '#faf9f6' },
+        mnext: { l: 'NEXT MODEL ▶', bg: '#181715', fg: '#faf9f6' },
+        vprev: { l: '◀ PREV VIEW',  bg: '#f1efe9', fg: '#181715' },
+        vnext: { l: 'NEXT VIEW ▶',  bg: '#f1efe9', fg: '#181715' },
+        style: { l: STYLES[styleIdx].label.toUpperCase(), bg: '#181715', fg: '#fbbf24' },
+        mood:  { l: MOODS[moodIdx].label.toUpperCase(),   bg: '#f1efe9', fg: '#181715' },
+        maq:   { l: maquetteMode ? '🏡 MAQUETTE: ON' : '🏡 MAQUETTE', bg: maquetteMode ? '#fbbf24' : '#f1efe9', fg: '#181715' },
+        doors: { l: interactiveRigs.length ? '🚪 CYCLE DOORS' : '✕ HIDE HUD', bg: interactiveRigs.length ? '#b45309' : '#dc2626', fg: '#ffffff' }
+      };
+      for (const b of HUD_BTNS) {
+        const s = specs[b.id];
+        const hov = vrHoverBtn === b.id;
+        hudCtx.fillStyle = hov ? '#fbbf24' : s.bg;
+        hudCtx.fillRect(b.x, b.y, b.w, b.h);
+        hudCtx.strokeStyle = '#181715'; hudCtx.lineWidth = hov ? 4 : 2.5;
+        hudCtx.strokeRect(b.x, b.y, b.w, b.h);
+        hudCtx.fillStyle = hov ? '#181715' : s.fg;
+        hudCtx.font = 'bold 17px sans-serif';
+        hudCtx.textAlign = 'center'; hudCtx.textBaseline = 'middle';
+        hudCtx.fillText(s.l, b.x + b.w * 0.5, b.y + b.h * 0.5 + 1);
+      }
+      hudCtx.textAlign = 'left'; hudCtx.textBaseline = 'alphabetic';
+      hudTex.needsUpdate = true;
+    }
+
+    function placeVRHud(immediate = true) {
+      const xrCam = renderer.xr.getCamera();
+      const hp = new THREE.Vector3(), hq = new THREE.Quaternion();
+      xrCam.getWorldPosition(hp); xrCam.getWorldQuaternion(hq);
+      const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(hq); fwd.y = 0;
+      if (fwd.lengthSq() < 1e-4) fwd.set(0, 0, -1); else fwd.normalize();
+      vrHud.position.set(hp.x + fwd.x * 1.48, Math.max(rig.position.y + 0.9, hp.y - 0.16), hp.z + fwd.z * 1.48);
+      vrHud.lookAt(hp.x, vrHud.position.y + 0.06, hp.z);
+    }
+
+    function placeVRTabletop() {
+      const xrCam = renderer.xr.getCamera();
+      const hp = new THREE.Vector3(), hq = new THREE.Quaternion();
+      xrCam.getWorldPosition(hp); xrCam.getWorldQuaternion(hq);
+      const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(hq); fwd.y = 0;
+      if (fwd.lengthSq() < 1e-4) fwd.set(0, 0, -1); else fwd.normalize();
+      const sc = THREE.MathUtils.clamp(0.85 / Math.max(4, modelMaxSpan), 0.005, 0.18);
+      worldRoot.scale.setScalar(sc);
+      worldRoot.position.set(hp.x + fwd.x * 1.0 - modelCenter.x * sc, Math.max(0.55, hp.y - 0.52), hp.z + fwd.z * 1.0 - modelCenter.z * sc);
+    }
+
+    const ctrlFactory = new XRControllerModelFactory();
+    const controllers = [];
+    for (let i = 0; i < 2; i++) {
+      const c = renderer.xr.getController(i);
+      rig.add(c);
+      const lg = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3(0, 0, -4.5)]);
+      const line = new THREE.Line(lg, new THREE.LineBasicMaterial({ color: 0x181715 }));
+      c.add(line); c.userData.laser = line;
+      c.addEventListener('selectstart', () => onVRSelect(c));
+      const grip = renderer.xr.getControllerGrip(i);
+      grip.add(ctrlFactory.createControllerModel(grip));
+      rig.add(grip);
+      controllers.push(c);
+    }
+
+    function onVRSelect(ctrl) {
+      if (!renderer.xr.isPresenting || currentMode !== 2) return;
+      tmpMat.identity().extractRotation(ctrl.matrixWorld);
+      vrRay.ray.origin.setFromMatrixPosition(ctrl.matrixWorld);
+      vrRay.ray.direction.set(0, 0, -1).applyMatrix4(tmpMat);
+      vrRay.near = 0.05; vrRay.far = 12;
+
+      if (vrHud.visible) {
+        const hh = vrRay.intersectObject(vrHud, false);
+        if (hh.length > 0 && hh[0].uv) {
+          const ux = hh[0].uv.x * HUD_W, uy = (1 - hh[0].uv.y) * HUD_H;
+          const b = HUD_BTNS.find((k) => ux >= k.x && ux <= k.x + k.w && uy >= k.y && uy <= k.y + k.h);
+          if (b) {
+            playClick();
+            if (b.id === 'mprev') loadModelEntry((activeModelIdx - 1 + catalog.length) % catalog.length);
+            else if (b.id === 'mnext') loadModelEntry((activeModelIdx + 1) % catalog.length);
+            else if (b.id === 'vprev') goToViewpoint(activeVpIdx - 1, false);
+            else if (b.id === 'vnext') goToViewpoint(activeVpIdx + 1, false);
+            else if (b.id === 'style') applyVisualStyle(styleIdx + 1);
+            else if (b.id === 'mood') { moodIdx = (moodIdx + 1) % MOODS.length; applyEnvironmentAndMood(); updateVRHudCanvas(); }
+            else if (b.id === 'maq') setMaquetteMode(!maquetteMode);
+            else if (b.id === 'doors') { if (interactiveRigs.length) cycleAllDoors(); else vrHud.visible = false; }
+          }
+          return;
+        }
+      }
+      if (interactiveMeshes.length > 0) {
+        const dh = vrRay.intersectObjects(interactiveMeshes, false);
+        for (const h of dh) {
+          if (isVisibleDeep(h.object) && h.object.userData.interactiveRig) {
+            toggleRig(h.object.userData.interactiveRig);
+            return;
+          }
+        }
+      }
+      if (!maquetteMode && vrTpValid) {
+        const hw = new THREE.Vector3();
+        renderer.xr.getCamera().getWorldPosition(hw);
+        rig.position.x += vrTpTarget.x - hw.x;
+        rig.position.z += vrTpTarget.z - hw.z;
+        rig.position.y = vrTpTarget.y;
+        playClick();
+      }
+    }
+
+    let snapCD = 0;
+    function updateVR(dt) {
+      if (currentMode !== 2) return;
+      if (snapCD > 0) snapCD -= dt;
+      let nextHovBtn = null, nextHovRig = null, aimHud = false;
+      vrTpValid = false; vrReticle.visible = false; vrArcLine.visible = false;
+
+      for (const c of controllers) {
+        tmpMat.identity().extractRotation(c.matrixWorld);
+        vrRay.ray.origin.setFromMatrixPosition(c.matrixWorld);
+        vrRay.ray.direction.set(0, 0, -1).applyMatrix4(tmpMat);
+        vrRay.near = 0.05; vrRay.far = 10;
+        let len = 4.2, hitDoor = false;
+
+        if (vrHud.visible) {
+          const hh = vrRay.intersectObject(vrHud, false);
+          if (hh.length > 0 && hh[0].uv) {
+            aimHud = true; len = hh[0].distance;
+            const ux = hh[0].uv.x * HUD_W, uy = (1 - hh[0].uv.y) * HUD_H;
+            const b = HUD_BTNS.find((k) => ux >= k.x && ux <= k.x + k.w && uy >= k.y && uy <= k.y + k.h);
+            if (b) nextHovBtn = b.id;
+          }
+        }
+        if (!aimHud && interactiveMeshes.length > 0) {
+          const dh = vrRay.intersectObjects(interactiveMeshes, false);
+          for (const h of dh) {
+            if (isVisibleDeep(h.object) && h.object.userData.interactiveRig) {
+              hitDoor = true; nextHovRig = h.object.userData.interactiveRig; len = h.distance; break;
+            }
+          }
+        }
+        const posA = c.userData.laser.geometry.attributes.position;
+        posA.setXYZ(1, 0, 0, -len); posA.needsUpdate = true;
+        c.userData.laser.material.color.setHex(hitDoor ? 0xf59e0b : 0x0ea5e9);
+
+        // Simple parabolic floor teleport on first free controller
+        if (!maquetteMode && !aimHud && !hitDoor && !vrTpValid && vrRay.ray.direction.y < 0.45) {
+          const p = vrRay.ray.origin.clone(), v = vrRay.ray.direction.clone().multiplyScalar(7.0);
+          vrArcArr[0] = p.x; vrArcArr[1] = p.y; vrArcArr[2] = p.z;
+          const stepRay = new THREE.Raycaster();
+          for (let s = 1; s <= VR_ARC_N; s++) {
+            const np = p.clone().addScaledVector(v, 0.08);
+            v.y -= 9.8 * 0.08;
+            const seg = np.clone().sub(p); const sl = seg.length();
+            stepRay.set(p, seg.normalize()); stepRay.near = 0; stepRay.far = sl;
+            const hits = stepRay.intersectObjects(walkableMeshes, false);
+            if (hits.length > 0 && hits[0].face && hits[0].face.normal.y > 0.5) {
+              vrTpTarget.copy(hits[0].point); vrTpValid = true;
+              vrReticle.position.copy(vrTpTarget); vrReticle.position.y += 0.015; vrReticle.visible = true;
+              for (let k = s; k <= VR_ARC_N; k++) { vrArcArr[k*3] = vrTpTarget.x; vrArcArr[k*3+1] = vrTpTarget.y; vrArcArr[k*3+2] = vrTpTarget.z; }
+              break;
+            }
+            p.copy(np);
+            vrArcArr[s*3] = p.x; vrArcArr[s*3+1] = p.y; vrArcArr[s*3+2] = p.z;
+          }
+          vrArcGeo.attributes.position.needsUpdate = true;
+          vrArcLine.visible = vrTpValid;
+        }
+      }
+      setHoveredRig(nextHovRig, null, null);
+      if (nextHovBtn !== vrHoverBtn) { vrHoverBtn = nextHovBtn; updateVRHudCanvas(); }
+
+      // Thumbsticks: Left Walk, Right Snap Turn, Y/B Toggle HUD
+      const session = renderer.xr.getSession();
+      if (!session) return;
+      const xrCam = renderer.xr.getCamera();
+      const hq = new THREE.Quaternion(); xrCam.getWorldQuaternion(hq);
+      const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(hq); fwd.y = 0;
+      if (fwd.lengthSq() > 1e-4) fwd.normalize();
+      const right = new THREE.Vector3(-fwd.z, 0, fwd.x);
+      for (const src of session.inputSources) {
+        if (!src.gamepad) continue;
+        const gp = src.gamepad;
+        const axX = Math.abs(gp.axes[2] || 0) > Math.abs(gp.axes[0] || 0) ? (gp.axes[2] || 0) : (gp.axes[0] || 0);
+        const axY = Math.abs(gp.axes[3] || 0) > Math.abs(gp.axes[1] || 0) ? (gp.axes[3] || 0) : (gp.axes[1] || 0);
+        if (src.handedness === 'left') {
+          if (Math.abs(axX) > 0.18 || Math.abs(axY) > 0.18) {
+            rig.position.addScaledVector(fwd, -axY * 2.8 * dt).addScaledVector(right, axX * 2.8 * dt);
+          }
+        } else if (src.handedness === 'right' && snapCD <= 0 && Math.abs(axX) > 0.65) {
+          rig.rotation.y += (axX > 0 ? -1 : 1) * (Math.PI / 6);
+          snapCD = 0.30;
+        }
+        if (gp.buttons[5] && gp.buttons[5].pressed && snapCD <= 0) {
+          vrHud.visible = !vrHud.visible;
+          if (vrHud.visible) placeVRHud(true);
+          snapCD = 0.35;
+        }
+      }
+    }
+
+    // WebXR AR helpers
+    let hitTestSource = null, hitTestRequested = false;
+    function applyARTabletopTransform() {
+      worldRoot.scale.setScalar(arScale);
+      worldRoot.rotation.set(0, arYaw, 0);
+      const off = new THREE.Vector3(modelCenter.x * arScale, 0, modelCenter.z * arScale).applyAxisAngle(new THREE.Vector3(0, 1, 0), arYaw);
+      worldRoot.position.copy(arAnchor).sub(off);
+    }
+    function placeARTabletopAtReticle() {
+      if (arReticle.visible) arAnchor.setFromMatrixPosition(arReticle.matrix);
+      else arAnchor.set(0, -0.15, -0.95);
+      arScale = THREE.MathUtils.clamp(0.55 / Math.max(4, modelMaxSpan), 0.003, 0.2);
+      applyARTabletopTransform();
+      arLabel.textContent = `TABLETOP AR · SCALE 1:${Math.round(1 / arScale)}`;
+    }
+
+    function setActiveModeBtn(n) {
+      currentMode = n;
+      [1, 2, 3, 4].forEach((i) => document.getElementById(`btn-mode-${i}`).classList.toggle('active', i === n));
+    }
+
+    async function endXR() {
+      const s = renderer.xr.getSession();
+      if (s) await s.end();
+    }
+
+    async function startXR(modeNum) {
+      await endXR();
+      if (!navigator.xr) { statusSub.textContent = 'WEBXR NOT AVAILABLE IN THIS BROWSER (3D STUDIO ACTIVE)'; return; }
+      const type = modeNum === 2 ? 'immersive-vr' : 'immersive-ar';
+      const ok = await navigator.xr.isSessionSupported(type).catch(() => false);
+      if (!ok) { statusSub.textContent = `${type.toUpperCase()} NOT SUPPORTED ON THIS DEVICE`; return; }
+      try {
+        const opts = modeNum === 2
+          ? { optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking'] }
+          : { requiredFeatures: ['local-floor'], optionalFeatures: ['hit-test', 'dom-overlay'], domOverlay: { root: document.getElementById('ui-overlay') } };
+        const session = await navigator.xr.requestSession(type, opts);
+        setActiveModeBtn(modeNum);
+        await renderer.xr.setSession(session);
+        btnExitXR.style.display = 'inline-flex';
+        applyEnvironmentAndMood();
+
+        if (modeNum === 2) {
+          vrHud.visible = true;
+          updateVRHudCanvas();
+          setTimeout(() => placeVRHud(true), 120);
+        } else {
+          drawerEl.classList.add('collapsed');
+          arBar.classList.add('visible');
+          arTouchSurface.classList.toggle('active', modeNum === 4);
+          if (modeNum === 4) placeARTabletopAtReticle();
+          else { worldRoot.scale.setScalar(1); worldRoot.position.set(-focusCenter.x, 0, -focusCenter.z - 2.5); }
+        }
+        session.addEventListener('end', () => {
+          hitTestSource = null; hitTestRequested = false;
+          arReticle.visible = false; vrReticle.visible = false; vrArcLine.visible = false; vrHud.visible = false;
+          arBar.classList.remove('visible'); arTouchSurface.classList.remove('active');
+          btnExitXR.style.display = 'none';
+          worldRoot.position.set(0, 0, 0); worldRoot.rotation.set(0, 0, 0); worldRoot.scale.set(1, 1, 1);
+          setActiveModeBtn(1);
+          applyEnvironmentAndMood();
+          goToViewpoint(activeVpIdx, false);
+        });
+      } catch (err) {
+        statusSub.textContent = `XR ERROR: ${err.message || err}`;
+      }
+    }
+
+    document.getElementById('btn-mode-1').addEventListener('click', async (e) => { e.stopPropagation(); playClick(); await endXR(); setActiveModeBtn(1); });
+    document.getElementById('btn-mode-2').addEventListener('click', (e) => { e.stopPropagation(); playClick(); startXR(2); });
+    document.getElementById('btn-mode-3').addEventListener('click', (e) => { e.stopPropagation(); playClick(); startXR(3); });
+    document.getElementById('btn-mode-4').addEventListener('click', (e) => { e.stopPropagation(); playClick(); startXR(4); });
+    btnExitXR.addEventListener('click', (e) => { e.stopPropagation(); playClick(); endXR(); });
+    document.getElementById('btn-ar-place').addEventListener('click', (e) => { e.stopPropagation(); playClick(); placeARTabletopAtReticle(); });
+    document.getElementById('btn-ar-up').addEventListener('click', (e) => { e.stopPropagation(); arAnchor.y += 0.08; applyARTabletopTransform(); });
+    document.getElementById('btn-ar-down').addEventListener('click', (e) => { e.stopPropagation(); arAnchor.y -= 0.08; applyARTabletopTransform(); });
+    document.getElementById('btn-ar-rot').addEventListener('click', (e) => { e.stopPropagation(); arYaw += Math.PI / 4; applyARTabletopTransform(); });
+
+    // =========================================================================
+    // 11. MAIN ANIMATION LOOP & BOOTSTRAP
+    // =========================================================================
+    const clock = new THREE.Clock();
+    const tmpCamPos = new THREE.Vector3();
+
+    renderer.setAnimationLoop((ts, frame) => {
+      const dt = Math.min(clock.getDelta(), 0.1);
+      updateRigs(dt);
+
+      if (mixer && animPlaying && !animScrubbing) {
+        mixer.update(dt);
+        if (animDuration > 0) {
+          const t = mixer.time % animDuration;
+          animSlider.value = Math.round((t / animDuration) * 1000);
+          animReadout.textContent = `${t.toFixed(1)}s`;
+        }
+      }
+
+      if (renderer.xr.isPresenting && frame) {
+        if (currentMode === 2) updateVR(dt);
+        if (currentMode === 4) {
+          const sess = renderer.xr.getSession();
+          const refSpace = renderer.xr.getReferenceSpace();
+          if (sess && !hitTestRequested) {
+            hitTestRequested = true;
+            sess.requestReferenceSpace('viewer').then((vs) => {
+              if (sess.requestHitTestSource) sess.requestHitTestSource({ space: vs }).then((src) => { hitTestSource = src; }).catch(() => {});
+            }).catch(() => {});
+          }
+          if (hitTestSource && refSpace) {
+            const res = frame.getHitTestResults(hitTestSource);
+            if (res.length > 0) {
+              const pose = res[0].getPose(refSpace);
+              if (pose) { arReticle.visible = true; arReticle.matrix.fromArray(pose.transform.matrix); }
+            } else arReticle.visible = false;
+          }
+        }
+      } else {
+        // Desktop camera transition & WASD movement & Maquette turntable spin
+        if (camTrans.active) {
+          const u = Math.min(1, (performance.now() - camTrans.t0) / camTrans.dur);
+          const ease = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+          rig.position.lerpVectors(camTrans.p0, camTrans.p1, ease);
+          yaw = THREE.MathUtils.lerp(camTrans.y0, camTrans.y1, ease);
+          pitch = THREE.MathUtils.lerp(camTrans.pi0, camTrans.pi1, ease);
+          camera.rotation.set(pitch, yaw, 0);
+          if (u >= 1) {
+            camTrans.active = false;
+            orbitTarget.copy(camTrans.tgt1);
+            orbitRadius = camTrans.r1;
+          }
+        } else if (autoSpin && !dragDown) {
+          yaw += 0.24 * dt;
+          applyOrbitToRig();
+        }
+
+        const speed = (keys.shift ? 8.5 : 3.6) * dt * Math.max(1, modelMaxSpan / 18);
+        if (keys.w || keys.s || keys.a || keys.d || keys.e || keys.q) {
+          camTrans.active = false;
+          const eu = new THREE.Euler(pitch, yaw, 0, 'YXZ');
+          const f = new THREE.Vector3(0, 0, -1).applyEuler(eu);
+          const r = new THREE.Vector3(1, 0, 0).applyEuler(eu);
+          const delta = new THREE.Vector3();
+          if (keys.w) delta.addScaledVector(f, speed);
+          if (keys.s) delta.addScaledVector(f, -speed);
+          if (keys.d) delta.addScaledVector(r, speed);
+          if (keys.a) delta.addScaledVector(r, -speed);
+          if (keys.e) delta.y += speed;
+          if (keys.q) delta.y -= speed;
+          rig.position.add(delta);
+          orbitTarget.add(delta);
+        }
+      }
+
+      if (skyDome.visible) {
+        const cam = renderer.xr.isPresenting ? renderer.xr.getCamera() : camera;
+        cam.getWorldPosition(tmpCamPos);
+        skyDome.position.copy(tmpCamPos);
+      }
+
+      renderer.render(scene, camera);
+    });
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Bootstrap catalog from models.json
+    (async function boot() {
+      try {
+        const resp = await fetch('./hub_models.json?v=2.0.0');
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        catalog = await resp.json();
+      } catch (err) {
+        console.warn('Could not fetch models.json, using fallback:', err);
+        catalog = [{
+          id: '9-tsubo-house',
+          title: '9-Tsubo House (Sumire Aoi)',
+          subtitle: 'Koizumi Studio · 1999',
+          url: './9_tsubo_house.glb?v=2.0.0',
+          standaloneUrl: './index.html',
+          sizeMB: 2.54,
+          badges: ['16 Interactive Rigs', 'Pocket Doors'],
+          defaultMood: 'day',
+          focusHouseOnly: true
+        }];
+      }
+      renderCatalogList('');
+      const reqId = URL_PARAMS.get('model');
+      const startIdx = reqId ? Math.max(0, catalog.findIndex((c) => c.id === reqId)) : 0;
+      loadModelEntry(startIdx);
+    })();
+  </script>
+</body>
+</html>
